@@ -64,7 +64,7 @@ app.use(express.static(path.join(path.dirname(__dirname), "client" ,"build")))
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(path.dirname(__dirname), "client" ,"build", "index.html"));
-})
+});
 
 app.post("/api/login", async (req, res) => {
   const {login, password} = req.body;
@@ -397,6 +397,10 @@ app.get("/api/admin/flags", async (req, res) => {
   }
 
   res.send(flags);
+})
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(path.dirname(__dirname), "client" ,"build", "index.html"));
 })
 
 app.listen(process.env.PORT || 3001, () => {
