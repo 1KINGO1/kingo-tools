@@ -1,1 +1,1 @@
-web: cd server && node index
+web: npm run start
