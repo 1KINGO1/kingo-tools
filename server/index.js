@@ -8,6 +8,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const {CLIENT_URL} = require("./config");
 const axios = require("axios");
+const path = require("path");
 mongoose.connect('mongodb+srv://fsdfsdfsdf:aYZdwxlnetcEVTzr@cluster0.epd8a.mongodb.net/kingo-tools?retryWrites=true&w=majority').then(() => {
   console.log("Database connected")
 });
@@ -59,6 +60,11 @@ app.use(cors({
   origin: CLIENT_URL,
   credentials: true,
 }));
+app.use(express.static(path.join(path.dirname(__dirname), "client" ,"build")))
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(path.dirname(__dirname), "client" ,"build", "index.html"));
+})
 
 app.post("/api/login", async (req, res) => {
   const {login, password} = req.body;
