@@ -201,8 +201,8 @@ app.post("/api/dcb/command", async (req, res) => {
   }
 
   try{
-    if (method === "get"){
-      const {data} = await axios.get(`https://discord.com/api/v9/${path}`, {headers: {
+    if (method === "get" || method === "delete"){
+      const {data} = await axios[method](`https://discord.com/api/v9/${path}`, {headers: {
           authorization: authToken
       }});
       res.send({err: false, message: data});

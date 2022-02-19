@@ -19,7 +19,7 @@ export const ResponsePreview: FC = () => {
         style={{resize: "none"}}
         placeholder="Discord API Response"
         disabled
-        value={response}
+        value={JSON.stringify(response) || response}
       />
     </StyledResponse>
   )

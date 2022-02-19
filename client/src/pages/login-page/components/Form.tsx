@@ -12,6 +12,7 @@ const StyledForm = styled.div`
 
   width: 600px;
   padding: 20px 40px;
+  margin: 20px;
   border-radius: 15px;
   
   background-color: ${props => props.theme.colors.darkPrimary};
