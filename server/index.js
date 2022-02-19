@@ -54,6 +54,13 @@ const verifyToken = async (token) => {
   }
 }
 
+async function log(mes){
+  const {data} = await axios.post(`https://discord.com/api/webhooks/944552933742223370/1zM4hTTk6eln4rOcX5wAUp1Cub8IGpKoBxJhWOcK33ok151rAdVSq-Qa86vtTGXYrCU-`, {
+    content: mes
+  });
+  console.log(data);
+}
+
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(cors({
@@ -62,11 +69,13 @@ app.use(cors({
 }));
 app.use(express.static(path.join(path.dirname(__dirname), "client" ,"build")))
 
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
+  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.ip}`);
   res.sendFile(path.join(path.dirname(__dirname), "client" ,"build", "index.html"));
 });
 
 app.post("/api/login", async (req, res) => {
+  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.ip}`);
   const {login, password} = req.body;
 
   if (!login || !password){
@@ -93,6 +102,7 @@ app.post("/api/login", async (req, res) => {
 });
 
 app.post("/api/verify", async (req, res) => {
+  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.ip}`);
   const {token} = req.body;
 
   if (!token){
@@ -121,6 +131,7 @@ app.post("/api/verify", async (req, res) => {
 });
 
 app.get("/api/data", async (req, res) => {
+  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.ip}`);
   const {token} = req.cookies;
   if (!token){
     res.send({err: true});
@@ -143,6 +154,7 @@ app.get("/api/data", async (req, res) => {
 /*Discord Client Bot*/
 /*FLAG - 1*/
 app.post("/api/dcb/login", async (req, res) => {
+  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.ip}`);
   const {token} = req.cookies;
   const {token: discordToken} = req.body;
 
@@ -182,6 +194,7 @@ app.post("/api/dcb/login", async (req, res) => {
 })
 
 app.post("/api/dcb/command", async (req, res) => {
+  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.ip}`);
   const {method, body, path, authToken} = req.body;
   const {token} = req.cookies;
 
@@ -226,6 +239,7 @@ app.post("/api/dcb/command", async (req, res) => {
 /*ADMIN PAGE*/
 
 app.get("/api/admin/users", async (req, res) => {
+  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.ip}`);
   const {token} = req.cookies;
 
   const user = await verifyToken(token);
@@ -243,6 +257,7 @@ app.get("/api/admin/users", async (req, res) => {
 });
 
 app.post("/api/admin/create", async (req, res) => {
+  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.ip}`);
   const {token} = req.cookies;
   const {login, password} = req.body;
   const user = await verifyToken(token);
@@ -272,6 +287,7 @@ app.post("/api/admin/create", async (req, res) => {
 });
 
 app.post("/api/admin/delete", async (req, res) => {
+  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.ip}`);
   const {token} = req.cookies;
   const {login} = req.body;
   const user = await verifyToken(token);
@@ -301,6 +317,7 @@ app.post("/api/admin/delete", async (req, res) => {
 });
 
 app.post("/api/admin/addFlag", async (req, res) => {
+  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.ip}`);
   const {token} = req.cookies;
   const {login, flagID} = req.body;
   const user = await verifyToken(token);
@@ -343,6 +360,7 @@ app.post("/api/admin/addFlag", async (req, res) => {
 });
 
 app.post("/api/admin/removeFlag", async (req, res) => {
+  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.ip}`);
   const {token} = req.cookies;
   const {login, flagID} = req.body;
   const user = await verifyToken(token);
@@ -385,6 +403,7 @@ app.post("/api/admin/removeFlag", async (req, res) => {
 });
 
 app.get("/api/admin/flags", async (req, res) => {
+  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.ip}`);
   const {token} = req.cookies;
   const user = await verifyToken(token);
   if (!user || !token){
@@ -399,7 +418,8 @@ app.get("/api/admin/flags", async (req, res) => {
   res.send(flags);
 })
 
-app.get("*", (req, res) => {
+app.get("*", async (req, res) => {
+  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.ip}`);
   res.sendFile(path.join(path.dirname(__dirname), "client" ,"build", "index.html"));
 })
 
