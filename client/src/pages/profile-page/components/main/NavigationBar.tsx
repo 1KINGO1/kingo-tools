@@ -1,18 +1,12 @@
 import {FC} from "react";
 import styled from "styled-components";
 import {Menu} from "antd";
-import {
-  BugOutlined,
-  ContactsOutlined,
-  ContainerOutlined,
-  CrownOutlined,
-  DesktopOutlined,
-  PieChartOutlined
-} from "@ant-design/icons";
-import {Link, Route} from "react-router-dom";
+import {CrownOutlined} from "@ant-design/icons";
+import {Link} from "react-router-dom";
 import config from "../../../../config/config";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../../store/store";
+import {User} from "../../../../store/actions/authActions";
 
 const StyledNavigation = styled.nav`
   width: 20%;
@@ -23,7 +17,7 @@ const StyledNavigation = styled.nav`
 
 export const NavigationBar: FC = () => {
 
-  const user = useSelector<RootState>(state => state.auth.user);
+  const user = useSelector<RootState>(state => state.auth.user) as User;
 
   return(
     <StyledNavigation>
@@ -39,7 +33,6 @@ export const NavigationBar: FC = () => {
         </Menu.Item>
         {
           config.pages.map((page,  index) => {
-            // @ts-ignore
             const isAllow = user.flags.some((flag: { id: number; }) => page.allowed.includes(flag.id));
             if (isAllow){
               return (
@@ -47,7 +40,7 @@ export const NavigationBar: FC = () => {
                   <Link to={`/profile/${page.link}`}>{page.name}</Link>
                 </Menu.Item>)
             }
-            else {return <></>};
+            else {return (<></>)};
           })
         }
       </Menu>

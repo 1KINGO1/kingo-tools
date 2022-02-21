@@ -1,7 +1,8 @@
-import React, {ChangeEvent, FC} from "react";
+import React, {FC} from "react";
 import styled from "styled-components";
 import {Checkbox, Tag} from "antd";
 import {addFlag, removeFlag} from "../../../../utils/adminAPI";
+import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
 const StyledAddFlag = styled.div<StyledProps>`
   position: absolute;
@@ -46,7 +47,21 @@ export const AddFlag: FC<AddFlagProps> = ({ x,
                                             includedFlags,
                                             updateUsers,
                                             login,
-                                            onClick}) => {
+                                            onClick }
+) => {
+
+  const changeHandler = (e: CheckboxChangeEvent, flag: Flag) => {
+    if (e.target.checked){
+      addFlag(login, flag.id).then(() =>  {
+        updateUsers();
+      })
+    }
+    else{
+      removeFlag(login, flag.id).then(() =>  {
+        updateUsers();
+      });
+    }
+  }
 
   return (
     <StyledAddFlag x={x} y={y} isShow={isShow} onClick={onClick}>
@@ -55,18 +70,7 @@ export const AddFlag: FC<AddFlagProps> = ({ x,
           <Checkbox key={flag.id}
                     style={{margin: "4px auto"}}
                     checked={flags.some(() => includedFlags.includes(flag.id))}
-                    onChange={(e) => {
-                      if (e.target.checked){
-                        addFlag(login, flag.id).then(() =>  {
-                          updateUsers();
-                        })
-                      }
-                      else{
-                        removeFlag(login, flag.id).then(() =>  {
-                          updateUsers();
-                        });
-                      }
-                    }}
+                    onChange={(e: CheckboxChangeEvent) => changeHandler(e, flag)}
           >
             <Tag color={flag.color} key={flag.id}>{flag.title}</Tag>
           </Checkbox>)

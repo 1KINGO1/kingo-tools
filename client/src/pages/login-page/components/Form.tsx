@@ -14,6 +14,8 @@ const StyledForm = styled.div`
   padding: 20px 40px;
   margin: 20px;
   border-radius: 15px;
+  position: relative;
+  z-index: 999999999;
   
   background-color: ${props => props.theme.colors.darkPrimary};
 `;

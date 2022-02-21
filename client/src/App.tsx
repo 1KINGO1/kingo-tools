@@ -4,11 +4,12 @@ import {LoginPage, Profile, Introduction} from "./pages";
 import {useSelector} from "react-redux";
 import {RootState} from "./store/store";
 import config from "./config/config";
+import {User} from "./store/actions/authActions";
 
 export const App: FC = () => {
 
   const isAuth = useSelector<RootState>(state => state.auth.isAuth);
-  const user = useSelector<RootState>(state => state.auth.user);
+  const user = useSelector<RootState>(state => state.auth.user) as User;
 
   return (
     <>
@@ -18,7 +19,6 @@ export const App: FC = () => {
           <Route path="/profile" element={<Profile/>}>
             <Route path="intro" element={<Introduction/>}/>
             {config.pages.map(page => {
-              // @ts-ignore
               const isAllow = user.flags.some((flag: { id: number; }) => page.allowed.includes(flag.id));
               if (isAllow){
                 return (<Route path={page.link} element={page.component}/>)

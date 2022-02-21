@@ -8,14 +8,16 @@ import {Exit} from "./Exit";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../../store/store";
 import {User} from "../../../../store/actions/authActions";
+import {motion} from "framer-motion";
 
-const StyledHeader = styled.header`
+const StyledHeader = styled(motion.header)`
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 20px;
   height: 9%;
   border-bottom: 10px solid ${props => props.theme.colors.grayBlack};
+  position: relative;
 `
 
 export const Header: FC = () => {

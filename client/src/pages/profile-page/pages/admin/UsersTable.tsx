@@ -13,14 +13,11 @@ interface User {
   flags: Array<any>
 }
 
-const StyledTable = styled.div`
-
-`;
+const StyledTable = styled.div``;
 
 const StyledTableFooter = styled.div`
   display: flex;
   justify-content: space-between;
-
   > * {
     margin: 0px 10px;
   }
@@ -30,18 +27,15 @@ const AddTag = styled.div`
   cursor: pointer;
   display: inline-block;
   align-items: center;
-
 `;
 
 export const UsersTable: FC = () => {
 
-  const [fetchedUsers, fetchUsers] = useState<User[] | null>(null);
+  const [fetchedUsers, setFetchedUsers] = useState<User[] | null>(null);
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
 
   const currentLogin = useSelector<RootState>(state => state.auth.user.login);
-
-  //Add Tag Menu
 
   const [x, setX] = useState(0);
   const [y, setY] = useState(0);
@@ -50,16 +44,25 @@ export const UsersTable: FC = () => {
   const [flagLogin, setFlagLogin] = useState("");
   const [includedFlags, setIncludedFlags] = useState<number[]>([]);
 
-  useEffect(() => {
+  const fetchUsers = (): void => {
     getUsers().then((data) => {
       if (!data.err) {
-        fetchUsers(data.users)
+        setFetchedUsers(data.users)
       } else {
-        fetchUsers(null);
+        setFetchedUsers(null);
       }
-    })
-  }, []);
+    });
+  };
 
+  const addFlagClickHandler = (e: MouseEvent<HTMLDivElement>) => {
+    setVisible(false);
+    e.stopPropagation();
+  }
+
+  //Fetching users
+  useEffect(fetchUsers, []);
+
+  //Fetching all flags
   useEffect(() => {
     getFlags().then(data => {
       if (!data.err) {
@@ -73,22 +76,15 @@ export const UsersTable: FC = () => {
   return (
     <StyledTable onClick={() => {setVisible(false)}}>
 
-      <AddFlag onClick={(e: MouseEvent<HTMLDivElement>) => {setVisible(false);e.stopPropagation()}}
+      <AddFlag onClick={addFlagClickHandler}
                x={x}
                y={y}
                isShow={isVisible}
                flags={flags || []}
                includedFlags={includedFlags}
                login={flagLogin}
-               updateUsers={() => {
-                 getUsers().then((data) => {
-                   if (!data.err) {
-                     fetchUsers(data.users)
-                   } else {
-                     fetchUsers(null);
-                   }
-                 })
-               }}/>
+               updateUsers={fetchUsers}
+      />
 
       {!fetchedUsers ?
         <LoadingOutlined style={{fontSize: 24}} spin/> :
@@ -99,17 +95,11 @@ export const UsersTable: FC = () => {
             createUser(login, password).then((data) => {
               if (data.err) {
                 message.error(data.message);
-              } else {
-                message.success("Успешно!");
-                getUsers().then((data) => {
-                  if (!data.err) {
-                    fetchUsers(data.users)
-                  } else {
-                    fetchUsers(null);
-                  }
-                })
               }
-              ;
+              else {
+                message.success("Успешно!");
+                fetchUsers();
+              }
             });
           }
 
@@ -159,13 +149,7 @@ export const UsersTable: FC = () => {
                   message.error(data.message);
                 } else {
                   message.success("Успешно!");
-                  getUsers().then((data) => {
-                    if (!data.err) {
-                      fetchUsers(data.users)
-                    } else {
-                      fetchUsers(null);
-                    }
-                  })
+                  fetchUsers();
                 }
                 ;
               })

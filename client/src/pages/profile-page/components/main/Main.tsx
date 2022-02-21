@@ -6,8 +6,9 @@ import {useDispatch} from "react-redux";
 import {loadData} from "../../../../utils/api";
 import {setData} from "../../../../store/actions/authActions";
 import {message} from "antd";
+import {motion} from "framer-motion";
 
-const StyledMain = styled.main`
+const StyledMain = styled(motion.main)`
   height: 91%;
   display: flex;
   justify-content: space-between;

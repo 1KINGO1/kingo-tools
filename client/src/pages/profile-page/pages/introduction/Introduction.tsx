@@ -4,9 +4,7 @@ import {Text} from "../../../../components/Text";
 import {AnimatedHand} from "./AnimatedHand";
 
 
-const StyledIntroduction = styled.div`
-  
-`
+const StyledIntroduction = styled.div``;
 
 export const Introduction: FC = () => {
   return(
