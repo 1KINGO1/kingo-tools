@@ -6,7 +6,7 @@ class Curve {
   private y: number;
   private speedX: number;
   private speedY: number;
-  private opacity: number = Math.random();
+  private opacity: number = Math.random() + 0.5;
 
   constructor(private ctx: CanvasRenderingContext2D,
               private maxW: number,
