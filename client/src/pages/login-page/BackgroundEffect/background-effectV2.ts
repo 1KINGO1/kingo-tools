@@ -6,6 +6,7 @@ class Curve {
   private y: number;
   private speedX: number;
   private speedY: number;
+  private opacity: number = Math.random();
 
   constructor(private ctx: CanvasRenderingContext2D,
               private maxW: number,
@@ -19,8 +20,8 @@ class Curve {
 
   render(){
     this.ctx.beginPath();
-    this.ctx.strokeStyle = "#1F1B24";
-    this.ctx.bezierCurveTo(-100, -100, this.x, this.y ,this.maxW + 100, this.maxH + 100);
+    this.ctx.strokeStyle = `rgba(31,27,36,${this.opacity})`;
+    this.ctx.bezierCurveTo(-+ this.maxW / 20, -this.maxH / 20, this.x, this.y ,this.maxW + this.maxW / 20, this.maxH + this.maxH / 20);
     this.ctx.stroke();
 
     this.move();
@@ -51,7 +52,7 @@ export class BackgroundEffect{
     this.canvas = canvas;
     this.ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
 
-    for (let i = 0; i < 160; i++){
+    for (let i = 0; i < 260; i++){
       this.curves.push(new Curve(this.ctx, this.canvas.width, this.canvas.height));
     }
   }
