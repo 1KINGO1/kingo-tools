@@ -14,8 +14,6 @@ class Particle {
 
   private ctx: CanvasRenderingContext2D;
 
-  // private footprints: Footprint[] = [];
-
   constructor(startX: number, startY: number, ctx: CanvasRenderingContext2D, maxW: number, maxH: number) {
     this.x = startX;
     this.y = startY;
@@ -25,12 +23,6 @@ class Particle {
 
     this.speedX = Math.random() * speedX * (Math.random() > .5 ? 1 : -1);
     this.speedY = Math.random() * speedY * (Math.random() > .5 ? 1 : -1);
-
-    // setTimeout(() => {
-    //   setInterval(() => {
-    //     this.clearLastFootprint();
-    //   }, 1000 / 60)
-    // }, 240)
   }
 
   render(){
@@ -43,7 +35,7 @@ class Particle {
   }
 
   private move(){
-    if (this.speedX <= 3 && this.speedY <= 3){
+    if (this.speedX <= 5 && this.speedY <= 5){
       if (this.x >= this.maxW || this.x <= 0){
         this.speedX = this.speedX * (-1);
       }
@@ -52,44 +44,11 @@ class Particle {
       }
     }
 
-    // this.renderAllFootprints();
-    // this.footprints.push(new Footprint(this.x, this.y, this.ctx));
-
     this.x += this.speedX;
     this.y += this.speedY;
   }
 
-  // clearLastFootprint(){
-  //   this.footprints.shift();
-  // }
-
-  // private renderAllFootprints(){
-  //   this.footprints.forEach(fp => {
-  //     fp.render();
-  //   })
-  // }
 }
-
-// class Footprint{
-//
-//   private x: number;
-//   private y: number;
-//
-//   private ctx: CanvasRenderingContext2D;
-//
-//   constructor(x: number, y: number, ctx: CanvasRenderingContext2D) {
-//     this.x = x;
-//     this.y = y;
-//     this.ctx = ctx;
-//   }
-//
-//   render(){
-//     this.ctx.beginPath();
-//     this.ctx.fillStyle  = "rgba(136,136,136,0.22)";
-//     this.ctx.arc(this.x, this.y, 5, 0, 2 * Math.PI);
-//     this.ctx.fill();
-//   }
-// }
 
 export class BackgroundEffect{
 
@@ -103,7 +62,7 @@ export class BackgroundEffect{
     this.canvas = canvas;
     this.ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
 
-    for (let i = 0; i < 120; i++){
+    for (let i = 0; i < 160; i++){
       this.particles.push(new Particle(Math.random() * this.canvas.width,
                                        Math.random() * this.canvas.height,
                                              this.ctx,

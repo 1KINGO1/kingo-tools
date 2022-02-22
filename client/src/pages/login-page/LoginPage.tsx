@@ -1,7 +1,8 @@
 import {FC, useEffect, useRef} from "react";
 import {Form} from "./components/Form";
 import styled from "styled-components";
-import {BackgroundEffect} from "./BackgroundEffect/background-effect";
+import {BackgroundEffect} from "./BackgroundEffect/background-effectV2";
+import {motion} from "framer-motion";
 
 const LoginSection = styled.section`
   width: 100vw;
@@ -12,7 +13,7 @@ const LoginSection = styled.section`
   position: relative;
 `;
 
-const StyledBackground = styled.canvas`
+const StyledBackground = styled(motion.canvas)`
   width: 100vw;
   height: 100vh;
   position: absolute;
@@ -36,7 +37,7 @@ export const LoginPage: FC = () => {
 
     return(
         <LoginSection>
-            <StyledBackground ref={canvas} width={window.innerWidth} height={window.innerHeight}/>
+            <StyledBackground ref={canvas} width={window.innerWidth} height={window.innerHeight} initial={{opacity: "0"}} animate={{opacity: "1"}}/>
             <Form />
         </LoginSection>
     )

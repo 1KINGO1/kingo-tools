@@ -13,7 +13,6 @@ const StyledForm = styled.div`
   width: 600px;
   padding: 20px 40px;
   margin: 20px;
-  border-radius: 15px;
   position: relative;
   z-index: 999999999;
   
