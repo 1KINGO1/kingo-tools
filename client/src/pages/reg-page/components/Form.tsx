@@ -1,7 +1,7 @@
 import {ChangeEvent, FC, useState, MouseEvent, useEffect} from "react";
 import styled from "styled-components";
-import {Button, Input, message} from "antd";
-import {UserOutlined, LockOutlined} from "@ant-design/icons";
+import {Button, Input, message, Spin} from "antd";
+import {UserOutlined, LockOutlined, MailOutlined, LoadingOutlined} from "@ant-design/icons";
 import {Text} from "../../../components/Text";
 import {login as accountLogin, verifyToken} from "../../../utils/api";
 import {useDispatch} from "react-redux";
@@ -18,13 +18,14 @@ const StyledForm = styled(motion.div)`
   margin: 20px;
   position: relative;
   z-index: 999999999;
-  
+
   background-color: ${props => props.theme.colors.darkPrimary};
 `;
 
 export const Form: FC = () => {
 
   const [login, setLogin] = useState("");
+  const [main, setMain] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -32,15 +33,14 @@ export const Form: FC = () => {
 
   useEffect(() => {
     const token = cookieService.getCookie("token");
-    if (token){
+    if (token) {
       setIsLoading(true);
       verifyToken(token).then(ver => {
-        if (!ver.err){
+        if (!ver.err) {
           dispatch(setToken(token));
           dispatch(auth());
           setIsLoading(false);
-        }
-        else{
+        } else {
           cookieService.deleteCookie("token");
           setIsLoading(false);
         }
@@ -51,14 +51,13 @@ export const Form: FC = () => {
   const clickHandler = async (e: MouseEvent<HTMLButtonElement>) => {
     setIsLoading(true);
     const res = await accountLogin(login, password);
-    if (res.err){
+    if (res.err) {
       message.error(res.message);
       setIsLoading(false);
       return
-    }
-    else{
+    } else {
       setIsLoading(false);
-      if (res.token){
+      if (res.token) {
         dispatch(setToken(res.token));
         cookieService.setCookie("token", res.token);
         message.success("Добро пожаловать!");
@@ -75,45 +74,60 @@ export const Form: FC = () => {
     setPassword(e.target.value);
   }
 
+  const onMailChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setMain(e.target.value);
+  }
+
   const isButtonEnable = !(login && password);
 
   return (
-    <StyledForm initial="initial" variants={fade as any} animate="show">
+    <Spin spinning={true} indicator={<LoadingOutlined />}>
+      <StyledForm initial="initial" variants={fade as any} animate="show">
 
-      <Text style={{padding: "5px 0 15px 5px", color: "mainWhite", fontSize: "22px", fontWeight: "500" }}>
-        Войдите
-      </Text>
+        <Text style={{padding: "5px 0 15px 5px", color: "mainWhite", fontSize: "22px", fontWeight: "500"}}>
+          Регистрация
+        </Text>
 
-      <Input
-        style={{margin: "5px 0"}}
-        size="large"
-        placeholder="Login"
-        prefix={<UserOutlined />}
-        onChange={onLoginChange}
-        value={login}
-      />
+        <Input
+          style={{margin: "5px 0"}}
+          size="large"
+          placeholder="Login"
+          prefix={<UserOutlined/>}
+          onChange={onLoginChange}
+          value={login}
+        />
 
-      <Input.Password
-        style={{margin: "5px 0"}}
-        size="large"
-        placeholder="Password"
-        prefix={<LockOutlined/>}
-        onChange={onPasswordChange}
-        value={password}
-      />
+        <Input
+          style={{margin: "5px 0"}}
+          size="large"
+          placeholder="E-mail"
+          prefix={<MailOutlined/>}
+          onChange={onMailChange}
+          value={main}
+        />
 
-      <div style={{display: "flex", alignItems: "center"}}>
-        <Button
-          style={{margin: "10px 0"}}
-          type="primary"
-          disabled={isButtonEnable || isLoading}
-          loading={isLoading}
-          onClick={clickHandler}
-        >
-          Войти
-        </Button>
-        <Text style={{margin: "0 20px", fontSize: "15px"}}>Нет аккаунта? <Link to="/registration">Зарегистрироватся</Link></Text>
-      </div>
-    </StyledForm>
+        <Input.Password
+          style={{margin: "5px 0"}}
+          size="large"
+          placeholder="Password"
+          prefix={<LockOutlined/>}
+          onChange={onPasswordChange}
+          value={password}
+        />
+        <div style={{display: "flex", alignItems: "center"}}>
+          <Button
+            style={{margin: "10px 0"}}
+            type="primary"
+            disabled={isButtonEnable || isLoading}
+            loading={isLoading}
+            onClick={clickHandler}
+          >
+            Зарегистрироватся
+          </Button>
+          <Text style={{margin: "0 20px", fontSize: "15px"}}>Есть аккаунт? <Link
+            to="/login">Войти</Link></Text>
+        </div>
+      </StyledForm>
+    </Spin>
   )
 }

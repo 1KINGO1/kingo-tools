@@ -3,11 +3,11 @@ const speedY = 10;
 
 class Particle {
 
-  private x: number;
-  private y: number;
+  x: number;
+  y: number;
 
-  private speedX: number;
-  private speedY: number;
+  speedX: number;
+  speedY: number;
 
   private readonly maxW: number;
   private readonly maxH: number;
@@ -27,7 +27,7 @@ class Particle {
 
   render(){
     this.ctx.beginPath();
-    this.ctx.fillStyle  = "#bfbfbf";
+    this.ctx.fillStyle  = "rgba(31,27,36,1)";
     this.ctx.arc(this.x, this.y, 5, 0, 2 * Math.PI);
     this.ctx.fill();
 
@@ -88,7 +88,26 @@ export class BackgroundEffect{
   private renderAllParticles(): void{
     this.particles.forEach(particle => {
       particle.render();
-    })
+    });
+    for (let particle_index = 0; particle_index < this.particles.length; particle_index++){
+      if (!this.particles[particle_index + 1]) break;
+      if (this.particles[particle_index].speedX > 5 ||
+          this.particles[particle_index].speedY > 5 ||
+          this.particles[particle_index + 1].speedX > 5 ||
+          this.particles[particle_index + 1].speedY > 5) {
+        continue;
+      }
+      this.ctx.beginPath();
+      this.ctx.strokeStyle = `rgba(31,27,36,1)`;
+      this.ctx.bezierCurveTo(
+        this.particles[particle_index].x,
+        this.particles[particle_index].y,
+        this.canvas.width / 2,
+        this.canvas.height /2,
+        this.particles[particle_index + 1].x,
+        this.particles[particle_index + 1].y);
+      this.ctx.stroke();
+    }
   }
 
   clearBackground(): void{

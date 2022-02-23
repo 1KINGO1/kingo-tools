@@ -1,11 +1,11 @@
 import {FC, useEffect, useRef} from "react";
-import {Form} from "./components/Form";
 import styled from "styled-components";
-import {BackgroundEffect} from "../../components/BackgroundEffect/background-effectV2";
 import {motion} from "framer-motion";
+import {Form} from "./components/Form";
+import {BackgroundEffect} from "../../components/BackgroundEffect/background-effect";
 import {Background} from "../../components/Background";
 
-const LoginSection = styled(motion.section)`
+const RegSection = styled(motion.section)`
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -15,7 +15,8 @@ const LoginSection = styled(motion.section)`
   overflow: hidden;
 `;
 
-export const LoginPage: FC = () => {
+
+export const RegistrationPage: FC = () =>  {
 
   let canvas = useRef<any>(null);
 
@@ -29,15 +30,15 @@ export const LoginPage: FC = () => {
     }
   }, [canvas])
 
-  return (
-    <LoginSection initial={{opacity: 0}}
-                  animate={{opacity: 1}}
-                  exit={{opacity: 0}}>
+  return(
+    <RegSection initial={{opacity: 0}}
+                animate={{opacity: 1}}
+                exit={{opacity: 0}}>
       <Background ref={canvas}
                   width={window.innerWidth}
                   height={window.innerHeight}
       />
-      <Form/>
-    </LoginSection>
+      <Form />
+    </RegSection>
   )
 }
