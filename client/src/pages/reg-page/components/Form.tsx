@@ -3,13 +3,13 @@ import styled from "styled-components";
 import {Button, Input, message, Spin} from "antd";
 import {UserOutlined, LockOutlined, MailOutlined, LoadingOutlined} from "@ant-design/icons";
 import {Text} from "../../../components/Text";
-import {login as accountLogin, verifyToken} from "../../../utils/api";
+import {register, verifyToken} from "../../../utils/api";
 import {useDispatch} from "react-redux";
 import {auth, setToken} from "../../../store/actions/authActions";
 import {cookieService} from "../../../utils/cookie";
 import {motion} from "framer-motion";
 import {fade} from "../../../styles/variants/Fade";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 
 const StyledForm = styled(motion.div)`
 
@@ -30,6 +30,7 @@ export const Form: FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const dispatch = useDispatch();
+  const navigator = useNavigate();
 
   useEffect(() => {
     const token = cookieService.getCookie("token");
@@ -46,23 +47,18 @@ export const Form: FC = () => {
         }
       });
     }
-  }, [])
+  }, []);
 
   const clickHandler = async (e: MouseEvent<HTMLButtonElement>) => {
     setIsLoading(true);
-    const res = await accountLogin(login, password);
-    if (res.err) {
-      message.error(res.message);
-      setIsLoading(false);
-      return
-    } else {
-      setIsLoading(false);
-      if (res.token) {
-        dispatch(setToken(res.token));
-        cookieService.setCookie("token", res.token);
-        message.success("Добро пожаловать!");
-        dispatch(auth());
-      }
+    const data = await register(login, password);
+    setIsLoading(false);
+    if (data.err){
+      message.error(data.message);
+    }
+    else{
+      message.success("Успешно!");
+      navigator("/login");
     }
   }
 
@@ -81,7 +77,7 @@ export const Form: FC = () => {
   const isButtonEnable = !(login && password);
 
   return (
-    <Spin spinning={true} indicator={<LoadingOutlined />}>
+    <Spin spinning={false} indicator={<LoadingOutlined />}>
       <StyledForm initial="initial" variants={fade as any} animate="show">
 
         <Text style={{padding: "5px 0 15px 5px", color: "mainWhite", fontSize: "22px", fontWeight: "500"}}>
@@ -95,15 +91,6 @@ export const Form: FC = () => {
           prefix={<UserOutlined/>}
           onChange={onLoginChange}
           value={login}
-        />
-
-        <Input
-          style={{margin: "5px 0"}}
-          size="large"
-          placeholder="E-mail"
-          prefix={<MailOutlined/>}
-          onChange={onMailChange}
-          value={main}
         />
 
         <Input.Password

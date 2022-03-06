@@ -2,10 +2,18 @@ import config from "../config/config";
 import axios from "axios";
 import {User} from "../store/actions/authActions";
 
-interface loginResponse{
+interface registerResponse{
   err: boolean,
-  message?: string,
+  message?: string
+}
+
+interface loginResponse extends registerResponse{
   token?: string
+}
+
+export const register = async (login: string, password: string): Promise<registerResponse> => {
+  const {data} = await axios.post(config.API_URL + "/registration", {login, password});
+  return data;
 }
 
 export const login = async (login: string, password: string): Promise<loginResponse> => {

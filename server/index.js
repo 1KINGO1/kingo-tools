@@ -101,6 +101,32 @@ app.post("/api/login", async (req, res) => {
   res.send({err: false, token});
 });
 
+app.post("/api/registration", async (req, res) => {
+  const {login, password} = req.body;
+
+  if (!login || !password){
+    res.send({err: true, message: "Заполните все поля!"});
+    return;
+  }
+
+  if (password.length < 10){
+    res.send({err: true, message: "Пароль должен содержать больше 9-ти символов!"});
+    return;
+  }
+
+  const checkUser = await User.findOne({login});
+
+  if (checkUser){
+    res.send({err: true, message: "Логин занят."});
+    return;
+  }
+
+  const user = new User({login, password, flags: []});
+  await user.save();
+
+  res.send({err: false});
+})
+
 app.post("/api/verify", async (req, res) => {
   await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.headers['x-forwarded-for']?.split(',').shift()}`);
   const {token} = req.body;
