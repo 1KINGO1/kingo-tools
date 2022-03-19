@@ -1,6 +1,6 @@
 import {DefaultTheme} from "styled-components";
 
-export const mainTheme: DefaultTheme = {
+export const mainTheme: DefaultTheme | any = {
   colors: {
     "grayBlack": "#121212",
     "dark": "#070707",
