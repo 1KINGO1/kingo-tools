@@ -37,13 +37,15 @@ export const App: FC = () => {
                         <>
                             <Route path="/login" element={<LoginPage/>}/>
                             <Route path="/registration" element={<RegistrationPage/>}/>
+                            <Route path="/bio" element={<Bio/>}/>
                         </>
                     )}
-                    <Route path="/bio" element={<Bio/>}/>
                     <Route path="*" element={<Navigate to={isAuth ? "/profile/intro" : "/login"}/>}/>
                 </Routes>
             </AnimatePresence>
-            <BioButton />
+            {
+                ["/login", "/password", "/bio"].includes(location.pathname) ? <BioButton /> : ""
+            }
         </>
     )
 }

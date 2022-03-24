@@ -8,7 +8,8 @@ export interface Flag{
 
 export interface User {
   login: string,
-  flags: Array<Flag>
+  flags: Array<Flag>,
+  discord: Object
 }
 
 export const setToken = createAction<string>("AUTH/SET_TOKEN");

@@ -4,7 +4,7 @@ import {NavigationBar} from "./NavigationBar";
 import {ViewContent} from "./ViewContent";
 import {useDispatch} from "react-redux";
 import {loadData} from "../../../../utils/api";
-import {setData} from "../../../../store/actions/authActions";
+import {removeAuth, setData} from "../../../../store/actions/authActions";
 import {message} from "antd";
 import {motion} from "framer-motion";
 
@@ -21,7 +21,8 @@ export const Main: FC = () => {
   useEffect(() => {
     loadData().then((data) => {
       if ("err" in data){
-        message.error("Ошибка получения данных!")
+        message.error("Ошибка получения данных!");
+        dispatch(removeAuth());
       }
       else{
         dispatch(setData(data));

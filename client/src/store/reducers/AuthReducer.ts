@@ -12,7 +12,8 @@ const initialState = {
   token: null,
   user: {
     login: "",
-    flags: []
+    flags: [],
+    discord: {}
   }
 }
 
