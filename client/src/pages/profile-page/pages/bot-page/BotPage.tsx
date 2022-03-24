@@ -16,7 +16,7 @@ export const BotPage: FC = () => {
     }
 
     return (
-        Object.keys(discord).length === 0 ? <Result
+        Object.keys(discord || {}).length === 0 ? <Result
             status="warning"
             title="Перед использованием данного функционала войдите в свой аккаунт Discord"
             extra={
