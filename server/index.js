@@ -4,9 +4,8 @@ const {createToken, decodeToken} = require("./utils");
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
-
 const mongoose = require('mongoose');
-const {CLIENT_URL} = require("./config");
+const {CLIENT_URL, REDIRECT_URL} = require("./config");
 const axios = require("axios");
 const path = require("path");
 mongoose.connect('mongodb+srv://fsdfsdfsdf:aYZdwxlnetcEVTzr@cluster0.epd8a.mongodb.net/kingo-tools?retryWrites=true&w=majority').then(() => {
@@ -30,6 +29,7 @@ const User = mongoose.model('User', {
   login: String,
   password: String,
   flags: Array,
+  discord: Object
 });
 
 const verifyToken = async (token) => {
@@ -121,7 +121,7 @@ app.post("/api/registration", async (req, res) => {
     return;
   }
 
-  const user = new User({login, password, flags: []});
+  const user = new User({login, password, flags: [], discord: {}});
   await user.save();
 
   res.send({err: false});
@@ -173,8 +173,40 @@ app.get("/api/data", async (req, res) => {
     res.send({err: true});
     return;
   };
-  res.send({login: user.login, flags: user.flags});
 
+  if (Object.keys(user.discord).length > 0) {
+    delete user.discord.guilds;
+    res.send({login: user.login, flags: user.flags, discord: user.discord});
+  }
+  else{
+    res.send({login: user.login, flags: user.flags, discord: user.discord});
+  }
+
+});
+
+app.get("/api/fetchGuilds", async (req, res) => {
+  const {token} = req.cookies;
+  if (!token){
+    res.send({err: true});
+    return;
+  }
+
+  let user;
+
+  try{
+    const decode = await decodeToken(token);
+    user = await User.findOne({login: decode.login});
+  }catch (e) {
+    res.send({err: true});
+    return;
+  };
+
+  if (Object.keys(user.discord).length === 0){
+    res.send({err: true});
+    return;
+  }
+
+  res.send({err: false, guilds: user.discord.guilds.filter(guild => guild.owner)});
 })
 
 /*Discord Client Bot*/
@@ -307,7 +339,7 @@ app.post("/api/admin/create", async (req, res) => {
     return;
   }
 
-  const newUser = new User({login, password, flags: []});
+  const newUser = new User({login, password, flags: [], discord: {}});
   await newUser.save();
   res.send({err: false});
 });
@@ -442,6 +474,78 @@ app.get("/api/admin/flags", async (req, res) => {
   }
 
   res.send(flags);
+});
+
+app.post("/api/discord", async (req, res) => {
+  const {token} = req.cookies;
+  const {code} = req.body;
+
+  const user = await verifyToken(token);
+  if (!user || !token){
+    res.send({err: true, message: "Укажите токен!"});
+    return;
+  }
+  if (!user.flags.some(flag => flag.id === 1)){
+    res.send({err: true, message: "Вы не можете использовать этот функционал!"});
+    return;
+  }
+  if (Object.keys(user.discord).length > 0){
+    res.send({err: true, message: "Discord аккаунт уже привязан"});
+    return;
+  }
+  if (!code){
+    res.send({err: true, message: ""});
+    return;
+  }
+
+  const params = new URLSearchParams()
+  params.append('client_id', '956507803395178549');
+  params.append('client_secret', 'fo2R8GvvwpvVROrXu_LyRoQwnXrfuddb');
+  params.append('grant_type', 'authorization_code');
+  params.append('code', code);
+  params.append('redirect_uri', REDIRECT_URL);
+
+  let type = null;
+  let discordToken = null;
+
+  axios.post("https://discord.com/api/oauth2/token", params,{
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    }
+  }).then(async ({data}) => {
+
+    type = data.token_type;
+    discordToken = data.access_token;
+
+    axios.get("https://discord.com/api/users/@me", {
+      headers:{
+        "Authorization": `${type} ${discordToken}`
+      }
+    }).then(async ({data: userData}) => {
+
+              const {data: guilds} = await axios.get("https://discord.com/api/users/@me/guilds", {
+                headers:{
+                  "Authorization": `${type} ${discordToken}`
+                }
+              });
+
+              user.discord = {...userData, guilds};
+              await user.save();
+              res.send({err: false})
+
+
+
+
+       }).catch((e) => {
+              res.send({err: true, message: "Ошибка"})
+              console.log(e);
+       })
+    }).catch((e) => {
+
+      res.send({err: true, message: "Ошибка"})
+
+    });
+
 })
 
 app.get("*", async (req, res) => {
