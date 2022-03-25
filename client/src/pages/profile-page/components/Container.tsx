@@ -8,6 +8,7 @@ const StyledContainer = styled.div`
   border-radius: 30px;
   
   background-color: ${props => props.theme.colors.darkPrimary};
+  overflow: hidden;
 `
 
 export const Container: FC = ({ children }) => {

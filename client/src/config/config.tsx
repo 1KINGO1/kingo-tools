@@ -1,5 +1,6 @@
 import {BugOutlined, FireOutlined, LoadingOutlined, ThunderboltOutlined} from "@ant-design/icons";
 import React from "react";
+import {AntiScamLinks} from "../pages/profile-page/pages/bot-page/pages/AntiScamLinks";
 
 const DiscordClientBot = React.lazy(() =>
     import('../pages/profile-page/pages/discordClientBot/DiscordClientBot')
@@ -44,6 +45,12 @@ export default {
             component: <React.Suspense
                 fallback={<LoadingOutlined style={{fontSize: 24}} spin/>}><Admin/></React.Suspense>,
             icon: <FireOutlined/>
+        }
+    ],
+    botSubPages: [
+        {
+            link: "asl",
+            component: <AntiScamLinks />
         }
     ]
 }

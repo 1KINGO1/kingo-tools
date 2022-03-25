@@ -12,24 +12,28 @@ import {
   REGISTER, persistCombineReducers,
 } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
+import {botReducer} from "./reducers/BotReducer";
 
-const rootReducer = combineReducers({
-  auth: authReducer,
-  dcb: DCBReducer
-})
-
-const persistConfig = {
-  key: 'root',
+const persistConfigAuth = {
+  key: 'auth',
   storage,
   whitelist: ["isAuth", "token"]
-}
+};
+const persistConfigBot = {
+  key: 'bot',
+  storage,
+  whitelist: ["currentGuild"]
+};
 
-const persistedReducerAuth = persistReducer(persistConfig, authReducer)
+const persistedReducerAuth = persistReducer(persistConfigAuth, authReducer);
+const persistedReducerBot = persistReducer(persistConfigBot, botReducer);
+
 
 export const store = configureStore({
   reducer: {
     auth: persistedReducerAuth,
-    dcb: DCBReducer
+    dcb: DCBReducer,
+    bot: botReducer
   },
   middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({

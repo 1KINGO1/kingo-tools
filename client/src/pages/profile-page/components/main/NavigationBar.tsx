@@ -24,10 +24,9 @@ export const NavigationBar: FC = () => {
   return(
     <StyledNavigation>
       <Menu
-        defaultSelectedKeys={['0']}
         mode="inline"
         theme="dark"
-        selectedKeys={[config.pages.filter(page => "/profile/" + page.link === window.location.pathname).map(page => page.key).join("") || "0"]}
+        selectedKeys={[config.botSubPages.filter(page => "/profile/" + page.link === window.location.pathname).map(page => page.link).join("") ? "999" : config.pages.filter(page => "/profile/" + page.link === window.location.pathname).map(page => page.key).join("") || "0"]}
         style={{backgroundColor: "#1F1B24", width: "100%"}}
       >
         <Menu.Item key="0" icon={<CrownOutlined />}>

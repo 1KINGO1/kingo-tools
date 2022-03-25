@@ -1,6 +1,8 @@
 import {FC} from "react";
 import styled from "styled-components";
 import {Text} from "../../../../../components/Text";
+import {useDispatch} from "react-redux";
+import {setGuild} from "../../../../../store/actions/botActions";
 
 const StyledGuildWrapper = styled.div`
   margin: 20px;
@@ -28,9 +30,16 @@ const StyledGuildBox = styled.div<any>`
 `;
 
 export const Guild: FC<any> = (props) => {
+
+    const dispatch = useDispatch();
+
+    const clickHandler = () => {
+        dispatch(setGuild(props.guildId))
+    }
+
     return (
         <StyledGuildWrapper>
-            <StyledGuildBox {...props} />
+            <StyledGuildBox {...props} onClick={clickHandler}/>
             <Text style={{textAlign: "center", color: "white", fontSize: "12px", fontWeight: 500}}>
                 {props.title}
             </Text>

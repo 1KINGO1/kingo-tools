@@ -15,6 +15,7 @@ export const App: FC = () => {
 
     const isAuth = useSelector<RootState>(state => state.auth.isAuth);
     const user = useSelector<RootState>(state => state.auth.user) as User;
+    const guildId = useSelector<RootState>(state => state.bot.currentGuild);
 
     return (
         <>
@@ -32,6 +33,9 @@ export const App: FC = () => {
                                 }
                                 ;
                             })}
+                            {guildId ? config.botSubPages.map(page => {
+                                return (<Route path={page.link} element={page.component}/>)
+                            }) : ""}
                         </Route>
                     ) : (
                         <>

@@ -70,4 +70,11 @@ export const fetchGuilds = async () => {
     withCredentials: true
   });
   return data;
-}
+};
+
+export const fetchGuildData = async (id: string) => {
+  const {data} = await axios.get(config.API_URL + "/fetchGuildData?serverId=" + id,{
+    withCredentials: true
+  });
+  return data;
+};

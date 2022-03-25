@@ -23,7 +23,9 @@ const flags = [
     title: "Admin",
     color: "gold"
   }
-]
+];
+
+const BOT_TOKEN = "OTU2NTA3ODAzMzk1MTc4NTQ5.YjxPTw.mwPbEQWwBMaUleOPvLjYmh0QNj0";
 
 const User = mongoose.model('User', {
   login: String,
@@ -31,6 +33,13 @@ const User = mongoose.model('User', {
   flags: Array,
   discord: Object
 });
+
+const Guild = mongoose.model("Server", {
+  id: String,
+  owner_id: String,
+  options: Object,
+  data: Object
+})
 
 const verifyToken = async (token) => {
   if (!token){
@@ -174,7 +183,7 @@ app.get("/api/data", async (req, res) => {
     return;
   };
 
-  if (Object.keys(user.discord).length > 0) {
+  if (Object.keys(user.discord || {}).length > 0) {
     delete user.discord.guilds;
     res.send({login: user.login, flags: user.flags, discord: user.discord});
   }
@@ -206,7 +215,42 @@ app.get("/api/fetchGuilds", async (req, res) => {
     return;
   }
 
-  res.send({err: false, guilds: user.discord.guilds.filter(guild => guild.owner)});
+  //refreshing guilds
+  let discordToken = null;
+  let refreshToken = null;
+
+  const params = new URLSearchParams()
+  params.append('client_id', '956507803395178549');
+  params.append('client_secret', 'fo2R8GvvwpvVROrXu_LyRoQwnXrfuddb');
+  params.append('grant_type', 'refresh_token');
+  params.append('refresh_token', user.discord.refreshToken)
+
+  axios.post("https://discord.com/api/oauth2/token", params, {
+    'Content-Type': 'application/x-www-form-urlencoded'
+  }).then(async ({data}) => {
+    discordToken = data.access_token;
+    refreshToken = data.refresh_token;
+
+    console.log(refreshToken);
+    console.log(discordToken);
+
+    user.discord = {...user.discord, refreshToken};
+    await user.save();
+
+    const {data: guilds} = await axios.get("https://discord.com/api/users/@me/guilds", {
+      headers:{
+        "Authorization": `Bearer ${discordToken}`
+      }
+    });
+
+    user.discord.guilds = guilds;
+    await user.save();
+
+    res.send({err: false, guilds: user.discord.guilds.filter(guild => guild.owner)});
+
+  }).catch((e) => {
+    res.send({err: true, message: "Ошибка обновления серверов"})
+  })
 })
 
 /*Discord Client Bot*/
@@ -476,6 +520,7 @@ app.get("/api/admin/flags", async (req, res) => {
   res.send(flags);
 });
 
+//Link Discord
 app.post("/api/discord", async (req, res) => {
   const {token} = req.cookies;
   const {code} = req.body;
@@ -507,6 +552,7 @@ app.post("/api/discord", async (req, res) => {
 
   let type = null;
   let discordToken = null;
+  let refreshToken = null;
 
   axios.post("https://discord.com/api/oauth2/token", params,{
     headers: {
@@ -516,6 +562,8 @@ app.post("/api/discord", async (req, res) => {
 
     type = data.token_type;
     discordToken = data.access_token;
+    refreshToken = data.refresh_token;
+
 
     axios.get("https://discord.com/api/users/@me", {
       headers:{
@@ -529,7 +577,7 @@ app.post("/api/discord", async (req, res) => {
                 }
               });
 
-              user.discord = {...userData, guilds};
+              user.discord = {...userData, guilds, refreshToken};
               await user.save();
               res.send({err: false})
 
@@ -546,6 +594,42 @@ app.post("/api/discord", async (req, res) => {
 
     });
 
+})
+
+//Fetch Server Data
+app.get("/api/fetchGuildData", async (req, res) => {
+  const {token} = req.cookies;
+  const {serverId} = req.query;
+
+  const user = await verifyToken(token);
+  if (!user || !token){
+    res.send({err: true, message: "Укажите токен!"});
+    return;
+  }
+  if (!user.flags.some(flag => flag.id === 1)){
+    res.send({err: true, message: "Вы не можете использовать этот функционал!"});
+    return;
+  }
+  if (Object.keys(user.discord).length === 0){
+    res.send({err: true, message: "Discord аккаунт не привязан"});
+    return;
+  }
+
+  if(!user.discord.guilds.find(guild => guild.id === serverId)){
+    res.send({err: true, message: "Вы не владеете данным серверов"});
+    return;
+  }
+
+  let guild = await Guild.findOne({id: serverId});
+
+  if (!guild){
+    res.send({err: false, message: "Добавьте бота на сервер"});
+    return;
+  }
+  else{
+    res.send({err: false, guild});
+    return;
+  }
 })
 
 app.get("*", async (req, res) => {
