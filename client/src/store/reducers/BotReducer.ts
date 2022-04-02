@@ -1,12 +1,15 @@
 import {createReducer} from "@reduxjs/toolkit";
-import {removeGuild, setGuild} from "../actions/botActions";
+import {removeGuild, setGuild, setGuildData} from "../actions/botActions";
+import {Guild} from "../../types/Guild";
 
 interface State{
-    currentGuild: string
+    currentGuild: string,
+    guildData: Guild | null
 };
 
 const initialState: State = {
-    currentGuild: ""
+    currentGuild: "",
+    guildData: null
 };
 
 export const botReducer = createReducer(initialState, {
@@ -15,5 +18,8 @@ export const botReducer = createReducer(initialState, {
     },
     [removeGuild.type]: (state) => {
         state.currentGuild = "";
+    },
+    [setGuildData.type]: (state, action) => {
+        state.guildData = action.payload
     }
 });

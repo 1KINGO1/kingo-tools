@@ -78,3 +78,29 @@ export const fetchGuildData = async (id: string) => {
   });
   return data;
 };
+
+export const toggleModule = async (moduleName: string, guildId: string, action: "on_module" | "off_module") => {
+  const {data} = await axios.post(config.API_URL + "/config",{
+    type: action,
+    payload: "none",
+    guild_id: guildId || "none",
+    module: moduleName || "none",
+    property: "none"
+  },{
+    withCredentials: true
+  });
+  return data;
+};
+
+export const defineProperty = async (payload: any, guildId: string, moduleName: string, property:string) => {
+  const {data} = await axios.post(config.API_URL + "/config",{
+    type: "change_field",
+    payload,
+    guild_id: guildId || "none",
+    module: moduleName || "none",
+    property: property || "none"
+  },{
+    withCredentials: true
+  });
+  return data;
+}

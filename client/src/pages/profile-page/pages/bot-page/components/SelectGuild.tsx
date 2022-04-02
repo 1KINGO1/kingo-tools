@@ -1,8 +1,8 @@
 import {FC, useEffect, useState} from "react";
 import {fetchGuilds} from "../../../../../utils/api";
-import {LoadingOutlined} from "@ant-design/icons";
 import {Guild} from "./Guild";
 import styled from "styled-components";
+import {Loading} from "../../../../../components/Loading";
 
 const GuildWrapper = styled.div`
   display: flex;
@@ -25,7 +25,7 @@ export const SelectGuild:FC = () => {
     }, [])
 
     return (
-        load ? <LoadingOutlined /> :
+        load ? <Loading /> :
             <GuildWrapper>
                 {guilds.map((guild, index) => <Guild key={index}
                                                              guildId={guild.id}

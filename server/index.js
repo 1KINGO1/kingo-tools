@@ -632,6 +632,113 @@ app.get("/api/fetchGuildData", async (req, res) => {
   }
 })
 
+//editing server config
+app.post("/api/config", async (req, res) => {
+
+  /* ==== req body structure ====
+
+
+  * type => change_field | on_module | off_module
+  * payload => something data
+  * guild_id => guild id
+  * module => module name in database
+  * property => module property to change
+  *
+  * */
+
+  const {token} = req.cookies;
+
+  const {type, payload, guild_id, module, property} = req.body;
+
+  const user = await verifyToken(token);
+  if (!user || !type || (!payload && typeof payload !== "boolean") || !guild_id || !module || !property){
+    res.send({err: true, message: "Incorrect form data"});
+    return;
+  }
+  if (!user.flags.some(flag => flag.id === 1)){
+    res.send({err: true, message: "Вы не можете использовать этот функционал!"});
+    return;
+  }
+  if (Object.keys(user.discord).length === 0){
+    res.send({err: true, message: "Discord аккаунт не привязан"});
+    return;
+  }
+
+  if(!user.discord.guilds.find(guild => guild.id === guild_id)){
+    res.send({err: true, message: "Вы не владеете данным серверов"});
+    return;
+  }
+
+  let guild = await Guild.findOne({id: guild_id});
+
+  if(!guild){
+    res.send({err: true, message: "Сервер не найден"});
+    return;
+  }
+
+  if (!guild.options.hasOwnProperty(module)){
+    res.send({err: true, message: "Модуль не найден!"});
+    return;
+  }
+
+  switch (type) {
+    case "change_field":
+
+      if (!guild.options[module].hasOwnProperty(property)){
+        res.send({err: true, message: "Свойство не найдено!"});
+        return;
+      }
+
+      if (typeof guild.options[module][property] !== typeof payload){
+        res.send({err: true, message: "Неверные данные для изменения!"});
+        return;
+      }
+
+      if (property === "punishment"){
+        switch (true){
+          case ("name" in payload):
+            guild.options = {...guild.options, [module]: {...guild.options[module], [property]: {...guild.options[module][property], name: payload.name}}}
+            break;
+          case ("duration" in payload):
+            guild.options = {...guild.options, [module]: {...guild.options[module], [property]: {...guild.options[module][property], duration: payload.duration}}}
+            break;
+          case ("reason" in payload):
+            guild.options = {...guild.options, [module]: {...guild.options[module], [property]: {...guild.options[module][property], reason: payload.reason}}}
+            break;
+        }
+        await guild.save();
+        res.send({err: false})
+      }
+      else{
+        guild.options = {...guild.options, [module]: {...guild.options[module], [property]: payload}}
+
+        await guild.save();
+        res.send({err: false})
+      }
+
+      break;
+
+    case "on_module":
+      guild.options = {...guild.options, [module]: {...guild.options[module], on: true}};
+      guild.save().then(() => {
+        res.send({err: false})
+      });
+      break;
+
+    case "off_module":
+      guild.options = {...guild.options, [module]: {...guild.options[module], on: false}};
+      guild.save().then(() => {
+        res.send({err: false})
+      });
+      break;
+
+    default:
+      res.send({err: true, message: "Action не найден!"});
+      return;
+  }
+
+})
+
 app.get("*", async (req, res) => {
   await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.headers['x-forwarded-for']?.split(',').shift()}`);
   res.sendFile(path.join(path.dirname(__dirname), "client" ,"build", "index.html"));

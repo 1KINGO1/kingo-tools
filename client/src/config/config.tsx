@@ -1,6 +1,7 @@
 import {BugOutlined, FireOutlined, LoadingOutlined, ThunderboltOutlined} from "@ant-design/icons";
 import React from "react";
-import {AntiScamLinks} from "../pages/profile-page/pages/bot-page/pages/AntiScamLinks";
+import {AntiScamLinks} from "../pages/profile-page/pages/bot-page/bot-modules/AntiScamLinks";
+import {Loading} from "../components/Loading";
 
 const DiscordClientBot = React.lazy(() =>
     import('../pages/profile-page/pages/discordClientBot/DiscordClientBot')
@@ -25,7 +26,7 @@ export default {
             allowed: [1],
             link: "dcb",
             component: <React.Suspense
-                fallback={<LoadingOutlined style={{fontSize: 24}} spin/>}><DiscordClientBot/></React.Suspense>,
+                fallback={<Loading />}><DiscordClientBot/></React.Suspense>,
             icon: <BugOutlined/>
         },
         {
@@ -34,7 +35,7 @@ export default {
             allowed: [1],
             link: "bot",
             component: <React.Suspense
-                fallback={<LoadingOutlined style={{fontSize: 24}} spin/>}><Bot/></React.Suspense>,
+                fallback={<Loading />}><Bot/></React.Suspense>,
             icon: <ThunderboltOutlined/>
         },
         {
@@ -43,7 +44,7 @@ export default {
             allowed: [2],
             link: "admin",
             component: <React.Suspense
-                fallback={<LoadingOutlined style={{fontSize: 24}} spin/>}><Admin/></React.Suspense>,
+                fallback={<Loading />}><Admin/></React.Suspense>,
             icon: <FireOutlined/>
         }
     ],
