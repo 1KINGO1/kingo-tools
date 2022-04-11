@@ -1,3 +1,5 @@
+import {Command} from "./Command";
+
 export interface Guild{
     id: string,
     owner_id: string,
@@ -7,15 +9,16 @@ export interface Guild{
             on: boolean,
             cssChecker: boolean,
             websiteIconChecker: boolean,
-            inSiteBlackWordsList: Array<string>,
-            inSiteTitleBlackWordsList: Array<string>,
-            blackListWords: Array<string>,
+            inSiteBlackWordsList: string[],
+            inSiteTitleBlackWordsList: string[],
+            blackListWords: string[],
             punishment: {
                 name: "timeout" | "ban" | "none",
                 reason: string,
                 duration: number
             }
-        }
+        },
+        commands: Command[]
     },
     data: {
         name: string,

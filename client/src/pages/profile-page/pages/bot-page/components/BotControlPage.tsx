@@ -78,10 +78,14 @@ export const BotControlPage: FC = () => {
                 <ModuleButton title="AntiScamLink"
                               value="antiScamLinks"
                               checked={guild?.options.antiScamLinks.on || false}
+                              canCheck={true}
                               link="asl"
                 />
-                <ModuleButton title="AntiScamLink" checked={false} link="asl" value={"1"}/>
-                <ModuleButton title="AntiScamLink" checked={false} link="asl" value={"1"}/>
+                <ModuleButton title="Commands"
+                              value="commands"
+                              canCheck={false}
+                              link="commands"
+                />
             </Buttons>
         </>
     )

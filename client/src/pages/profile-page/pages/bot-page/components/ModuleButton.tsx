@@ -11,8 +11,9 @@ import {toggleModule} from "../../../../../utils/api";
 interface Props{
     title: string,
     link: string,
-    checked: boolean,
-    value: string
+    checked?: boolean,
+    value: string,
+    canCheck: boolean
 }
 
 const StyledButton = styled.div`
@@ -25,7 +26,7 @@ const StyledButton = styled.div`
   margin: 10px;
 `;
 
-export const ModuleButton: FC<Props> = ({title, link, checked, value}) => {
+export const ModuleButton: FC<Props> = ({title, link, checked, value, canCheck}) => {
 
     const guild_id = useSelector<RootState>(state => state.bot.currentGuild) as string;
 
@@ -58,7 +59,7 @@ export const ModuleButton: FC<Props> = ({title, link, checked, value}) => {
             <Text style={{fontSize: "16px", fontWeight: "500"}}>
                 {title}
             </Text>
-            <Switch checked={isChecked} onChange={changeHandler} loading={load} style={{margin: "0 0 0 10px"}}/>
+            {canCheck ? <Switch checked={isChecked} onChange={changeHandler} loading={load} style={{margin: "0 0 0 10px"}}/> : "" }
             <SettingOutlined style={{margin: "0 0 0 auto"}} onClick={() => navigator("/profile/" + link)}/>
         </StyledButton>
     )

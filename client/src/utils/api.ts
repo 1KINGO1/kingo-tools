@@ -103,4 +103,22 @@ export const defineProperty = async (payload: any, guildId: string, moduleName: 
     withCredentials: true
   });
   return data;
+};
+
+export const defineCommandProperty = async (payload: any,
+                                            guildId: string,
+                                            moduleName: string,
+                                            property: "on" | "channelWhiteList" | "rolesWhiteList",
+                                            commandName: string) => {
+  const {data} = await axios.post(config.API_URL + "/config",{
+    type: "change_command",
+    payload,
+    guild_id: guildId || "none",
+    module: moduleName || "none",
+    property: property || "none",
+    commandName
+  },{
+    withCredentials: true
+  });
+  return data;
 }

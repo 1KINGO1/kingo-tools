@@ -638,17 +638,17 @@ app.post("/api/config", async (req, res) => {
   /* ==== req body structure ====
 
 
-  * type => change_field | on_module | off_module
+  * type => change_field | on_module | off_module | change_command
   * payload => something data
   * guild_id => guild id
   * module => module name in database
   * property => module property to change
-  *
+  * commandName? => name of command to change
   * */
 
   const {token} = req.cookies;
 
-  const {type, payload, guild_id, module, property} = req.body;
+  const {type, payload, guild_id, module, property, commandName} = req.body;
 
   const user = await verifyToken(token);
   if (!user || !type || (!payload && typeof payload !== "boolean") || !guild_id || !module || !property){
@@ -732,6 +732,50 @@ app.post("/api/config", async (req, res) => {
       });
       break;
 
+    case "change_command":
+      if (!commandName){
+        res.send({err: true, message: "Укажите название команды!"});
+        return;
+      }
+      const commandsArray = JSON.parse(JSON.stringify(guild.options.commands));
+      const command = commandsArray.find(command => command.name === commandName);
+      if (!command){
+        res.send({err: true, message: "Команда не найдена!"});
+        return;
+      }
+      if (!(property in command)){
+        res.send({err: true, message: "Свойство не найдено!"});
+        return;
+      }
+      if (property !== "rolesWhiteList" && property !== "on" && property !== "channelWhiteList"){
+        res.send({err: true, message: "Данное свойство нельзя изменить!"});
+        return;
+      }
+
+      if (typeof command[property] !== typeof payload){
+        res.send({err: true, message: "Неверные данные для изменения!"});
+        return;
+      }
+
+      let resultArray = [];
+
+      command[property] = payload;
+
+      for (let c of commandsArray){
+        if (c.name !== commandName){
+          resultArray.push(c);
+        }
+        else{
+          resultArray.push(command);
+        }
+      }
+
+      guild.options = {...guild.options, [module]: [...resultArray]};
+
+      await guild.save().catch(console.log);
+      res.send({err: false})
+      break;
+
     default:
       res.send({err: true, message: "Action не найден!"});
       return;
@@ -739,11 +783,11 @@ app.post("/api/config", async (req, res) => {
 
 })
 
+//Bot commands
 app.get("*", async (req, res) => {
   await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.headers['x-forwarded-for']?.split(',').shift()}`);
   res.sendFile(path.join(path.dirname(__dirname), "client" ,"build", "index.html"));
 })
-
 app.listen(process.env.PORT || 3001, () => {
   console.log(`Server running on port ${process.env.PORT || 3001}`)
 })

@@ -2,6 +2,7 @@ import {BugOutlined, FireOutlined, LoadingOutlined, ThunderboltOutlined} from "@
 import React from "react";
 import {AntiScamLinks} from "../pages/profile-page/pages/bot-page/bot-modules/AntiScamLinks";
 import {Loading} from "../components/Loading";
+import {Commands} from "../pages/profile-page/pages/bot-page/bot-modules/commands/Commands";
 
 const DiscordClientBot = React.lazy(() =>
     import('../pages/profile-page/pages/discordClientBot/DiscordClientBot')
@@ -52,6 +53,10 @@ export default {
         {
             link: "asl",
             component: <AntiScamLinks />
+        },
+        {
+            link: "commands",
+            component: <Commands />
         }
     ]
 }
