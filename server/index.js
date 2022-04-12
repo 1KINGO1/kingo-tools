@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 const {CLIENT_URL, REDIRECT_URL} = require("./config");
 const axios = require("axios");
 const path = require("path");
+const fs = require("fs");
 mongoose.connect('mongodb+srv://fsdfsdfsdf:aYZdwxlnetcEVTzr@cluster0.epd8a.mongodb.net/kingo-tools?retryWrites=true&w=majority').then(() => {
   console.log("Database connected")
 });
@@ -783,7 +784,83 @@ app.post("/api/config", async (req, res) => {
 
 })
 
-//Bot commands
+//update bot commands
+app.post("/api/updateGuildData", async (req, res) => {
+  const {token} = req.cookies;
+
+  const {guild_id} = req.body;
+
+  const user = await verifyToken(token);
+  if (!user || !guild_id){
+    res.send({err: true, message: "Incorrect form data"});
+    return;
+  }
+  if (!user.flags.some(flag => flag.id === 1)){
+    res.send({err: true, message: "Вы не можете использовать этот функционал!"});
+    return;
+  }
+  if (Object.keys(user.discord).length === 0) {
+    res.send({err: true, message: "Discord аккаунт не привязан"});
+    return;
+  }
+  if(!user.discord.guilds.find(guild => guild.id === guild_id)){
+    res.send({err: true, message: "Вы не владеете данным серверов"});
+    return;
+  }
+  let guild = await Guild.findOne({id: guild_id});
+  if(!guild){
+    res.send({err: true, message: "Сервер не найден"});
+    return;
+  }
+
+  const pathArray = fs.readdirSync(path.join(path.dirname(__dirname), "KB", "commands"), {withFileTypes: true});
+
+  let newCommands = [];
+
+  for (const p of pathArray){
+    const command = require("../KB/commands/" + p.name);
+    newCommands.push(command);
+  }
+
+  newCommands = newCommands.map(({name, description, example, category}) => {
+    return {
+      name, description, example, category,
+      on: true,
+      rolesWhiteList: [],
+      channelWhiteList: []
+    }
+  });
+
+  let guildCommands = JSON.parse(JSON.stringify(guild.options.commands));
+
+  let resultCommands = [];
+
+  for (let command of newCommands){
+    let guildCommand = guildCommands.find(c => c.name === command.name);
+
+    if (!guildCommand){
+      resultCommands.push(command);
+      continue;
+    }
+
+    resultCommands.push({
+      on: guildCommand.on,
+      name: command.name,
+      example: command.example,
+      description: command.description,
+      category: command.category,
+      rolesWhiteList: guildCommand.rolesWhiteList,
+      channelWhiteList: guildCommand.channelWhiteList
+    })
+  }
+
+  guild.options = {...guild.options, commands: [...resultCommands]};
+  await guild.save();
+  res.send({err: false});
+
+});
+
+
 app.get("*", async (req, res) => {
   await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.headers['x-forwarded-for']?.split(',').shift()}`);
   res.sendFile(path.join(path.dirname(__dirname), "client" ,"build", "index.html"));

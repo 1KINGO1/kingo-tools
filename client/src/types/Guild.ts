@@ -1,4 +1,6 @@
 import {Command} from "./Command";
+import {LevelSystemUser} from "./LevelSystemUser";
+import {LevelSystemRole} from "./LevelSystemRole";
 
 export interface Guild{
     id: string,
@@ -17,6 +19,15 @@ export interface Guild{
                 reason: string,
                 duration: number
             }
+        },
+        levelSystem: {
+            on: boolean,
+            xpCoefficient: number,
+            deleteRolesAfterNewLevel: boolean,
+            xpFarmWhiteListChannels: string[],
+            whiteListRoles: string[],
+            levelRoles: LevelSystemRole[],
+            users: LevelSystemUser[]
         },
         commands: Command[]
     },

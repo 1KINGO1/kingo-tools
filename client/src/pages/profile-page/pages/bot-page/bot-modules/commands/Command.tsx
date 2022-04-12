@@ -1,15 +1,16 @@
-import {FC, useState} from "react";
+import {FC, useState, FocusEvent} from "react";
 import styled from "styled-components";
-import {Switch} from "antd";
+import {Input, Modal, Switch, Tooltip, Typography} from "antd";
 import {defineCommandProperty} from "../../../../../../utils/api";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../../../../store/store";
-import {SettingOutlined} from "@ant-design/icons";
+import {InfoCircleOutlined, SettingOutlined} from "@ant-design/icons";
 
 interface CommandProps{
     name: string,
     description: string,
     on: boolean,
+    example: string,
     options: {
         rolesWhiteList: string[],
         channelWhiteList: string[]
@@ -45,16 +46,46 @@ const CommandDescription = styled.p`
 const ControlBar = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 12px;
   background-color: rgba(255, 255, 255, 0.03);
 `;
 
-export const Command: FC<CommandProps> = ({name, description, on, options}) => {
+const SettingWrapper = styled.div`
+  border-radius: 100%;
+  transition: all .1s ease;
+  cursor: pointer;
+
+  &:hover {
+    transform: scale(1.03);
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  & > * {
+    width: 100%;
+    height: 100%;
+  };
+`;
+
+const Label = styled.p`
+  font-size: 20px;
+  font-weight: 500;
+  text-align: center;
+  
+  margin: 10px 0 0 0;
+  
+  &:nth-child(1){
+    margin: 0;
+  }
+`;
+
+export const Command: FC<CommandProps> = ({name, description, on, example, options}) => {
 
     const guildId = useSelector<RootState>(state => state.bot.currentGuild) as string;
 
     const [isOn, setIsOn] = useState(on);
     const [load, setLoad] = useState(false);
+    const [settingsVisible, setSettingsVisible] = useState(false);
 
     const switchHandler = () => {
         setLoad(true);
@@ -63,6 +94,17 @@ export const Command: FC<CommandProps> = ({name, description, on, options}) => {
             setIsOn(!isOn)
         }).catch(() => setLoad(false));
     };
+    const settingsClickHandler = () => {
+      setSettingsVisible(state => !state);
+    };
+    const blurHandler = (e: FocusEvent<HTMLInputElement, Element>, value: string) => {
+      if (value === "roles"){
+        defineCommandProperty(e.target.value.split(",").map(role => role.trim()), guildId, "commands", "rolesWhiteList", name)
+      }
+      else{
+        defineCommandProperty(e.target.value.split(",").map(role => role.trim()), guildId, "commands", "channelWhiteList", name)
+      }
+    }
 
     return(
         <CommandWrapper on={isOn}>
@@ -74,8 +116,46 @@ export const Command: FC<CommandProps> = ({name, description, on, options}) => {
             </CommandDescription>
             <ControlBar>
                 <Switch checked={isOn} onChange={switchHandler} loading={load}/>
-                <SettingOutlined />
+                <SettingWrapper onClick={settingsClickHandler}>
+                  <SettingOutlined />
+                </SettingWrapper>
             </ControlBar>
+          <Modal
+            visible={settingsVisible}
+            title={`Настройки команды ${name}`}
+            onOk={() => {}}
+            onCancel={() => {setSettingsVisible(false)}}
+            footer={[]}
+          >
+            <Label>
+              Пример использования:
+            </Label>
+            <Typography.Text code style={{fontSize: "20px", fontWeight: "500", textAlign: "center", margin: "0 auto", display: "block"}}>
+              {example}
+            </Typography.Text>
+            <Label>
+              Whitelist роли
+            </Label>
+            <Input placeholder="Введите айди ролей через запятую"
+                   defaultValue={options.rolesWhiteList.join(", ")}
+                   onBlur={(e) => {blurHandler(e, "roles")}}
+                   suffix={
+                     <Tooltip title="Ключевые слова: everyone, admins">
+                       <InfoCircleOutlined style={{ color: "white" }} />
+                     </Tooltip>
+                   }/>
+            <Label>
+              Whitelist каналы
+            </Label>
+            <Input placeholder="Введите айди каналов через запятую"
+                   defaultValue={options.channelWhiteList.join(", ")}
+                   onBlur={(e) => {blurHandler(e, "channels")}}
+                   suffix={
+                     <Tooltip title="Ключевые слова: all">
+                       <InfoCircleOutlined style={{ color: "white" }} />
+                     </Tooltip>
+                   }/>
+          </Modal>
         </CommandWrapper>
     )
 }

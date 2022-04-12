@@ -121,4 +121,13 @@ export const defineCommandProperty = async (payload: any,
     withCredentials: true
   });
   return data;
-}
+};
+
+export const updateCommandsData = async (guild_id: string) => {
+  const {data} = await axios.post(config.API_URL + "/updateGuildData",{
+    guild_id: guild_id || "none"
+  },{
+    withCredentials: true
+  });
+  return data;
+};

@@ -52,12 +52,11 @@ client.on('messageCreate', async (message, author) => {
     //Commands
     let command = guild.options.commands.find((command) => prefix + command.name === messageArray[0]);
     if (!command){
-        message.reply({content: "Команда не найдена!"});
         return;
     };
     const messageObj = require(`./commands/${command.name}`);
     if (command.on){
-        await messageObj.execute(message);
+        await messageObj.execute(message, command);
     }
 
 });
@@ -108,6 +107,15 @@ client.on("guildCreate", async guild => {
                     duration: 0
                 }
             },
+            levelSystem: {
+                on: false,
+                xpCoefficient: 1,
+                deleteRolesAfterNewLevel: true,
+                xpFarmWhiteListChannels: [],
+                whiteListRoles: [],
+                levelRoles: [],
+                users: []
+            },
             commands
         },
         data: {
@@ -125,3 +133,7 @@ client.on("guildDelete", async guild => {
 })
 
 client.login(token);
+
+module.exports = {
+    client
+}
