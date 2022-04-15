@@ -1,6 +1,7 @@
 import config from "../config/config";
 import axios from "axios";
 import {User} from "../store/actions/authActions";
+import {LevelSystemRole} from "../types/LevelSystemRole";
 
 interface registerResponse{
   err: boolean,
@@ -131,3 +132,18 @@ export const updateCommandsData = async (guild_id: string) => {
   });
   return data;
 };
+
+export const defineLevelsRule = async (payload: LevelSystemRole | string,
+                                       type: "remove_levels_rule" | "add_levels_rule",
+                                       guildId: string) => {
+  const {data} = await axios.post(config.API_URL + "/config",{
+    type,
+    payload,
+    guild_id: guildId || "none",
+    property: "none",
+    module: "levelSystem"
+  },{
+    withCredentials: true
+  });
+  return data;
+}

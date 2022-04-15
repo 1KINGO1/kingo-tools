@@ -86,6 +86,12 @@ export const BotControlPage: FC = () => {
                               canCheck={false}
                               link="commands"
                 />
+                <ModuleButton title="Level System"
+                              value="levelSystem"
+                              checked={guild?.options.levelSystem.on || false}
+                              canCheck={true}
+                              link="levels"
+                />
             </Buttons>
         </>
     )

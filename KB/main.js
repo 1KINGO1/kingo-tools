@@ -7,6 +7,7 @@ const {token, prefix} = require('./config.json');
 
 //MODULES
 const antiScamLinks = require("./modules/anti-scam-links");
+const levels = require("./modules/levels");
 const path = require("path");
 
 mongoose.connect('mongodb+srv://fsdfsdfsdf:aYZdwxlnetcEVTzr@cluster0.epd8a.mongodb.net/kingo-tools?retryWrites=true&w=majority').then(() => {
@@ -37,17 +38,23 @@ client.on('messageCreate', async (message, author) => {
 
     let guild = await Guild.findOne({id: message.guild.id});
 
+    if (!guild || !guild.options.allowed){
+        message.reply({content: "Вы не можете использовать данного бота на этом сервере :("});
+        return;
+    };
+
     //Anti Scam Links
     if (guild?.options?.antiScamLinks?.on){
         await antiScamLinks(message, guild.options.antiScamLinks)
     }
 
+    //Levels
+    if (guild?.options?.levelSystem?.on){
+        await levels(message, guild, await message.guild.members.fetch(message.author.id));
+    }
+
     if (!message.content.startsWith(prefix)) return;
     let messageArray = message.content.split(' ');
-    if (!guild || !guild.options.allowed){
-        message.reply({content: "Вы не можете использовать данного бота на этом сервере :("});
-        return;
-    };
 
     //Commands
     let command = guild.options.commands.find((command) => prefix + command.name === messageArray[0]);
@@ -56,7 +63,7 @@ client.on('messageCreate', async (message, author) => {
     };
     const messageObj = require(`./commands/${command.name}`);
     if (command.on){
-        await messageObj.execute(message, command);
+        await messageObj.execute(message, command, guild);
     }
 
 });
@@ -135,5 +142,6 @@ client.on("guildDelete", async guild => {
 client.login(token);
 
 module.exports = {
-    client
+    client,
+    User
 }

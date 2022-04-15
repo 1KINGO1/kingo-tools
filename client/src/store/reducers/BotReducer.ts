@@ -1,6 +1,7 @@
 import {createReducer} from "@reduxjs/toolkit";
-import {removeGuild, setGuild, setGuildData} from "../actions/botActions";
+import {addLevelsRule, removeGuild, removeLevelsRule, setGuild, setGuildData} from "../actions/botActions";
 import {Guild} from "../../types/Guild";
+import {LevelSystemRole} from "../../types/LevelSystemRole";
 
 interface State{
     currentGuild: string,
@@ -21,5 +22,20 @@ export const botReducer = createReducer(initialState, {
     },
     [setGuildData.type]: (state, action) => {
         state.guildData = action.payload
+    },
+    [addLevelsRule.type]: (state, action) => {
+        state.guildData?.options.levelSystem.levelRoles.push(action.payload);
+    },
+    [removeLevelsRule.type]: (state, action) => {
+        let arr: LevelSystemRole[] = [];
+
+        for (let rule of state.guildData?.options.levelSystem.levelRoles || []){
+            if (action.payload === rule.roleId){
+                continue;
+            }
+            arr.push(rule);
+        }
+
+       state.guildData!.options.levelSystem.levelRoles = arr
     }
 });

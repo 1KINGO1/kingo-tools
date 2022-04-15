@@ -1,4 +1,5 @@
 export interface LevelSystemRole{
   roleId: string,
-  levelRequired: number
+  levelRequired: number,
+  comment: string
 }

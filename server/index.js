@@ -9,6 +9,8 @@ const {CLIENT_URL, REDIRECT_URL} = require("./config");
 const axios = require("axios");
 const path = require("path");
 const fs = require("fs");
+const {client} = require("../KB/main");
+
 mongoose.connect('mongodb+srv://fsdfsdfsdf:aYZdwxlnetcEVTzr@cluster0.epd8a.mongodb.net/kingo-tools?retryWrites=true&w=majority').then(() => {
   console.log("Database connected")
 });
@@ -639,7 +641,7 @@ app.post("/api/config", async (req, res) => {
   /* ==== req body structure ====
 
 
-  * type => change_field | on_module | off_module | change_command
+  * type => change_field | on_module | off_module | change_command | add_levels_rule | remove_levels_rule
   * payload => something data
   * guild_id => guild id
   * module => module name in database
@@ -775,6 +777,48 @@ app.post("/api/config", async (req, res) => {
 
       await guild.save().catch(console.log);
       res.send({err: false})
+      break;
+
+    case "add_levels_rule":
+
+      const {roleId: payload_roleId, levelRequired: payload_levelRequired, comment: payload_comment} = payload;
+
+      if (!payload_roleId || !payload_levelRequired || !payload_comment){
+        res.send({err: true, message: "Неверный формат данных!"});
+        return;
+      }
+
+      if (guild.options.levelSystem.levelRoles.find(rule => rule.roleId === payload_roleId)){
+        res.send({err: true, message: "Правило для этой роли уже существует!"});
+        return;
+      }
+
+      guild.options = {...guild.options, levelSystem: {...guild.options.levelSystem, levelRoles: [...guild.options.levelSystem.levelRoles, payload]}};
+      await guild.save();
+      res.send({err: false});
+      break;
+
+    case "remove_levels_rule":
+
+      if (typeof payload !=="string"){
+        res.send({err: true, message: "Неверный формат данных!"});
+        return;
+      }
+
+      let arr = [];
+
+      for(let rule of guild.options.levelSystem.levelRoles){
+        if (rule.roleId === payload){
+          continue;
+        }
+        arr.push(rule);
+      }
+
+      guild.options = {...guild.options, levelSystem: {...guild.options.levelSystem, levelRoles: arr}};
+      await guild.save();
+
+      res.send({err: false})
+
       break;
 
     default:
