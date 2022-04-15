@@ -4,6 +4,6 @@
   "dependencies": {
   },
   "scripts": {
-    "start": "cd ../KB && npm install && cd ../server && npm install && node index.js"
+    "start": "cd KB && npm install && cd ../server && npm install && node index.js"
   }
 }
