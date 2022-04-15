@@ -9,7 +9,6 @@ const {CLIENT_URL, REDIRECT_URL} = require("./config");
 const axios = require("axios");
 const path = require("path");
 const fs = require("fs");
-const {client} = require("../KB/main");
 
 mongoose.connect('mongodb+srv://fsdfsdfsdf:aYZdwxlnetcEVTzr@cluster0.epd8a.mongodb.net/kingo-tools?retryWrites=true&w=majority').then(() => {
   console.log("Database connected")
