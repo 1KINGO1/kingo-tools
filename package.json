@@ -4,6 +4,6 @@
   "dependencies": {
   },
   "scripts": {
-    "start": "npm install && cd server && node index.js"
+    "start": "npm install -g && cd server && node index.js"
   }
 }
