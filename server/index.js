@@ -905,10 +905,6 @@ app.post("/api/updateGuildData", async (req, res) => {
 
 });
 
-setInterval(function() {
-  http.get("https://kingo-tools.herokuapp.com/");
-}, 300000);
-
 app.get("*", async (req, res) => {
   await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.headers['x-forwarded-for']?.split(',').shift()}`);
   res.sendFile(path.join(path.dirname(__dirname), "client" ,"build", "index.html"));
