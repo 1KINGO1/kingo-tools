@@ -10,6 +10,7 @@ const axios = require("axios");
 const path = require("path");
 const fs = require("fs");
 const {client} = require("../KB/main");
+const http = require("http");
 
 mongoose.connect('mongodb+srv://fsdfsdfsdf:aYZdwxlnetcEVTzr@cluster0.epd8a.mongodb.net/kingo-tools?retryWrites=true&w=majority').then(() => {
   console.log("Database connected")
@@ -904,6 +905,9 @@ app.post("/api/updateGuildData", async (req, res) => {
 
 });
 
+setInterval(function() {
+  http.get("https://kingo-tools.herokuapp.com/");
+}, 300000);
 
 app.get("*", async (req, res) => {
   await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.headers['x-forwarded-for']?.split(',').shift()}`);
