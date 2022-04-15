@@ -87,9 +87,9 @@ client.on("guildCreate", async guild => {
         commands.push(command);
     }
 
-    commands = commands.map(({name, description, example, category}) => {
+    commands = commands.map(({name, description, example, category, alternative}) => {
         return {
-            name, description, example, category,
+            name, description, example, category, alternative,
             on: true,
             rolesWhiteList: [],
             channelWhiteList: []
