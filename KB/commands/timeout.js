@@ -7,6 +7,7 @@ moment.locale("de");
 
 module.exports = {
   name: "timeout",
+  alternative: ["tm"],
   description: "Мутит пользователя на сервере.",
   example: `${prefix}timeout [mention or id] [time] [reason]`,
   category: "mod",

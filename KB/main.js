@@ -57,7 +57,7 @@ client.on('messageCreate', async (message, author) => {
     let messageArray = message.content.split(' ');
 
     //Commands
-    let command = guild.options.commands.find((command) => prefix + command.name === messageArray[0]);
+    let command = guild.options.commands.find((command) => command?.alternative?.some(com => prefix + com === messageArray[0]) || prefix + command.name === messageArray[0]);
     if (!command){
         return;
     };

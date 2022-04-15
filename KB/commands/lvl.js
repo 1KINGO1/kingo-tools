@@ -61,8 +61,14 @@ module.exports = {
       const canvas = Canvas.createCanvas(700, 240);
       const context = canvas.getContext('2d');
 
-      const background = await Canvas.loadImage(user.backgroundImage || "https://media.discordapp.net/attachments/959916309041283152/964451211728285696/profile_background.png");
-      context.drawImage(background, 0, 0, canvas.width, canvas.height);
+      try{
+        const background = await Canvas.loadImage(user.backgroundImage || "https://media.discordapp.net/attachments/959916309041283152/964451211728285696/profile_background.png");
+        context.drawImage(background, 0, 0, canvas.width, canvas.height);
+      }catch (e) {
+        const background = await Canvas.loadImage(user.backgroundImage);
+        context.drawImage(background, 0, 0, canvas.width, canvas.height);
+      }
+
 
       //Ник
       context.font = '48px sans-serif';
