@@ -44,7 +44,7 @@ module.exports = async function levels(message, guild, member){
 
       if (guild.options.levelSystem.deleteRolesAfterNewLevel){
           try{
-            guild.options.levelSystem.levelRoles.forEach(role => {
+            guild.options.levelSystem.levelRoles.filter(role => role.levelRequired < new_statistic.level).forEach(role => {
               member.roles.remove(role.roleId).catch(e => {});
             })
           }catch (e){}
