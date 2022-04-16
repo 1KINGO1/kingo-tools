@@ -95,7 +95,7 @@ client.on("guildCreate", async guild => {
             channelWhiteList: []
         }
     });
-
+    
     let server = new Guild({
         id: guild.id,
         owner_id: guild.ownerId,

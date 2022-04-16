@@ -5,7 +5,7 @@ const getUserFromMention = require("../utils/getUserFromMention");
 module.exports = {
     name: "ban",
     description: "Банит пользователя на сервере.",
-    example: `${prefix}ban [mention or id] [reason]`,
+    example: `${prefix}ban [mention or id] [?reason]`,
     category: "mod",
     execute: async function(message, command){
         let messageArray = message.content.split(' ');

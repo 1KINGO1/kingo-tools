@@ -109,7 +109,7 @@ export const Commands: FC = () => {
             {currentPageId === "2" ?
                 <CommandsGrid>
                     {commands
-                        .filter(command => command.category === "fun")
+                        .filter(command => command.category === "fan")
                         .map(command => <Command on={command.on}
                                                  name={command.name}
                                                  description={command.description}

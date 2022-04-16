@@ -3,7 +3,8 @@ export interface Command{
     name: string,
     example: string,
     description: string,
-    category: "mod" | "fun" | "config" | "games" | "levels" | "utils",
+    alternative: string[],
+    category: "mod" | "fan" | "config" | "games" | "levels" | "utils",
     rolesWhiteList: string[],
     channelWhiteList: string[]
 }

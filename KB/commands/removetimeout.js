@@ -6,10 +6,10 @@ const moment = require("moment");
 moment.locale("de");
 
 module.exports = {
-  name: "timeout",
-  alternative: ["tm"],
-  description: "Мутит пользователя на сервере.",
-  example: `${prefix}timeout [mention or id] [time] [?reason]`,
+  name: "removetimeout",
+  alternative: ["rtm"],
+  description: "Размутит пользователя на сервере.",
+  example: `${prefix}rtm [mention or id]`,
   category: "mod",
   execute: async function(message, command){
     let messageArray = message.content.split(' ');
@@ -17,7 +17,7 @@ module.exports = {
     let guild = message.guild;
     let member = await guild.members.fetch(message.author.id);
     if (!await checkRoles(command, member)){
-      message.reply("Вы не можете мутить пользователей!");
+      message.reply("Вы не можете размучивать пользователей!");
       return;
     };
     if (!await checkChannels(command, message.channel.id)){
@@ -27,10 +27,6 @@ module.exports = {
 
     if (!args[0]){
       message.reply(`⛔ Неверный формат команды, упомяните или укажите айди пользователя (\`${this.example}\`)`);
-      return;
-    }
-    if (!args[1]){
-      message.reply(`⛔ Неверный формат команды, укажите срок наказания (\`${this.example}\`)`);
       return;
     }
 
@@ -45,25 +41,17 @@ module.exports = {
       return;
     }
 
-    let time;
-    try{
-      time = dateParser(args[1]);
-    }catch (e) {
-      message.reply("⛔ Неверный формат даты");
-      return;
-    }
-
     let banMemberRolePosition = banMember.roles.cache.reduce((prev, item) => item.position > prev ? item.position : prev, -1);
     let authorRolePosition = member.roles.cache.reduce((prev, item) => item.position > prev ? item.position : prev, -1);
 
     if (banMemberRolePosition >= authorRolePosition && member.id !== guild.ownerId){
-      message.reply("⛔ Вы не можете мутить пользователя, который имеет позицию роли выше вашей!");
+      message.reply("⛔ Вы не можете размутить пользователя, который имеет позицию роли выше вашей!");
       return;
     }
 
     try{
-      await banMember.timeout(time, args[2] || "Без причины")
-      message.reply(`${banMember.user.tag} был замучен ✅`);
+      await banMember.timeout(0, "Размут")
+      message.reply(`${banMember.user.tag} был размучен ✅`);
     }catch (e){
       message.reply(`Не удалось замутить ${banMember.user.tag} ❌`);
     }

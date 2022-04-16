@@ -10,6 +10,13 @@ module.exports = function calcLevelByXp(xp){
   let levelNeedFarm = (level) * (level) * INITIAL_MAX_POINTS - (level-1) * (level-1) * INITIAL_MAX_POINTS;
   let levelFarmed = xp - (level-1) * (level-1) * INITIAL_MAX_POINTS;
 
+  if (levelNeedFarm < 0){
+    levelNeedFarm = 100;
+  }
+  if (levelFarmed < 0){
+    levelFarmed = 0;
+  }
+
   return {
     level,
     levelNeedFarm,
