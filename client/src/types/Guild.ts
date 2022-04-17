@@ -29,6 +29,12 @@ export interface Guild{
             levelRoles: LevelSystemRole[],
             users: LevelSystemUser[]
         },
+        logger: {
+            on: boolean,
+            modChannel: string,
+            modAllow: string[], //["BAN", "KICK", "TIMEOUT", "BAN_REMOVE", "TIMEOUT_REMOVE"]
+
+        },
         commands: Command[]
     },
     data: {

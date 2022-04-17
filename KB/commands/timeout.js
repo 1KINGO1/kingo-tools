@@ -2,6 +2,7 @@ const {prefix} = require('../config.json');
 const {checkRoles, checkChannels} = require("../utils/checkAvailability");
 const getUserFromMention = require("../utils/getUserFromMention");
 const dateParser = require("../utils/dateParser");
+const logger = require("../modules/logger");
 const moment = require("moment");
 moment.locale("de");
 
@@ -11,7 +12,7 @@ module.exports = {
   description: "Мутит пользователя на сервере.",
   example: `${prefix}timeout [mention or id] [time] [?reason]`,
   category: "mod",
-  execute: async function(message, command){
+  execute: async function(message, command, dbGuild){
     let messageArray = message.content.split(' ');
     let args = messageArray.slice(1);
     let guild = message.guild;
@@ -63,7 +64,8 @@ module.exports = {
 
     try{
       await banMember.timeout(time, args[2] || "Без причины")
-      message.reply(`${banMember.user.tag} был замучен ✅`);
+      await message.reply(`${banMember.user.tag} был замучен ✅`);
+      await logger(dbGuild, {type: "TIMEOUT", category: "mod", offender: banMember.user, name: "timeout", reason: args[2] || "Без причины", mod: message.author})
     }catch (e){
       message.reply(`Не удалось замутить ${banMember.user.tag} ❌`);
     }

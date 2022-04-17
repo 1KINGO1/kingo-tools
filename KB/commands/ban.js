@@ -1,13 +1,14 @@
 const {prefix} = require('../config.json');
 const {checkRoles, checkChannels} = require("../utils/checkAvailability");
 const getUserFromMention = require("../utils/getUserFromMention");
+const logger = require("../modules/logger");
 
 module.exports = {
     name: "ban",
     description: "Банит пользователя на сервере.",
     example: `${prefix}ban [mention or id] [?reason]`,
     category: "mod",
-    execute: async function(message, command){
+    execute: async function(message, command, dbGuild){
         let messageArray = message.content.split(' ');
         let args = messageArray.slice(1);
         let guild = message.guild;
@@ -48,6 +49,7 @@ module.exports = {
         try{
             await guild.members.ban(banMember.id, {reason: args[1] || "Без причины"});
             message.reply(`${banMember.user.tag} был забанен ✅`);
+            await logger(dbGuild, {type: "BAN", category: "mod", offender: banMember.user, name: "ban", reason: args[2] || "Без причины", mod: message.author})
         }catch (e){
             message.reply(`Не удалось забанить ${banMember.user.tag} ❌`);
         }

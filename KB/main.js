@@ -123,6 +123,11 @@ client.on("guildCreate", async guild => {
                 levelRoles: [],
                 users: []
             },
+            logger: {
+                on: false,
+                modChannel: "",
+                modAllow: []
+            },
             commands
         },
         data: {
