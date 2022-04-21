@@ -1,0 +1,122 @@
+module.exports = [
+  {
+    name: "noob",
+    description: "Начальный персонаж. Тупой и ничего не умеет. Есть палка и броня из листьев. ",
+    icon: "🤪",
+    swordDamage: 1,
+    bowDamage: 0,
+    magicDamage: 0,
+    silverPrice: 0,
+    goldPrice: 0,
+    hp: 100,
+    defence: 5
+  },
+  {
+    name: "knight",
+    description: "Рыцарь. Есть броня меч и щит.",
+    icon: "🗡",
+    swordDamage: 10,
+    bowDamage: 0,
+    magicDamage: 0,
+    silverPrice: 5000,
+    goldPrice: 0,
+    hp: 150,
+    defence: 50
+  },
+  {
+    name: "archer",
+    description: "Неочень меткий лучник. Есть лук и кинжал.",
+    icon: "🏹",
+    swordDamage: 2,
+    bowDamage: 7,
+    magicDamage: 0,
+    silverPrice: 5000,
+    goldPrice: 0,
+    hp: 100,
+    defence: 0
+  },
+  {
+    name: "zombie",
+    description: "Тупая неконтролируемая неубиваемая машина.",
+    icon: "🧟‍",
+    swordDamage: 8,
+    bowDamage: 0,
+    magicDamage: 0,
+    silverPrice: 0,
+    goldPrice: 50,
+    hp: 500,
+    defence: 0
+  },
+  {
+    name: "skeleton",
+    description: "Скелет. Рассыпается с первого удара, но стрелы проходят сквозь него.",
+    icon: "💀‍",
+    swordDamage: 5,
+    bowDamage: 15,
+    magicDamage: 0,
+    silverPrice: 25000,
+    goldPrice: 0,
+    hp: 10,
+    defence: 0
+  },
+  {
+    name: "vampire",
+    description: "Кровожадный вампир. При ударе восстанавливает здоровья.",
+    icon: "🧛‍",
+    swordDamage: 8,
+    bowDamage: 0,
+    magicDamage: 2,
+    silverPrice: 100000,
+    goldPrice: 0,
+    hp: 50,
+    defence: 300
+  },
+  {
+    name: "clown",
+    description: "Клоун с красным носом. Жанглирует жариками и кидает их в врагов.",
+    icon: "🤡",
+    swordDamage: 10,
+    bowDamage: 10,
+    magicDamage: 0,
+    silverPrice: 100000,
+    goldPrice: 0,
+    hp: 150,
+    defence: 150
+  },
+  {
+    name: "tiger",
+    description: "Котик.",
+    icon: "🐅‍",
+    swordDamage: 20,
+    bowDamage: 0,
+    magicDamage: 0,
+    silverPrice: 0,
+    goldPrice: 500,
+    hp: 300,
+    defence: 0
+  },
+  {
+    name: "ghost",
+    description: "Приведенью не страшны ни меч, ни лук. Его можно убить только с помощью магии.",
+    icon: "👻‍",
+    swordDamage: 10,
+    bowDamage: 0,
+    magicDamage: 10,
+    silverPrice: 250000,
+    goldPrice: 0,
+    hp: 100,
+    defence: 0
+  },
+  {
+    name: "wizard",
+    description: "Старинный маг. Может станить врагов и бить их молнией.",
+    icon: "🧙‍",
+    swordDamage: 0,
+    bowDamage: 0,
+    magicDamage: 15,
+    silverPrice: 0,
+    goldPrice: 5000,
+    hp: 250,
+    defence: 50
+  }
+]

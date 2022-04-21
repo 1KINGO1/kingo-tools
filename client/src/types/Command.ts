@@ -4,7 +4,8 @@ export interface Command{
     example: string,
     description: string,
     alternative: string[],
-    category: "mod" | "fan" | "config" | "games" | "levels" | "utils",
+    isSlash: boolean,
+    category: "mod" | "fan" | "config" | "games" | "levels"  | "economy" | "utils",
     rolesWhiteList: string[],
     channelWhiteList: string[]
 }

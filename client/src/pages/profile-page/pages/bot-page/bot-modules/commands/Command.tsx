@@ -11,6 +11,7 @@ interface CommandProps{
     description: string,
     on: boolean,
     example: string,
+    isSlash?: boolean,
     options: {
         rolesWhiteList: string[],
         channelWhiteList: string[]
@@ -34,6 +35,8 @@ const CommandTitle = styled.p`
   font-size: 35px;
   font-weight: bold;
   padding: 12px;
+  display: flex;
+  align-items: center;
 `;
 
 const CommandDescription = styled.p`
@@ -79,7 +82,17 @@ const Label = styled.p`
   }
 `;
 
-export const Command: FC<CommandProps> = ({name, description, on, example, options}) => {
+const SlashMark = styled.div`
+  background-color: #3c9ae8;
+  color: white;
+  font-weight: 500;
+  font-size: 13px;
+  margin: 5px 10px 0;
+  padding: 5px;
+  border-radius: 3px;
+`;
+
+export const Command: FC<CommandProps> = ({name, description, on, example, isSlash, options}) => {
 
     const guildId = useSelector<RootState>(state => state.bot.currentGuild) as string;
 
@@ -109,7 +122,7 @@ export const Command: FC<CommandProps> = ({name, description, on, example, optio
     return(
         <CommandWrapper on={isOn}>
             <CommandTitle>
-                {name}
+              {name} {isSlash ? <Tooltip placement="top" title="Команда также может быть использована в качестве слэш команды" color="#2db7f5"><SlashMark>Slash</SlashMark></Tooltip> : ""}
             </CommandTitle>
             <CommandDescription>
                 {description}

@@ -1,6 +1,7 @@
 import {Command} from "./Command";
 import {LevelSystemUser} from "./LevelSystemUser";
 import {LevelSystemRole} from "./LevelSystemRole";
+import {EconomyUser} from "./EconomyUser";
 
 export interface Guild{
     id: string,
@@ -34,6 +35,11 @@ export interface Guild{
             modChannel: string,
             modAllow: string[], //["BAN", "KICK", "TIMEOUT", "BAN_REMOVE", "TIMEOUT_REMOVE"]
 
+        },
+        economy: {
+            on: boolean,
+            economyItems: [],
+            users: EconomyUser[]
         },
         commands: Command[]
     },

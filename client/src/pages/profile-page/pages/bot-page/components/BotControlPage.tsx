@@ -92,6 +92,12 @@ export const BotControlPage: FC = () => {
                               canCheck={true}
                               link="levels"
                 />
+                <ModuleButton title="Economy System"
+                              value="economy"
+                              checked={guild?.options.economy.on || false}
+                              canCheck={true}
+                              link="economy"
+                />
             </Buttons>
         </>
     )

@@ -1,0 +1,30 @@
+interface EconomyItem{
+  id: string,
+  name: string,
+  description: string,
+  silverPrice: number,
+  goldPrice: number,
+  isEquipped: boolean,
+  type: "weapon_sword" | "weapon_bow" | "weapon_magic" | "discord_item" | "unknown",
+  swordDamage?: number,
+  bowDamage?: number,
+  magicDamage?: number,
+}
+
+export interface EconomyUser{
+  id: string,
+  goldCoins: number,
+  silverCoins: number,
+  isDied: boolean,
+  diedFor: number,
+  farmLastCollect: number,
+  workCountdown: number,
+  boxCountdown: number,
+  swordDamage: number,
+  bowDamage: number,
+  magicDamage: number,
+  hp: number,
+  defence: number,
+  selectedCharacter: "noob" | "knight" | "archer" | "zombie" | "vampire" | "skeleton" | "wizard" | "clown" | "tiger" | "ghost" | "robot",
+  inventory: EconomyItem[],
+}
