@@ -642,7 +642,7 @@ app.post("/api/config", async (req, res) => {
   /* ==== req body structure ====
 
 
-  * type => change_field | on_module | off_module | change_command | add_levels_rule | remove_levels_rule
+  * type => change_field | on_module | off_module | change_command | add_levels_rule | remove_levels_rule | check_log_property | uncheck_log_property
   * payload => something data
   * guild_id => guild id
   * module => module name in database
@@ -822,6 +822,51 @@ app.post("/api/config", async (req, res) => {
 
       break;
 
+    case "check_log_property":
+      let logger = JSON.parse(JSON.stringify(guild.options.logger));
+      if (!["modAllow","messageEventsAllow","voiceAllow","membersAllow"].includes(property)){
+        res.send({err: true, message: "Cвойство не найдено!"});
+        return;
+      }
+      let allowedProperty = ["BAN", "KICK", "TIMEOUT", "BAN_REMOVE", "TIMEOUT_REMOVE", "MESSAGE_DELETE", "MESSAGE_EDIT", "MESSAGE_PURGED", "VOICE_JOIN", "VOICE_LEAVE", "VOICE_CHANGE","MEMBER_JOIN", "MEMBER_LEAVE", "MEMBER_ROLE_ADD", "MEMBER_ROLE_REMOVE", "MEMBER_NICKNAME_CHANGE"];
+      if (!allowedProperty.includes(payload)){
+        res.send({err: true, message: "Cвойство не найдено!"});
+        return;
+      }
+      console.log(property, logger)
+      if (logger[property].includes(payload)){
+        res.send({err: true, message: "Cвойство уже включено!"});
+        return;
+      }
+      logger[property].push(payload);
+      guild.options = {...guild.options, logger};
+      await guild.save().catch(console.log);
+      res.send({err: false})
+      break;
+
+      break;
+
+    case "uncheck_log_property":
+      let loggerCopy = JSON.parse(JSON.stringify(guild.options.logger));
+      if (!["modAllow","messageEventsAllow","voiceAllow","membersAllow"].includes(property)){
+        res.send({err: true, message: "Cвойство не найдено!"});
+        return;
+      }
+      let allowedPropertys = ["BAN", "KICK", "TIMEOUT", "BAN_REMOVE", "TIMEOUT_REMOVE", "MESSAGE_DELETE", "MESSAGE_EDIT", "MESSAGE_PURGED", "VOICE_JOIN", "VOICE_LEAVE", "VOICE_CHANGE","MEMBER_JOIN", "MEMBER_LEAVE", "MEMBER_ROLE_ADD", "MEMBER_ROLE_REMOVE", "MEMBER_NICKNAME_CHANGE"];
+      if (!allowedPropertys.includes(payload)){
+        res.send({err: true, message: "Cвойство не найдено!"});
+        return;
+      }
+      if (!loggerCopy[property].includes(payload)){
+        res.send({err: true, message: "Cвойство уже выключено!"});
+        return;
+      }
+      loggerCopy[property] = loggerCopy[property].filter(p => p !== payload);
+      guild.options = {...guild.options, logger: loggerCopy};
+      await guild.save().catch(console.log);
+      res.send({err: false})
+      break;
+
     default:
       res.send({err: true, message: "Action не найден!"});
       return;
@@ -867,9 +912,10 @@ app.post("/api/updateGuildData", async (req, res) => {
     newCommands.push(command);
   }
 
-  newCommands = newCommands.map(({name, description, example, category}) => {
+  newCommands = newCommands.map(({name, description, example, category, alternative, useSlash}) => {
     return {
-      name, description, example, category,
+      name, description, example, category, alternative,
+      isSlash: useSlash,
       on: true,
       rolesWhiteList: [],
       channelWhiteList: []
@@ -894,6 +940,8 @@ app.post("/api/updateGuildData", async (req, res) => {
       example: command.example,
       description: command.description,
       category: command.category,
+      alternative: command?.alternative || [],
+      isSlash: command?.isSlash || false,
       rolesWhiteList: guildCommand.rolesWhiteList,
       channelWhiteList: guildCommand.channelWhiteList
     })

@@ -2,7 +2,7 @@ const {prefix} = require('../config.json');
 const {checkRoles, checkChannels} = require("../utils/checkAvailability");
 const getUserFromMention = require("../utils/getUserFromMention");
 const dateParser = require("../utils/dateParser");
-const logger = require("../modules/logger");
+const logger = require("../modules/loggerMod");
 const moment = require("moment");
 const {SlashCommandBuilder} = require("@discordjs/builders");
 const {MessageEmbed} = require("discord.js");
@@ -42,7 +42,7 @@ module.exports = {
         .setRequired(false)
         .setDescription("Причина")),
   category: "mod",
-  execute: async function (message, command, dbGuild) {
+  execute: async function (message, command, dbGuild, client) {
     let messageArray = message.content.split(' ');
     let args = messageArray.slice(1);
     let guild = message.guild;
@@ -104,12 +104,12 @@ module.exports = {
         name: "timeout",
         reason: args[2] || "Без причины",
         mod: message.author
-      })
+      }, client)
     } catch (e) {
       message.reply(`Не удалось замутить ${banMember.user.tag} ❌`);
     }
   },
-  executeLikeSlash: async function (interaction, command, dbGuild) {
+  executeLikeSlash: async function (interaction, command, dbGuild, client) {
     if (!await checkRoles(command, interaction.member)) {
       return interaction.reply({content: "Вы не можете использовать эту команду!", ephemeral: true});
     }
@@ -152,7 +152,7 @@ module.exports = {
         name: "timeout",
         reason: reason || "Без причины",
         mod: interaction.user
-      })
+      }, client)
     } catch (e) {
       await interaction.reply({content: `Не удалось замутить ${banMember.user.tag} ❌`, ephemeral: true});
     }

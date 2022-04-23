@@ -3,7 +3,7 @@ const {checkRoles, checkChannels} = require("../utils/checkAvailability");
 const getUserFromMention = require("../utils/getUserFromMention");
 const dateParser = require("../utils/dateParser");
 const moment = require("moment");
-const logger = require("../modules/logger");
+const logger = require("../modules/loggerMod");
 moment.locale("de");
 
 module.exports = {
@@ -12,7 +12,7 @@ module.exports = {
   description: "Размутит пользователя на сервере.",
   example: `${prefix}rtm [mention or id]`,
   category: "mod",
-  execute: async function(message, command, dbGuild){
+  execute: async function(message, command, dbGuild, client){
     let messageArray = message.content.split(' ');
     let args = messageArray.slice(1);
     let guild = message.guild;
@@ -53,7 +53,7 @@ module.exports = {
     try{
       await banMember.timeout(0, "Размут")
       message.reply(`${banMember.user.tag} был размучен ✅`);
-      await logger(dbGuild, {type: "TIMEOUT_REMOVE", category: "mod", offender: banMember.user, name: "timeout remove", reason: args[2] || "Без причины", mod: message.author})
+      await logger(dbGuild, {type: "TIMEOUT_REMOVE", category: "mod", offender: banMember.user, name: "timeout remove", reason: args[2] || "Без причины", mod: message.author}, client)
     }catch (e){
       message.reply(`Не удалось замутить ${banMember.user.tag} ❌`);
     }

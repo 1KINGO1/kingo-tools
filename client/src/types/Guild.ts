@@ -34,6 +34,12 @@ export interface Guild{
             on: boolean,
             modChannel: string,
             modAllow: string[], //["BAN", "KICK", "TIMEOUT", "BAN_REMOVE", "TIMEOUT_REMOVE"]
+            messageEventsChannel: string,
+            messageEventsAllow: string[], // ["MESSAGE_DELETE", "MESSAGE_EDIT", "MESSAGE_PURGED"],
+            voiceChannel: string,
+            voiceAllow: string[], // ["VOICE_JOIN", "VOICE_LEAVE", "VOICE_CHANGE"],
+            membersChannel: string,
+            membersAllow: string[], // ["MEMBER_JOIN", "MEMBER_LEAVE", "MEMBER_ROLE_ADD", "MEMBER_ROLE_REMOVE", "MEMBER_NICKNAME_CHANGE"],
 
         },
         economy: {

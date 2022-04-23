@@ -98,6 +98,12 @@ export const BotControlPage: FC = () => {
                               canCheck={true}
                               link="economy"
                 />
+                <ModuleButton title="Logger"
+                              value="logger"
+                              checked={guild?.options.logger.on || false}
+                              canCheck={true}
+                              link="logger"
+                />
             </Buttons>
         </>
     )

@@ -4,6 +4,7 @@ import {AntiScamLinks} from "../pages/profile-page/pages/bot-page/bot-modules/An
 import {Loading} from "../components/Loading";
 import {Commands} from "../pages/profile-page/pages/bot-page/bot-modules/commands/Commands";
 import {Levels} from "../pages/profile-page/pages/bot-page/bot-modules/levels/Levels";
+import {Logger} from "../pages/profile-page/pages/bot-page/bot-modules/Logger";
 
 const DiscordClientBot = React.lazy(() =>
     import('../pages/profile-page/pages/discordClientBot/DiscordClientBot')
@@ -62,6 +63,10 @@ export default {
         {
             link: "levels",
             component: <Levels />
+        },
+        {
+            link: "logger",
+            component: <Logger />
         }
     ]
 }

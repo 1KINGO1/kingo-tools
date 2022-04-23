@@ -1,14 +1,14 @@
 const {prefix} = require('../config.json');
 const {checkRoles, checkChannels} = require("../utils/checkAvailability");
 const getUserFromMention = require("../utils/getUserFromMention");
-const logger = require("../modules/logger");
+const logger = require("../modules/loggerMod");
 
 module.exports = {
     name: "unban",
     description: "Разбанит пользователя на сервере.",
     example: `${prefix}unban [mention or id] [?reason]`,
     category: "mod",
-    execute: async function(message, command, dbGuild){
+    execute: async function(message, command, dbGuild, client){
         let messageArray = message.content.split(' ');
         let args = messageArray.slice(1);
         let guild = message.guild;
@@ -30,7 +30,7 @@ module.exports = {
         try{
             await guild.members.unban(args[0], args[1] || "Без причины");
             message.reply(`<@${args[0]}> был разбанен ✅`);
-            await logger(dbGuild, {type: "BAN_REMOVE", category: "mod", offender: {id: args[0]}, name: "ban remove", reason: args[2] || "Без причины", mod: message.author})
+            await logger(dbGuild, {type: "BAN_REMOVE", category: "mod", offender: {id: args[0]}, name: "ban remove", reason: args[2] || "Без причины", mod: message.author}, client)
         }catch (e){
             message.reply(`Не удалось разбанить <@${args[0]}> ❌`);
         }

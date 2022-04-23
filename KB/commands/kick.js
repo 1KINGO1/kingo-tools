@@ -1,12 +1,13 @@
 const {prefix} = require("../config.json");
 const {checkRoles, checkChannels} = require("../utils/checkAvailability");
 const getUserFromMention = require("../utils/getUserFromMention");
+const logger = require("../modules/loggerMod");
 module.exports = {
   name: "kick",
   description: "Кикает пользователя на сервере.",
   example: `${prefix}kick [mention or id] [?reason]`,
   category: "mod",
-  execute: async function(message, command){
+  execute: async function(message, command, dbGuild, client){
     let messageArray = message.content.split(' ');
     let args = messageArray.slice(1);
     let guild = message.guild;
@@ -47,6 +48,7 @@ module.exports = {
     try{
       await guild.members.kick(banMember.id, args[1] || "Без причины");
       message.reply(`${banMember.user.tag} был кикнут ✅`);
+      await logger(dbGuild, {type: "KICK", category: "mod", offender: banMember.user, name: "kick", reason: args[1] || "Без причины", mod: message.author}, client)
     }catch (e){
       message.reply(`Не удалось кикнуть ${banMember.user.tag} ❌`);
     }

@@ -1,18 +1,13 @@
 const mongoose = require("mongoose");
-const {Client, Intents, Collection} = require('discord.js');
+const {Intents, Collection, MessageEmbed} = require('discord.js');
 const fs = require("fs");
+const Discord = require('discord.js')
 const {Routes} = require('discord-api-types/v9');
-const client = new Client({
-  intents: [
-    Intents.FLAGS.GUILDS,
-    Intents.FLAGS.GUILD_MESSAGES,
-    Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-    Intents.FLAGS.GUILD_MESSAGE_TYPING,
-    Intents.FLAGS.DIRECT_MESSAGES,
-    Intents.FLAGS.DIRECT_MESSAGE_REACTIONS,
-    Intents.FLAGS.DIRECT_MESSAGE_TYPING],
-  partials: ['MESSAGE', 'CHANNEL', 'REACTION']
+const client = new Discord.Client({
+  intents: new Discord.Intents(32767),
+  partials: ['MESSAGE', 'CHANNEL', 'REACTION', "GUILD_MEMBER"]
 });
+let colors = require("./utils/colors");
 
 const {token, prefix} = require('./config.json');
 
@@ -21,6 +16,7 @@ const antiScamLinks = require("./modules/anti-scam-links");
 const levels = require("./modules/levels");
 const path = require("path");
 const {REST} = require("@discordjs/rest");
+const logger = require("./modules/loggerMod");
 
 mongoose.connect('mongodb+srv://fsdfsdfsdf:aYZdwxlnetcEVTzr@cluster0.epd8a.mongodb.net/kingo-tools?retryWrites=true&w=majority').then(() => {
   console.log("Database connected")
@@ -77,7 +73,7 @@ client.on('messageCreate', async (message, author) => {
   ;
   const messageObj = require(`./commands/${command.name}`);
   if (command.on) {
-    await messageObj.execute(message, command, guild);
+    await messageObj.execute(message, command, guild, client);
   }
 
 });
@@ -99,7 +95,7 @@ client.on('interactionCreate', async (interaction) => {
   }
   const messageObj = require(`./commands/${command.name}`);
   if (command.on) {
-    await messageObj.executeLikeSlash(interaction, command, guild);
+    await messageObj.executeLikeSlash(interaction, command, guild, client);
   }
 })
 
@@ -167,7 +163,13 @@ client.on("guildCreate", async guild => {
       logger: {
         on: false,
         modChannel: "",
-        modAllow: []
+        modAllow: [], //["BAN", "KICK", "TIMEOUT", "BAN_REMOVE", "TIMEOUT_REMOVE"]
+        messageEventsChannel: "",
+        messageEventsAllow: [], // ["MESSAGE_DELETE", "MESSAGE_EDIT", "MESSAGE_PURGED"],
+        voiceChannel: "",
+        voiceAllow: [], // ["VOICE_JOIN", "VOICE_LEAVE", "VOICE_CHANGE"],
+        membersChannel: "",
+        membersAllow: [], // ["MEMBER_JOIN", "MEMBER_LEAVE", "MEMBER_ROLE_ADD", "MEMBER_ROLE_REMOVE", "MEMBER_NICKNAME_CHANGE"],
       },
       commands
     },
@@ -185,6 +187,206 @@ client.on("guildDelete", async guild => {
   await server.remove();
 })
 
+//LOGGER MESSAGES
+client.on("messageDelete", async message => {
+  let guild = await Guild.findOne({id: message.guild.id});
+  if (!guild.options.logger.on) return;
+  if (!guild.options.logger.messageEventsAllow.includes("MESSAGE_DELETE")) return;
+  let channel = await client.channels.fetch(message.channelId);
+  let embed = new MessageEmbed()
+    .setTitle("Сообщение удалено в " + channel.name)
+    .setAuthor(message.author.username + "#" + message.author.discriminator, message.author.displayAvatarURL())
+    .setDescription(message.content)
+    .setFooter(`ID: ${message.id}`)
+    .setTimestamp(new Date())
+    .setColor(colors.red)
+  try {
+    let channel = await client.channels.fetch(guild.options.logger.messageEventsChannel);
+    await channel.send({embeds: [embed]})
+  } catch (e) {
+  }
+})
+client.on("messageUpdate", async (oldMessage, newMessage) => {
+  let guild = await Guild.findOne({id: newMessage.guild.id});
+  if (!guild.options.logger.on) return;
+  if (!guild.options.logger.messageEventsAllow.includes("MESSAGE_EDIT")) return;
+  let channel = await client.channels.fetch(newMessage.channelId);
+  let embed = new MessageEmbed()
+    .setTitle("Сообщение изменено в " + channel.name)
+    .setAuthor(newMessage.author.username + "#" + newMessage.author.discriminator, newMessage.author.displayAvatarURL())
+    .setDescription(`**Before**: ${oldMessage.content}\n**After**: ${newMessage.content}`)
+    .setFooter(`ID: ${newMessage.id}`)
+    .setTimestamp(new Date())
+    .setColor(colors.yellow)
+  try {
+    let channel = await client.channels.fetch(guild.options.logger.messageEventsChannel);
+    await channel.send({embeds: [embed]})
+  } catch (e) {
+  }
+})
+
+//LOGGER MEMBERS
+client.on("guildMemberAdd", async member => {
+  let guild = await Guild.findOne({id: member.guild.id});
+  if (!guild.options.logger.on) return;
+  if (!guild.options.logger.membersAllow.includes("MEMBER_JOIN")) return;
+  let embed = new MessageEmbed()
+    .setTitle("Пользователь зашёл")
+    .setAuthor(member.user.username + "#" + member.user.discriminator, member.user.displayAvatarURL())
+    .setFooter(`ID: ${member.id}`)
+    .setTimestamp(new Date())
+    .setColor(colors.green)
+  try {
+    let channel = await client.channels.fetch(guild.options.logger.membersChannel);
+    await channel.send({embeds: [embed]})
+  } catch (e) {
+  }
+})
+client.on("guildMemberRemove", async member => {
+  let guild = await Guild.findOne({id: member.guild.id});
+  if (!guild.options.logger.on) return;
+  if (!guild.options.logger.membersAllow.includes("MEMBER_LEAVE")) return;
+  let embed = new MessageEmbed()
+    .setTitle("Пользователь вышел")
+    .setAuthor(member.user.username + "#" + member.user.discriminator, member.user.displayAvatarURL())
+    .setDescription(`Роли: ${member.roles.cache.filter(role => role.name !== "@everyone").map(role => `<@&${role.id}>`).join(" ") || "Отсутствуют."}`)
+    .setFooter(`ID: ${member.id}`)
+    .setTimestamp(new Date())
+    .setColor(colors.red)
+  try {
+    let channel = await client.channels.fetch(guild.options.logger.membersChannel);
+    await channel.send({embeds: [embed]})
+  } catch (e) {
+  }
+})
+client.on("guildMemberUpdate", async (oldMember, newMember) => {
+  await newMember.guild.members.fetch();
+  let guild = await Guild.findOne({id: newMember.guild.id});
+  if (!guild.options.logger.on) return;
+  if (JSON.stringify(oldMember.roles.cache) !== JSON.stringify(newMember.roles.cache) && oldMember.roles.cache && newMember.roles.cache && oldMember.roles.cache.size !== newMember.roles.cache.size) {
+    let embed = new MessageEmbed()
+      .setTitle("Роли пользователя изменены")
+      .setAuthor(newMember.user.username + "#" + newMember.user.discriminator, newMember.user.displayAvatarURL())
+      .setFooter(`ID: ${newMember.id}`)
+      .setTimestamp(new Date())
+      .setColor(colors.purple);
+    let addRoles = [];
+    let removeRoles = [];
+    for (let role of oldMember.roles.cache) {
+      if (!await newMember.roles.cache.find(r => r.id === role[0])) {
+        removeRoles.push(role);
+      }
+    }
+    for (let role of newMember.roles.cache) {
+      if (!await oldMember.roles.cache.find(r => r.id === role[0])) {
+        addRoles.push(role);
+      }
+    }
+
+    embed.setDescription(`${addRoles.length !== 0 && guild.options.logger.membersAllow.includes("MEMBER_ROLE_ADD") ? `**+** ${addRoles.map(r => `<@&${r[0]}>`).join(" ")}\n` : ""}${removeRoles.length !== 0 && guild.options.logger.membersAllow.includes("MEMBER_ROLE_REMOVE") ? `**-** ${removeRoles.map(r => `<@&${r[0]}>`).join(" ")}\n` : ""}`)
+    try {
+      let channel = await client.channels.fetch(guild.options.logger.membersChannel);
+      if (!embed.description.trim()) return;
+      await channel.send({embeds: [embed]})
+    } catch (e) {
+    }
+  }
+  if (oldMember.nickname !== newMember.nickname && guild.options.logger.membersAllow.includes("MEMBER_NICKNAME_CHANGE") && oldMember && newMember) {
+    let embed = new MessageEmbed()
+      .setTitle("Никнейм пользователя изменен")
+      .setAuthor(newMember.user.username + "#" + newMember.user.discriminator, newMember.user.displayAvatarURL())
+      .setFooter(`ID: ${newMember.id}`)
+      .setTimestamp(new Date())
+      .setDescription(`**After**: ${oldMember.nickname || oldMember.user.username}\n**Before**: ${newMember.nickname || newMember.user.username}`)
+      .setColor(colors.blue)
+    try {
+      let channel = await client.channels.fetch(guild.options.logger.membersChannel);
+      await channel.send({embeds: [embed]})
+    } catch (e) {
+    }
+    return
+  }
+})
+
+//LOGGER VOICE
+client.on("voiceStateUpdate", async (oldState, newState) => {
+  let guild = await Guild.findOne({id: oldState.guild.id || newState.guild.id});
+  if (!guild.options.logger.on) return;
+  if (newState.channelId !== null && oldState.channelId !== null && guild.options.logger.voiceAllow.includes("VOICE_CHANGE")) {
+    let embed = new MessageEmbed()
+      .setTitle("Пользователь поменял войс")
+      .setAuthor(oldState.member.user.username + "#" + oldState.member.user.discriminator, oldState.member.user.displayAvatarURL())
+      .setFooter(`ID: ${oldState.member.id}`)
+      .setTimestamp(new Date())
+      .setDescription(`**After**: <#${oldState.channelId}>\n**Before**: <#${newState.channelId}>`)
+      .setColor(colors.blue)
+    try {
+      let channel = await client.channels.fetch(guild.options.logger.voiceChannel);
+      await channel.send({embeds: [embed]})
+      return;
+    } catch (e) {
+      console.log(e)
+    }
+  }
+  if (newState.channelId === null && guild.options.logger.voiceAllow.includes("VOICE_LEAVE")) {
+    let embed = new MessageEmbed()
+      .setTitle("Пользователь вышел с канала")
+      .setAuthor(oldState.member.user.username + "#" + oldState.member.user.discriminator, oldState.member.user.displayAvatarURL())
+      .setFooter(`ID: ${oldState.member.id}`)
+      .setTimestamp(new Date())
+      .setDescription(`${oldState.member.user.username + "#" + oldState.member.user.discriminator} вышел с <#${oldState.channelId}>`)
+      .setColor(colors.orange)
+    try {
+      let channel = await client.channels.fetch(guild.options.logger.voiceChannel);
+      await channel.send({embeds: [embed]})
+      return;
+    } catch (e) {
+      console.log(e)
+    }
+  }
+  if (oldState.channelId === null && guild.options.logger.voiceAllow.includes("VOICE_JOIN")) {
+    let embed = new MessageEmbed()
+      .setTitle("Пользователь зашёл в канал")
+      .setAuthor(newState.member.user.username + "#" + newState.member.user.discriminator, newState.member.user.displayAvatarURL())
+      .setFooter(`ID: ${oldState.member.id}`)
+      .setTimestamp(new Date())
+      .setDescription(`${newState.member.user.username + "#" + newState.member.user.discriminator} зашёл в с <#${newState.channelId}>`)
+      .setColor(colors.green)
+    try {
+      let channel = await client.channels.fetch(guild.options.logger.voiceChannel);
+      await channel.send({embeds: [embed]})
+      return;
+    } catch (e) {
+      console.log(e)
+    }
+  }
+})
+
+//LOGGER MOD
+client.on("guildBanRemove", async (ban) => {
+  let guild = await Guild.findOne({id: ban.guild.id});
+  if (!guild.options.logger.on) return;
+  await logger(guild, {
+    type: "BAN_REMOVE",
+    category: "mod",
+    offender: {id: ban.user.id},
+    name: "ban remove",
+    reason: ban.reason,
+    mod: "unknown"
+  });
+})
+client.on("guildBanAdd", async (ban) => {
+  let guild = await Guild.findOne({id: ban.guild.id});
+  if (!guild.options.logger.on) return;
+  await logger(guild, {
+    type: "BAN",
+    category: "mod",
+    offender: {id: ban.user.id},
+    name: "ban",
+    reason: ban.reason,
+    mod: "unknown"
+  });
+})
 client.login(token).then(() => {
   setInterval(async () => {
     let guilds = await Guild.find({});

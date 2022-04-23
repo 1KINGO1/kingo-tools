@@ -147,3 +147,16 @@ export const defineLevelsRule = async (payload: LevelSystemRole | string,
   });
   return data;
 }
+
+export const defineCheck = async (type: "check_log_property" | "uncheck_log_property", payload: string, guildId: string, property: string) => {
+  const {data} = await axios.post(config.API_URL + "/config",{
+    type,
+    payload,
+    guild_id: guildId || "none",
+    property: property || "none",
+    module: "logger"
+  },{
+    withCredentials: true
+  });
+  return data;
+}
