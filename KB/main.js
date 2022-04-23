@@ -209,7 +209,7 @@ client.on("messageDelete", async message => {
 client.on("messageUpdate", async (oldMessage, newMessage) => {
   let guild = await Guild.findOne({id: newMessage.guild.id});
   if (!guild.options.logger.on) return;
-  if (oldMessage.pinned === newMessage.pinned) return;
+  if (oldMessage.content.trim() === newMessage.content.trim()) return;
   if (!guild.options.logger.messageEventsAllow.includes("MESSAGE_EDIT")) return;
   let channel = await client.channels.fetch(newMessage.channelId);
   let embed = new MessageEmbed()
