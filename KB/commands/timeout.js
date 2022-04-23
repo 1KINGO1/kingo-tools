@@ -103,6 +103,7 @@ module.exports = {
         offender: banMember.user,
         name: "timeout",
         reason: args[2] || "Без причины",
+        duration: time,
         mod: message.author
       }, client)
     } catch (e) {
@@ -151,6 +152,7 @@ module.exports = {
         offender: banMember.user,
         name: "timeout",
         reason: reason || "Без причины",
+        duration: time,
         mod: interaction.user
       }, client)
     } catch (e) {
