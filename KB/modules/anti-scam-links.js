@@ -8,7 +8,7 @@ module.exports = async function antiScamLinks(message, options, guild, client){
 
     try{
         let content = message.content.toLowerCase()
-        if (options.blackListWords.some((elem) => content.includes(elem.toLowerCase()))){
+        if (options.blackListWords.some((elem) => content.includes(elem.toLowerCase())) && content.trim()){
             applyPunishment(message, punishment, guild, client);
         }
     }catch (e) {}
