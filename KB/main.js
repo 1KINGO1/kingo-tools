@@ -190,6 +190,9 @@ client.on("guildDelete", async guild => {
 //LOGGER MESSAGES
 client.on("messageDelete", async message => {
   let guild = await Guild.findOne({id: message.guild.id});
+  if (!guild || !guild.options.allowed) {
+    return;
+  };
   if (!guild.options.logger.on) return;
   if (!guild.options.logger.messageEventsAllow.includes("MESSAGE_DELETE")) return;
   let channel = await client.channels.fetch(message.channelId);
@@ -209,6 +212,9 @@ client.on("messageDelete", async message => {
 client.on("messageUpdate", async (oldMessage, newMessage) => {
   let guild = await Guild.findOne({id: newMessage.guild.id});
   if (!guild.options.logger.on) return;
+  if (!guild || !guild.options.allowed) {
+    return;
+  };
   if (oldMessage.content.trim() === newMessage.content.trim()) return;
   if (oldMessage.content.trim() === "" || newMessage.content.trim() === "") return;
   if (!guild.options.logger.messageEventsAllow.includes("MESSAGE_EDIT")) return;
@@ -230,6 +236,9 @@ client.on("messageUpdate", async (oldMessage, newMessage) => {
 //LOGGER MEMBERS
 client.on("guildMemberAdd", async member => {
   let guild = await Guild.findOne({id: member.guild.id});
+  if (!guild || !guild.options.allowed) {
+    return;
+  };
   if (!guild.options.logger.on) return;
   if (!guild.options.logger.membersAllow.includes("MEMBER_JOIN")) return;
   let embed = new MessageEmbed()
@@ -248,6 +257,9 @@ client.on("guildMemberRemove", async member => {
   let guild = await Guild.findOne({id: member.guild.id});
   if (!guild.options.logger.on) return;
   if (!guild.options.logger.membersAllow.includes("MEMBER_LEAVE")) return;
+  if (!guild || !guild.options.allowed) {
+    return;
+  };
   let embed = new MessageEmbed()
     .setTitle("Пользователь вышел")
     .setAuthor(member.user.username + "#" + member.user.discriminator, member.user.displayAvatarURL())
@@ -264,6 +276,9 @@ client.on("guildMemberRemove", async member => {
 client.on("guildMemberUpdate", async (oldMember, newMember) => {
   await newMember.guild.members.fetch();
   let guild = await Guild.findOne({id: newMember.guild.id});
+  if (!guild || !guild.options.allowed) {
+    return;
+  };
   if (!guild.options.logger.on) return;
   if (JSON.stringify(oldMember.roles.cache) !== JSON.stringify(newMember.roles.cache) && oldMember.roles.cache && newMember.roles.cache && oldMember.roles.cache.size !== newMember.roles.cache.size) {
     let embed = new MessageEmbed()
@@ -314,6 +329,9 @@ client.on("guildMemberUpdate", async (oldMember, newMember) => {
 client.on("voiceStateUpdate", async (oldState, newState) => {
   let guild = await Guild.findOne({id: oldState.guild.id || newState.guild.id});
   if (!guild.options.logger.on) return;
+  if (!guild || !guild.options.allowed) {
+    return;
+  };
   if (newState.channelId !== null && oldState.channelId !== null && guild.options.logger.voiceAllow.includes("VOICE_CHANGE")) {
     let embed = new MessageEmbed()
       .setTitle("Пользователь поменял войс")
@@ -368,6 +386,9 @@ client.on("voiceStateUpdate", async (oldState, newState) => {
 client.on("guildBanRemove", async (ban) => {
   let guild = await Guild.findOne({id: ban.guild.id});
   if (!guild.options.logger.on) return;
+  if (!guild || !guild.options.allowed) {
+    return;
+  };
   await logger(guild, {
     type: "BAN_REMOVE",
     category: "mod",
@@ -380,6 +401,9 @@ client.on("guildBanRemove", async (ban) => {
 client.on("guildBanAdd", async (ban) => {
   let guild = await Guild.findOne({id: ban.guild.id});
   if (!guild.options.logger.on) return;
+  if (!guild || !guild.options.allowed) {
+    return;
+  };
   await logger(guild, {
     type: "BAN",
     category: "mod",
