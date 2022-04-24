@@ -29,7 +29,7 @@ module.exports = async function(guild, {type, category, name, mod, offender, rea
       if (!guild.options.logger.modAllow.includes(type)) return;
       let embed = new MessageEmbed()
         .setTitle(name)
-        .setDescription(`Пользователь: <@${offender?.id || offender}>\nПричина: \`${reason}\`\nМодератор: <@${mod.id}>\n${duration ? `До: <t:${Math.floor((new Date().getTime() + duration)/1000)}:f>` : ""}`)
+        .setDescription(`Пользователь: <@${offender?.id || offender}>\nПричина: \`${reason}\`\nМодератор: <@${mod?.id || mod}>\n${duration ? `До: <t:${Math.floor((new Date().getTime() + duration)/1000)}:f>` : ""}`)
         .setFooter(`ID: ${offender?.id || offender}`)
         .setTimestamp(new Date())
         .setColor(color)

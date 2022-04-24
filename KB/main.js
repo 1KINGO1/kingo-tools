@@ -54,7 +54,7 @@ client.on('messageCreate', async (message, author) => {
 
   //Anti Scam Links
   if (guild?.options?.antiScamLinks?.on) {
-    await antiScamLinks(message, guild.options.antiScamLinks)
+    await antiScamLinks(message, guild.options.antiScamLinks, guild, client)
   }
 
   //Levels

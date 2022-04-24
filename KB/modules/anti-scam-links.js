@@ -2,14 +2,14 @@ const parseLink = require("../utils/parseLink");
 const checkLink = require("../utils/checkLink");
 const applyPunishment = require("../utils/applyPunishment");
 
-module.exports = async function antiScamLinks(message, options){
+module.exports = async function antiScamLinks(message, options, guild, client){
 
     let {punishment} = options;
 
     try{
         let content = message.content.toLowerCase()
         if (options.blackListWords.some((elem) => content.includes(elem.toLowerCase()))){
-            applyPunishment(message, punishment);
+            applyPunishment(message, punishment, guild, client);
         }
     }catch (e) {}
     let messArr = message.content.split(' ');
@@ -18,7 +18,7 @@ module.exports = async function antiScamLinks(message, options){
             let link = parseLink(word);
             let check = await checkLink(link, options);
             if (check){
-                applyPunishment(message, punishment);
+                applyPunishment(message, punishment, guild, client);
             }
         }
     }
