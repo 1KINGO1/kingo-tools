@@ -58,7 +58,7 @@ module.exports = {
       .setAuthor({name: `${user.displayName} ( ${user.user.tag} )`, iconURL: user.user.displayAvatarURL({size:1024,dynamic:true})})
       .setFooter({text: `ID: ${user.user.id}`})
       .setThumbnail(user.user.displayAvatarURL({size:1024,dynamic:true}));
-    embed.addField("Роли", user.roles.cache.filter(role => role.name !== "@everyone").map(role => `<@&${role.id}>`).join(" "));
+    embed.addField("Роли", user.roles.cache.filter(role => role.name !== "@everyone").map(role => `<@&${role.id}>`).join(" ") || "Нет ролей :(");
     embed.addField("Аккаунт создан:", moment(user.user.createdAt).locale("ru").format('LLLL'));
     embed.addField("Зашел на сервер:", moment(user.joinedAt).locale("ru").format('LLLL'));
 
@@ -104,7 +104,7 @@ module.exports = {
       })
       .setFooter({text: `ID: ${user.user.id}`})
       .setThumbnail(user.user.displayAvatarURL({size: 1024, dynamic: true}));
-    embed.addField("Роли", user.roles.cache.filter(role => role.name !== "@everyone").map(role => `<@&${role.id}>`).join(" "));
+    embed.addField("Роли", user.roles.cache.filter(role => role.name !== "@everyone").map(role => `<@&${role.id}>`).join(" ") || "Нет ролей :(");
     embed.addField("Аккаунт создан:", moment(user.user.createdAt).locale("ru").format('LLLL'));
     embed.addField("Зашел на сервер:", moment(user.joinedAt).locale("ru").format('LLLL'));
 
