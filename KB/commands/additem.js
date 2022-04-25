@@ -34,7 +34,7 @@ module.exports = {
     if (response.status !== 200){
       return message.reply("Неудалось прочитать файл!");
     }
-    let text = iconv.decode(Buffer.from(response.data), "win1251");
+    let text = iconv.decode(Buffer.from(response.data), "utf-8");
 
     try{
       text = JSON.parse(text);
