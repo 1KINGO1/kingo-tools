@@ -2,6 +2,7 @@ import {Command} from "./Command";
 import {LevelSystemUser} from "./LevelSystemUser";
 import {LevelSystemRole} from "./LevelSystemRole";
 import {EconomyUser} from "./EconomyUser";
+import {ReactionRole} from "./ReactionRole";
 
 export interface Guild{
     id: string,
@@ -42,6 +43,7 @@ export interface Guild{
             membersAllow: string[], // ["MEMBER_JOIN", "MEMBER_LEAVE", "MEMBER_ROLE_ADD", "MEMBER_ROLE_REMOVE", "MEMBER_NICKNAME_CHANGE"],
 
         },
+        reactionRole: ReactionRole[],
         economy: {
             on: boolean,
             economyItems: [],

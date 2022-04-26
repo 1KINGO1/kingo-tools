@@ -2,6 +2,7 @@ import config from "../config/config";
 import axios from "axios";
 import {User} from "../store/actions/authActions";
 import {LevelSystemRole} from "../types/LevelSystemRole";
+import {ReactionRole} from "../types/ReactionRole";
 
 interface registerResponse{
   err: boolean,
@@ -155,6 +156,25 @@ export const defineCheck = async (type: "check_log_property" | "uncheck_log_prop
     guild_id: guildId || "none",
     property: property || "none",
     module: "logger"
+  },{
+    withCredentials: true
+  });
+  return data;
+}
+
+export const addRole = async (rr: ReactionRole, guild_id: string) => {
+  const {data} = await axios.post(config.API_URL + "/addReactionRole",{
+    data: rr,
+    guild_id
+  },{
+    withCredentials: true
+  });
+  return data;
+}
+export const removeRole = async (id: string, guild_id: string) => {
+  const {data} = await axios.post(config.API_URL + "/removeReactionRole",{
+    id,
+    guild_id
   },{
     withCredentials: true
   });

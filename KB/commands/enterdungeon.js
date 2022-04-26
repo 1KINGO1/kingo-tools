@@ -2,9 +2,9 @@ const {prefix} = require("../config.json");
 const {checkRoles, checkChannels} = require("../utils/checkAvailability");
 const {MessageEmbed} = require("discord.js");
 module.exports = {
-  name: "enterdungeon",
+  name: "enter",
   description: "Добавляет пользователя в систему экономики.",
-  example: `${prefix}enterdungeon`,
+  example: `${prefix}enter`,
   category: "economy",
   execute: async function(message, command, dbGuild){
     if (!dbGuild.options.economy.on) return;

@@ -10,7 +10,8 @@ import {addLevelsRule} from "../../../../../../store/actions/botActions";
 import {InfoCircleOutlined} from "@ant-design/icons";
 import {message} from "antd";
 import {Guild} from "../../../../../../types/Guild";
-
+import {Select} from 'antd';
+const {Option} = Select;
 const LevelsWrapper = styled.div`
   height: 100%;
   display: flex;
@@ -98,12 +99,16 @@ export const Levels: FC = () => {
   const levelRoles = useSelector<RootState>(state => state.bot.guildData?.options.levelSystem.levelRoles) as LevelSystemRole[];
   const guildID = useSelector<RootState>(state => state.bot.guildData?.id) as string;
   const guild = useSelector<RootState>(state => state.bot.guildData) as Guild;
+  const channels = useSelector<RootState>(state => state.bot.guildChannels) as { name: string, id: string }[];
+  const roles = useSelector<RootState>(state => state.bot.guildRoles) as { name: string, id: string, color: string }[];
 
   const [isVisible, setVisible] = useState(false);
   const [roleId, setRoleId] = useState("");
   const [comment, setComment] = useState("");
   const [requiredLevel, setRequiredLevel] = useState(0);
 
+  const [selectedChannels, setSelectedChannels] = useState<string[]>(guild.options.levelSystem.xpFarmWhiteListChannels);
+  const [selectedRoles, setSelectedRoles] = useState<string[]>(guild.options.levelSystem.whiteListRoles);
 
   const dispatch = useDispatch();
 
@@ -155,31 +160,40 @@ export const Levels: FC = () => {
               <Label>
                 Введите Whitelist каналы
               </Label>
-              <Input placeholder="Введите айди каналов через запятую"
-                     defaultValue={guild.options.levelSystem.xpFarmWhiteListChannels.join(", ")}
-                     onBlur={(e) => {
-                       defineProperty(e.target.value.split(",").map(id => id.trim()), guildID, "levelSystem", "xpFarmWhiteListChannels")
-                     }}
-                     suffix={
-                       <Tooltip title="Ключевые слова: all">
-                         <InfoCircleOutlined style={{ color: "white" }} />
-                       </Tooltip>
-                     }/>
+              <Select
+                mode="multiple"
+                defaultValue={selectedChannels.map(channel => "#" + (channels.find(ch => ch.id === channel)?.name || channel))}
+                placeholder="Нажмите чтобы выбрать"
+                optionFilterProp="children"
+                style={{width: "100%"}}
+                onChange={(selected: string[]) => {setSelectedChannels(selected)}}
+                onBlur={() => {
+                  defineProperty(selectedChannels, guildID, "levelSystem", "xpFarmWhiteListChannels")
+                }}
+              >
+                {[...channels, {id: "all", name: "all"}]
+                  .filter(c => !selectedChannels.includes(c.id))
+                  .map((channel, i) => (<Option value={channel.id} key={i}>{channel.name}</Option>))}
+              </Select>
 
               <Label>
                 Введите Whitelist роли
               </Label>
-              <Input placeholder="Введите айди ролей через запятую"
-                     defaultValue={guild.options.levelSystem.whiteListRoles.join(", ")}
-                     onBlur={(e) => {
-                       defineProperty(e.target.value.split(",").map(id => id.trim()), guildID, "levelSystem", "whiteListRoles")
-                     }}
-                     suffix={
-                       <Tooltip title="Ключевые слова: all">
-                         <InfoCircleOutlined style={{ color: "white" }} />
-                       </Tooltip>
-                     }/>
-
+              <Select
+                mode="multiple"
+                defaultValue={selectedRoles.map(role => roles.find(r => r.id === role)?.name || role)}
+                placeholder="Нажмите чтобы выбрать"
+                optionFilterProp="children"
+                style={{width: "100%"}}
+                onChange={(selected: string[]) => {setSelectedRoles(selected)}}
+                onBlur={() => {
+                  defineProperty(selectedRoles, guildID, "levelSystem", "whiteListRoles")
+                }}
+              >
+                {roles
+                  .filter(c => !selectedRoles.includes(c.id))
+                  .map((role, i) => (<Option style={{borderLeft: "2px solid " + role.color}} value={role.id} key={i}>{role.name}</Option>))}
+              </Select>
             </div>
             <div style={{width: "48%"}}>
               <CheckBoxWrapper>

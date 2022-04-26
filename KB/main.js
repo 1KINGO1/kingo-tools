@@ -7,6 +7,7 @@ const client = new Discord.Client({
   intents: new Discord.Intents(32767),
   partials: ['MESSAGE', 'CHANNEL', 'REACTION', "GUILD_MEMBER"]
 });
+const reactionRoles = require("./modules/reactionRoles");
 let colors = require("./utils/colors");
 
 const {token, prefix} = require('./config.json');
@@ -171,6 +172,7 @@ client.on("guildCreate", async guild => {
         membersChannel: "",
         membersAllow: [], // ["MEMBER_JOIN", "MEMBER_LEAVE", "MEMBER_ROLE_ADD", "MEMBER_ROLE_REMOVE", "MEMBER_NICKNAME_CHANGE"],
       },
+      reactionRole: [],
       commands
     },
     data: {
@@ -412,6 +414,22 @@ client.on("guildBanAdd", async (ban) => {
     reason: ban.reason,
     mod: "unknown"
   });
+})
+client.on("messageReactionAdd", async (reaction, user) => {
+  let guild = await Guild.findOne({id: reaction.message.guild.id});
+  if (!guild.options.logger.on) return;
+  if (!guild || !guild.options.allowed) {
+    return;
+  };
+  reactionRoles(guild, reaction, user, client, "add")
+});
+client.on("messageReactionRemove", async (reaction, user) => {
+  let guild = await Guild.findOne({id: reaction.message.guild.id});
+  if (!guild.options.logger.on) return;
+  if (!guild || !guild.options.allowed) {
+    return;
+  };
+  reactionRoles(guild, reaction, user, client, "remove")
 })
 client.login(token).then(() => {
   setInterval(async () => {

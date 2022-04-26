@@ -26,7 +26,7 @@ module.exports = {
     let user = JSON.parse(JSON.stringify(guild.options.economy.users.find(user => user.id === message.author.id) || ""));
     if (!user) {
       let embed = new MessageEmbed()
-        .setDescription("👹 Работать можно только с подземелья.")
+        .setDescription("👹 Вы не являетесь участником экономики.")
         .setColor("#eb4034");
       message.reply({embeds: [embed]});
       return;

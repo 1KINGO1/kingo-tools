@@ -6,6 +6,8 @@ import {RootState} from "../../../../../../store/store";
 import {Command as CommandType} from "../../../../../../types/Command";
 import { Command } from "./Command";
 import {updateCommandsData} from "../../../../../../utils/api";
+import {Select} from 'antd';
+const {Option} = Select;
 
 const CommandsWrapper = styled.div`
 

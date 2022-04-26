@@ -44,7 +44,7 @@ export const BotControlPage: FC = () => {
                 }
                 else{
                     if (data?.guild){
-                        dispatch(setGuildData(data.guild))
+                        dispatch(setGuildData({guild: data.guild, channels: data.channels, roles: data.roles}))
                         setLoad(false);
                     }
                     else{
@@ -103,6 +103,12 @@ export const BotControlPage: FC = () => {
                               checked={guild?.options.logger.on || false}
                               canCheck={true}
                               link="logger"
+                />
+                <ModuleButton title="Reaction Roles"
+                              value="reactionRole"
+                              checked={false}
+                              canCheck={false}
+                              link="rr"
                 />
             </Buttons>
         </>

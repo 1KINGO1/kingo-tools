@@ -1,21 +1,25 @@
 import {FC, useState, FocusEvent} from "react";
 import styled from "styled-components";
 import {Input, Modal, Switch, Tooltip, Typography} from "antd";
-import {defineCommandProperty} from "../../../../../../utils/api";
+import {defineCommandProperty, defineProperty} from "../../../../../../utils/api";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../../../../store/store";
 import {InfoCircleOutlined, SettingOutlined} from "@ant-design/icons";
+import {Select} from 'antd';
+import {Guild} from "../../../../../../types/Guild";
 
-interface CommandProps{
-    name: string,
-    description: string,
-    on: boolean,
-    example: string,
-    isSlash?: boolean,
-    options: {
-        rolesWhiteList: string[],
-        channelWhiteList: string[]
-    }
+const {Option} = Select;
+
+interface CommandProps {
+  name: string,
+  description: string,
+  on: boolean,
+  example: string,
+  isSlash?: boolean,
+  options: {
+    rolesWhiteList: string[],
+    channelWhiteList: string[]
+  }
 }
 
 const CommandWrapper = styled.div<any>`
@@ -67,17 +71,18 @@ const SettingWrapper = styled.div`
   & > * {
     width: 100%;
     height: 100%;
-  };
+  }
+;
 `;
 
 const Label = styled.p`
   font-size: 20px;
   font-weight: 500;
   text-align: center;
-  
+
   margin: 10px 0 0 0;
-  
-  &:nth-child(1){
+
+  &:nth-child(1) {
     margin: 0;
   }
 `;
@@ -94,81 +99,106 @@ const SlashMark = styled.div`
 
 export const Command: FC<CommandProps> = ({name, description, on, example, isSlash, options}) => {
 
-    const guildId = useSelector<RootState>(state => state.bot.currentGuild) as string;
+  const guildId = useSelector<RootState>(state => state.bot.currentGuild) as string;
+  const guild = useSelector<RootState>(state => state.bot.guildData) as Guild;
+  const channels = useSelector<RootState>(state => state.bot.guildChannels) as { name: string, id: string }[];
+  const roles = useSelector<RootState>(state => state.bot.guildRoles) as { name: string, id: string, color: string }[];
 
-    const [isOn, setIsOn] = useState(on);
-    const [load, setLoad] = useState(false);
-    const [settingsVisible, setSettingsVisible] = useState(false);
+  const [isOn, setIsOn] = useState(on);
+  const [load, setLoad] = useState(false);
+  const [settingsVisible, setSettingsVisible] = useState(false);
 
-    const switchHandler = () => {
-        setLoad(true);
-        defineCommandProperty(!isOn, guildId, "commands", "on", name).then(() => {
-            setLoad(false);
-            setIsOn(!isOn)
-        }).catch(() => setLoad(false));
-    };
-    const settingsClickHandler = () => {
-      setSettingsVisible(state => !state);
-    };
-    const blurHandler = (e: FocusEvent<HTMLInputElement, Element>, value: string) => {
-      if (value === "roles"){
-        defineCommandProperty(e.target.value.split(",").map(role => role.trim()), guildId, "commands", "rolesWhiteList", name)
-      }
-      else{
-        defineCommandProperty(e.target.value.split(",").map(role => role.trim()), guildId, "commands", "channelWhiteList", name)
-      }
-    }
+  const [selectedChannels, setSelectedChannels] = useState<string[]>(options.channelWhiteList);
+  const [selectedRoles, setSelectedRoles] = useState<string[]>(options.rolesWhiteList);
 
-    return(
-        <CommandWrapper on={isOn}>
-            <CommandTitle>
-              {name} {isSlash ? <Tooltip placement="top" title="Команда также может быть использована в качестве слэш команды" color="#2db7f5"><SlashMark>Slash</SlashMark></Tooltip> : ""}
-            </CommandTitle>
-            <CommandDescription>
-                {description}
-            </CommandDescription>
-            <ControlBar>
-                <Switch checked={isOn} onChange={switchHandler} loading={load}/>
-                <SettingWrapper onClick={settingsClickHandler}>
-                  <SettingOutlined />
-                </SettingWrapper>
-            </ControlBar>
-          <Modal
-            visible={settingsVisible}
-            title={`Настройки команды ${name}`}
-            onOk={() => {}}
-            onCancel={() => {setSettingsVisible(false)}}
-            footer={[]}
-          >
-            <Label>
-              Пример использования:
-            </Label>
-            <Typography.Text code style={{fontSize: "20px", fontWeight: "500", textAlign: "center", margin: "0 auto", display: "block"}}>
-              {example}
-            </Typography.Text>
-            <Label>
-              Whitelist роли
-            </Label>
-            <Input placeholder="Введите айди ролей через запятую"
-                   defaultValue={options.rolesWhiteList.join(", ")}
-                   onBlur={(e) => {blurHandler(e, "roles")}}
-                   suffix={
-                     <Tooltip title="Ключевые слова: everyone, admins">
-                       <InfoCircleOutlined style={{ color: "white" }} />
-                     </Tooltip>
-                   }/>
-            <Label>
-              Whitelist каналы
-            </Label>
-            <Input placeholder="Введите айди каналов через запятую"
-                   defaultValue={options.channelWhiteList.join(", ")}
-                   onBlur={(e) => {blurHandler(e, "channels")}}
-                   suffix={
-                     <Tooltip title="Ключевые слова: all">
-                       <InfoCircleOutlined style={{ color: "white" }} />
-                     </Tooltip>
-                   }/>
-          </Modal>
-        </CommandWrapper>
-    )
+  const switchHandler = () => {
+    setLoad(true);
+    defineCommandProperty(!isOn, guildId, "commands", "on", name).then(() => {
+      setLoad(false);
+      setIsOn(!isOn)
+    }).catch(() => setLoad(false));
+  };
+  const settingsClickHandler = () => {
+    setSettingsVisible(state => !state);
+  };
+
+  return (
+    <CommandWrapper on={isOn}>
+      <CommandTitle>
+        {name} {isSlash ? <Tooltip placement="top" title="Команда также может быть использована в качестве слэш команды"
+                                   color="#2db7f5"><SlashMark>Slash</SlashMark></Tooltip> : ""}
+      </CommandTitle>
+      <CommandDescription>
+        {description}
+      </CommandDescription>
+      <ControlBar>
+        <Switch checked={isOn} onChange={switchHandler} loading={load}/>
+        <SettingWrapper onClick={settingsClickHandler}>
+          <SettingOutlined/>
+        </SettingWrapper>
+      </ControlBar>
+      <Modal
+        visible={settingsVisible}
+        title={`Настройки команды ${name}`}
+        onOk={() => {
+        }}
+        onCancel={() => {
+          setSettingsVisible(false)
+        }}
+        footer={[]}
+      >
+        <Label>
+          Пример использования:
+        </Label>
+        <Typography.Text code style={{
+          fontSize: "20px",
+          fontWeight: "500",
+          textAlign: "center",
+          margin: "0 auto",
+          display: "block"
+        }}>
+          {example}
+        </Typography.Text>
+        <Label>
+          Whitelist роли
+        </Label>
+        <Select
+          mode="multiple"
+          defaultValue={selectedRoles.map(role => roles.find(r => r.id === role)?.name || role)}
+          placeholder="Нажмите чтобы выбрать"
+          optionFilterProp="children"
+          style={{width: "100%"}}
+          onChange={(selected: string[]) => {
+            setSelectedRoles(selected)
+          }}
+          onBlur={() => {
+            defineCommandProperty(selectedRoles, guildId, "commands", "rolesWhiteList", name)
+          }}
+        >
+          {[...roles, {id: "admins", name: "admins", color: "24E7EA"}]
+            .filter(c => !selectedRoles.includes(c.id))
+            .map((role, i) => (
+              <Option style={{borderLeft: "2px solid " + role.color}} value={role.id} key={i}>{role.name}</Option>))}
+        </Select>
+        <Label>
+          Whitelist каналы
+        </Label>
+        <Select
+          mode="multiple"
+          defaultValue={selectedChannels.map(channel => "#" + (channels.find(ch => ch.id === channel)?.name || channel))}
+          placeholder="Нажмите чтобы выбрать"
+          optionFilterProp="children"
+          style={{width: "100%"}}
+          onChange={(selected: string[]) => {setSelectedChannels(selected)}}
+          onBlur={() => {
+            defineCommandProperty(selectedChannels, guildId, "commands", "channelWhiteList", name)
+          }}
+        >
+          {[...channels, {id: "all", name: "all"}]
+            .filter(c => !selectedChannels.includes(c.id))
+            .map((channel, i) => (<Option value={channel.id} key={i}>{channel.name}</Option>))}
+        </Select>
+      </Modal>
+    </CommandWrapper>
+  )
 }

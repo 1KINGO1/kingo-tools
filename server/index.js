@@ -631,7 +631,23 @@ app.get("/api/fetchGuildData", async (req, res) => {
     return;
   }
   else{
-    res.send({err: false, guild});
+    let guildDs = await client.guilds.fetch(serverId);
+
+    let roles = guildDs.roles.cache;
+    let channels = guildDs.channels.cache;
+
+    let rolesArr = [];
+    let channelsArr = [];
+
+    roles.forEach(role => {
+      rolesArr.push({name: role.name, id: role.id, color: role.hexColor});
+    });
+    channels.forEach(channel => {
+      if (channel.type === "GUILD_TEXT"){
+        channelsArr.push({name: channel.name, id: channel.id})
+      }
+    });
+    res.send({err: false, guild, roles: rolesArr, channels: channelsArr});
     return;
   }
 })
@@ -873,6 +889,102 @@ app.post("/api/config", async (req, res) => {
   }
 
 })
+
+app.post("/api/addReactionRole", async (req, res) => {
+  const {token} = req.cookies;
+
+  const {guild_id, data} = req.body
+
+  const user = await verifyToken(token);
+  if (!user || !data || !"messageId" in data || !"roleId" in data || !"channelId" in data || !"emoji" in data){
+    res.send({err: true, message: "Incorrect form data"});
+    return;
+  }
+
+  if (!user.flags.some(flag => flag.id === 1)){
+    res.send({err: true, message: "Вы не можете использовать этот функционал!"});
+    return;
+  }
+  if (Object.keys(user.discord).length === 0){
+    res.send({err: true, message: "Discord аккаунт не привязан"});
+    return;
+  }
+
+  if(!user.discord.guilds.find(guild => guild.id === guild_id)){
+    res.send({err: true, message: "Вы не владеете данным серверов"});
+    return;
+  }
+
+  let guild = await Guild.findOne({id: guild_id});
+
+  if(!guild){
+    res.send({err: true, message: "Сервер не найден"});
+    return;
+  }
+
+  try{
+    let channel = await client.channels.fetch(data.channelId);
+    let message = await channel.messages.fetch(data.messageId);
+    await message.react(data.emoji);
+  }catch (e) {}
+
+  guild.options = {...guild.options, reactionRole: [...guild.options.reactionRole, data]};
+  await guild.save();
+
+  res.send({err: false})
+});
+
+app.post("/api/removeReactionRole", async (req, res) => {
+  const {token} = req.cookies;
+
+  const {guild_id, id} = req.body
+
+  const user = await verifyToken(token);
+  if (!user || !id){
+    res.send({err: true, message: "Incorrect form data"});
+    return;
+  }
+
+  if (!user.flags.some(flag => flag.id === 1)){
+    res.send({err: true, message: "Вы не можете использовать этот функционал!"});
+    return;
+  }
+  if (Object.keys(user.discord).length === 0){
+    res.send({err: true, message: "Discord аккаунт не привязан"});
+    return;
+  }
+
+  if(!user.discord.guilds.find(guild => guild.id === guild_id)){
+    res.send({err: true, message: "Вы не владеете данным серверов"});
+    return;
+  }
+
+  let guild = await Guild.findOne({id: guild_id});
+
+  if(!guild){
+    res.send({err: true, message: "Сервер не найден"});
+    return;
+  }
+  try{
+    let channel = await client.channels.fetch(data.channelId);
+    let message = await channel.messages.fetch(data.messageId);
+    await message.reactions.cache.get(await guild.options.reactionRole.find(r => r.id === id).emoji).remove()
+  }catch (e) {}
+
+
+  let resultArr = [];
+
+  for (let role of JSON.parse(JSON.stringify(guild.options.reactionRole))){
+    if (role.id !== id) {
+      resultArr.push(role);
+    }
+  }
+
+  guild.options = {...guild.options, reactionRole: resultArr};
+  await guild.save();
+
+  res.send({err: false})
+});
 
 //update bot commands
 app.post("/api/updateGuildData", async (req, res) => {

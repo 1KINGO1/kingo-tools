@@ -5,6 +5,7 @@ import {Loading} from "../components/Loading";
 import {Commands} from "../pages/profile-page/pages/bot-page/bot-modules/commands/Commands";
 import {Levels} from "../pages/profile-page/pages/bot-page/bot-modules/levels/Levels";
 import {Logger} from "../pages/profile-page/pages/bot-page/bot-modules/Logger";
+import {ReactionRoles} from "../pages/profile-page/pages/bot-page/bot-modules/ReactionRoles";
 
 const DiscordClientBot = React.lazy(() =>
     import('../pages/profile-page/pages/discordClientBot/DiscordClientBot')
@@ -67,6 +68,10 @@ export default {
         {
             link: "logger",
             component: <Logger />
+        },
+        {
+            link: "rr",
+            component: <ReactionRoles />
         }
     ]
 }
