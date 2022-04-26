@@ -58,7 +58,7 @@ const ReactionRole = styled.div`
   justify-content: space-between;
 
   background-color: #17161a;
-  border-radius: 3px;
+  border-radius: 10px;
   padding: 10px;
 
   p {

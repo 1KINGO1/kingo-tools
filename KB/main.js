@@ -217,6 +217,9 @@ client.on("messageUpdate", async (oldMessage, newMessage) => {
   if (!guild || !guild.options.allowed) {
     return;
   };
+  if (oldMessage.author.bot || newMessage.author.bot){
+    return;
+  }
   if (oldMessage.content.trim() === newMessage.content.trim()) return;
   if (oldMessage.content.trim() === "" || newMessage.content.trim() === "") return;
   if (!guild.options.logger.messageEventsAllow.includes("MESSAGE_EDIT")) return;
