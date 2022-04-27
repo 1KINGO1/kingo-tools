@@ -246,7 +246,7 @@ client.on("messageUpdate", async (oldMessage, newMessage) => {
   let embed = new MessageEmbed()
     .setTitle("Сообщение изменено в " + channel.name)
     .setAuthor(newMessage.author.username + "#" + newMessage.author.discriminator, newMessage.author.displayAvatarURL())
-    .setDescription(`**Before**: ${oldMessage.content}\n**After**: ${newMessage.content}`)
+    .setDescription(`**Before**: \n\`\`\`${oldMessage.content}\`\`\`\n**After**: \n\`\`\`${newMessage.content}\`\`\``)
     .setFooter(`ID: ${newMessage.id}`)
     .setTimestamp(new Date())
     .setColor(colors.yellow)
