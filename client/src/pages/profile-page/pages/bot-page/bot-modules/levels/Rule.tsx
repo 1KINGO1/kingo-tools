@@ -7,13 +7,14 @@ import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../../../../store/store";
 
 const StyledRule = styled.div`
-  padding: 5px;
+  padding: 10px;
   background-color: ${props => props.theme.colors.dark};
   margin: 0 0 6px 0;
   border-radius: 8px;
   
   p{
     font-size: 16px;
+    margin: 3px 0;
   }
   p:first-child{
     margin: 0 0 3px 0;
@@ -27,7 +28,7 @@ const RemoveButton = styled.div`
   background-color: #4d0000;
   display: inline-block;
   border-radius: 10px;
-  margin: 5px 0px;
+  margin: 10px 0px 5px;
   
   transition: .1s all ease;
   
@@ -40,6 +41,7 @@ export const Rule: FC<LevelSystemRole>  = ({comment, roleId, levelRequired}) => 
 
   const guildID = useSelector<RootState>(state => state.bot.guildData?.id) as string;
   const dispatch = useDispatch();
+  const roles = useSelector<RootState>(state => state.bot.guildRoles) as { name: string, id: string, color: string }[];
 
   const onRemove = () => {
     defineLevelsRule(roleId, "remove_levels_rule", guildID).then((data) => {
@@ -52,7 +54,7 @@ export const Rule: FC<LevelSystemRole>  = ({comment, roleId, levelRequired}) => 
   return(
     <StyledRule>
       <p>
-        {levelRequired} уровень - {roleId}
+        {levelRequired} уровень - {roles.find(r => r.id === roleId)?.name || roleId}
       </p>
       <p>
         {comment}

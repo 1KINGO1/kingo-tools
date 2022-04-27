@@ -16,7 +16,7 @@ const BotPageWrapper = styled.div`
   &::-webkit-scrollbar {
     width: 10px;
   }
-
+ 
   /* Track */
   &::-webkit-scrollbar-track {
     background: transparent;

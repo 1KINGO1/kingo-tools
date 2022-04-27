@@ -5,7 +5,7 @@ import {useDispatch} from "react-redux";
 import {setGuild} from "../../../../../store/actions/botActions";
 
 const StyledGuildWrapper = styled.div`
-  margin: 20px;
+  margin: 20px 40px;
   width: 200px;
   max-height: 250px;
 `
@@ -13,7 +13,7 @@ const StyledGuildWrapper = styled.div`
 const StyledGuildBox = styled.div<any>`
   width: 160px;
   height: 160px;
-  border-radius: 30px;
+  border-radius: 100%;
   margin: 20px;
   background-color: ${props => props.theme.colors.dark};
   background-repeat: no-repeat;

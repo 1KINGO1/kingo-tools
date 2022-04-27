@@ -49,6 +49,7 @@ const AddButton = styled.div`
   }
 `;
 const RuleListWrapper = styled.div`
+  min-width: 40px;
   background-color: rgba(255, 255, 255, 0.1);
   padding: 5px;
   border-radius: 8px;
@@ -218,12 +219,21 @@ export const Levels: FC = () => {
             ]}
           >
             <Label>
-              Введите айди роли
+              Укажите роль
             </Label>
-            <Input placeholder="Введите айди роли"
-                   style={{margin: "5px 0"}}
-                   value={roleId}
-                   onChange={(e: ChangeEvent<HTMLInputElement>) => setRoleId(e.target.value)}/>
+            <Select
+              showSearch
+              placeholder="Нажмите чтобы выбрать роль"
+              optionFilterProp="children"
+              style={{width: "100%", margin: "5px 0"}}
+              onChange={(selected: string) => {
+                setRoleId(selected)
+              }}
+            >
+              {roles
+                .map((role, i) => (
+                  <Option style={{borderLeft: "2px solid " + role.color}} value={role.id} key={i}>{role.name}</Option>))}
+            </Select>
             <Label>
               Введите необходимый уровень
             </Label>

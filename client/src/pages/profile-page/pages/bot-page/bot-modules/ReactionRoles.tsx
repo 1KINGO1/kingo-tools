@@ -47,7 +47,7 @@ const Wrapper = styled.div`
   }
 
   /* Handle on hover */
-
+  
   &::-webkit-scrollbar-thumb:hover {
     background: #e6fffb;
   }
@@ -141,7 +141,6 @@ export const ReactionRoles: FC = () => {
       >
         <Select
           showSearch
-          defaultValue={selectedRole}
           placeholder="Нажмите чтобы выбрать роль"
           optionFilterProp="children"
           style={{width: "100%", margin: "5px 0"}}
@@ -156,7 +155,6 @@ export const ReactionRoles: FC = () => {
         </Select>
         <Select
           showSearch
-          defaultValue={selectedChannel}
           placeholder="Нажмите чтобы выбрать канал"
           optionFilterProp="children"
           style={{width: "100%", margin: "5px 0"}}

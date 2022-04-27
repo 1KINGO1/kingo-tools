@@ -37,8 +37,27 @@ const Guild = mongoose.model("Server", {
   data: Object
 });
 
-client.on('ready', () => {
+const Reminds = mongoose.model("Remind", {
+  user_id: String,
+  text: String,
+  sendDate: Number
+})
+
+client.on('ready', async () => {
   console.log(`Logged in as ${client.user.tag}!`);
+  let reminds = await Reminds.find({});
+  reminds.forEach(r => {
+    setTimeout(async () => {
+      let user = await client.users.fetch(r.user_id);
+      let ch = await user.createDM();
+      let embed = new MessageEmbed()
+        .setTitle("Вы просили напомнить вам:")
+        .setDescription(r.text)
+        .setColor(colors.green);
+      await ch.send({embeds: [embed]});
+      await r.remove();
+    }, r.sendDate - new Date().getTime() <= 0 ? 0 : r.sendDate - new Date().getTime())
+  })
 });
 
 client.on('messageCreate', async (message, author) => {
@@ -481,5 +500,6 @@ client.login(token).then(() => {
 
 module.exports = {
   client,
-  User
+  User,
+  Reminds
 }

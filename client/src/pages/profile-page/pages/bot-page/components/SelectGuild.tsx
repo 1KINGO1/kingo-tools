@@ -6,7 +6,7 @@ import {Loading} from "../../../../../components/Loading";
 
 const GuildWrapper = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   flex-wrap: wrap;
 `;
 
