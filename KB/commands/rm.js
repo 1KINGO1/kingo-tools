@@ -26,6 +26,10 @@ module.exports = {
       message.reply("Укажите время!");
       return;
     }
+    if (!args[1]){
+      message.reply("Введите сообщение для напоминания!");
+      return;
+    }
     let time;
     try {
       time = dateParser(args[0]);
