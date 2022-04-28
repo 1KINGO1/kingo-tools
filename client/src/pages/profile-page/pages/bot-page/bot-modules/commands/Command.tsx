@@ -164,7 +164,7 @@ export const Command: FC<CommandProps> = ({name, description, on, example, isSla
         </Label>
         <Select
           mode="multiple"
-          defaultValue={selectedRoles.map(role => roles.find(r => r.id === role)?.name || role)}
+          defaultValue={selectedRoles}
           placeholder="Нажмите чтобы выбрать"
           optionFilterProp="children"
           style={{width: "100%"}}
@@ -184,7 +184,7 @@ export const Command: FC<CommandProps> = ({name, description, on, example, isSla
         </Label>
         <Select
           mode="multiple"
-          defaultValue={selectedChannels.map(channel => "#" + (channels.find(ch => ch.id === channel)?.name || channel))}
+          defaultValue={selectedChannels}
           placeholder="Нажмите чтобы выбрать"
           optionFilterProp="children"
           style={{width: "100%"}}
