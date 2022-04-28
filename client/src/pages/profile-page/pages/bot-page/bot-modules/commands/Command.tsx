@@ -176,7 +176,6 @@ export const Command: FC<CommandProps> = ({name, description, on, example, isSla
           }}
         >
           {[...roles, {id: "admins", name: "admins", color: "24E7EA"}]
-            .filter(c => !selectedRoles.includes(c.id))
             .map((role, i) => (
               <Option style={{borderLeft: "2px solid " + role.color}} value={role.id} key={i}>{role.name}</Option>))}
         </Select>
@@ -195,7 +194,6 @@ export const Command: FC<CommandProps> = ({name, description, on, example, isSla
           }}
         >
           {[...channels, {id: "all", name: "all"}]
-            .filter(c => !selectedChannels.includes(c.id))
             .map((channel, i) => (<Option value={channel.id} key={i}>{channel.name}</Option>))}
         </Select>
       </Modal>
