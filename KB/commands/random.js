@@ -17,6 +17,11 @@ module.exports = {
     }
     let args = message.content.split(" ").slice(1);
 
+    if (args.length === 0){
+      message.reply("Введите список пользователей !");
+      return;
+    }
+
     if (args.length === 1){
       if (/[0-9]+-[0-9]+/.test(args[0])){
         let [num1, num2] = args[0].split("-");
