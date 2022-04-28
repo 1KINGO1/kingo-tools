@@ -163,7 +163,7 @@ export const Levels: FC = () => {
               </Label>
               <Select
                 mode="multiple"
-                defaultValue={selectedChannels.map(channel => "#" + (channels.find(ch => ch.id === channel)?.name || channel))}
+                defaultValue={selectedChannels}
                 placeholder="Нажмите чтобы выбрать"
                 optionFilterProp="children"
                 style={{width: "100%"}}
@@ -173,7 +173,6 @@ export const Levels: FC = () => {
                 }}
               >
                 {[...channels, {id: "all", name: "all"}]
-                  .filter(c => !selectedChannels.includes(c.id))
                   .map((channel, i) => (<Option value={channel.id} key={i}>{channel.name}</Option>))}
               </Select>
 
@@ -182,7 +181,7 @@ export const Levels: FC = () => {
               </Label>
               <Select
                 mode="multiple"
-                defaultValue={selectedRoles.map(role => roles.find(r => r.id === role)?.name || role)}
+                defaultValue={selectedRoles}
                 placeholder="Нажмите чтобы выбрать"
                 optionFilterProp="children"
                 style={{width: "100%"}}
@@ -192,7 +191,6 @@ export const Levels: FC = () => {
                 }}
               >
                 {roles
-                  .filter(c => !selectedRoles.includes(c.id))
                   .map((role, i) => (<Option style={{borderLeft: "2px solid " + role.color}} value={role.id} key={i}>{role.name}</Option>))}
               </Select>
             </div>
