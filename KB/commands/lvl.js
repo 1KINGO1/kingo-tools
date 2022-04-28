@@ -73,10 +73,20 @@ module.exports = {
       //Ник
       context.font = '48px sans-serif';
       context.fillStyle = user.themeColor || "#fff";
-      context.fillText(mentionedMember?.displayName || member.displayName, 215, 80);
+      context.fillText(mentionedMember?.displayName || member.displayName, 215, 85);
 
       //Ранг
-      context.font = '40px sans-serif';
+      context.font = '30px sans-serif';
+      let rank;
+      let users = JSON.parse(JSON.stringify(guild.options.levelSystem.users));
+      for (let userIndex in users){
+        if (users[userIndex].id === (mentionedMember || member).id){
+          rank = userIndex;
+        }
+      }
+      let widthRank = context.measureText(`Rank #${+rank + 1}`).width;
+      context.fillStyle = user.themeColor || "#fff";
+      context.fillText(`Rank #${+rank + 1}`, canvas.width - widthRank - 25, 80);
 
       //Уровень
       context.font = '30px sans-serif';
@@ -93,7 +103,7 @@ module.exports = {
       context.beginPath();
       context.moveTo(220, 180);
       context.lineWidth = 15;
-      context.strokeStyle = user.secondThemeColor || '#8c8c8c';
+      context.strokeStyle = user.themeColor || "#fff";
       context.lineCap = 'round';
       context.lineTo(670, 180);
       context.stroke();
@@ -102,7 +112,7 @@ module.exports = {
       context.beginPath();
       context.moveTo(220, 180);
       context.lineWidth = 15;
-      context.strokeStyle = user.themeColor || "#fff";
+      context.strokeStyle =  user.secondThemeColor || "#fff";
       context.lineCap = 'round';
       context.lineTo(210 + statistic.levelFarmed / statistic.levelNeedFarm * 460, 180);
       context.stroke();

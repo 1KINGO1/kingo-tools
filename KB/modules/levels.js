@@ -8,7 +8,7 @@ module.exports = async function levels(message, guild, member){
       id: message.author.id,
       totalXP: 0,
       themeColor: "#fff",
-      secondThemeColor: "#8c8c8c",
+      secondThemeColor: "#fff",
       backgroundImage: ""
     };
 
