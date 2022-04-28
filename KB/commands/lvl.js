@@ -103,7 +103,7 @@ module.exports = {
       context.beginPath();
       context.moveTo(220, 180);
       context.lineWidth = 15;
-      context.strokeStyle = user.themeColor || "#fff";
+      context.strokeStyle = "#4d4d4d";
       context.lineCap = 'round';
       context.lineTo(670, 180);
       context.stroke();
