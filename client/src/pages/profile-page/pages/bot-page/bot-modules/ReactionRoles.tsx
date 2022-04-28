@@ -56,6 +56,7 @@ const ReactionRole = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  align-items: center;
 
   background-color: #17161a;
   border-radius: 10px;
@@ -191,7 +192,7 @@ export const ReactionRoles: FC = () => {
             });
           }}>Удалить</Button>}>
             <ReactionRole key={rr.id}>
-              <p>#{channels.find(c => rr.channelId === c.id)?.name}</p>
+              <p style={{background: "hsla(235,85.6%,64.7%,0.3)", color: "hsl(236,83.3%,92.9%)", display: "inline-block", padding: "2px"}}>#{channels.find(c => rr.channelId === c.id)?.name}</p>
               <p
                 style={{color: roles.find(c => rr.roleId === c.id)?.color}}>@{roles.find(c => rr.roleId === c.id)?.name}</p>
               <p>{rr.messageId}</p>
@@ -203,8 +204,4 @@ export const ReactionRoles: FC = () => {
 
     </ReactionRolesWrapper>
   )
-}
-
-function uniqid(): string {
-  throw new Error("Function not implemented.");
 }
