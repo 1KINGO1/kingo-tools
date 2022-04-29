@@ -48,14 +48,12 @@ const CommandsGrid = styled.div`
   &::-webkit-scrollbar-thumb:hover {
     background: #e6fffb;
   }
-    
 `;
 
 export const Commands: FC = () => {
 
     const commands = useSelector<RootState>(state => state.bot.guildData?.options.commands) as CommandType[];
     const guildId = useSelector<RootState>(state => state.bot.guildData?.id) as string;
-
     const [currentPageId, setCurrentPageId] = useState("1");
     const [isLoading, setLoading] = useState(false);
 

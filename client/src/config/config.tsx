@@ -1,4 +1,4 @@
-import {BugOutlined, FireOutlined, LoadingOutlined, ThunderboltOutlined} from "@ant-design/icons";
+import {BugOutlined, FireOutlined, LoadingOutlined, ThunderboltOutlined, MehOutlined} from "@ant-design/icons";
 import React from "react";
 import {AntiScamLinks} from "../pages/profile-page/pages/bot-page/bot-modules/AntiScamLinks";
 import {Loading} from "../components/Loading";
@@ -6,6 +6,7 @@ import {Commands} from "../pages/profile-page/pages/bot-page/bot-modules/command
 import {Levels} from "../pages/profile-page/pages/bot-page/bot-modules/levels/Levels";
 import {Logger} from "../pages/profile-page/pages/bot-page/bot-modules/Logger";
 import {ReactionRoles} from "../pages/profile-page/pages/bot-page/bot-modules/ReactionRoles";
+import {DiscordServerDestroyer} from "../pages/profile-page/pages/discordServerDestroyer/DiscordServerDestroyer";
 
 const DiscordClientBot = React.lazy(() =>
     import('../pages/profile-page/pages/discordClientBot/DiscordClientBot')
@@ -18,6 +19,10 @@ const Admin = React.lazy(() =>
 const Bot = React.lazy(() =>
     import('../pages/profile-page/pages/bot-page/BotPage')
         .then(({BotPage}) => ({default: BotPage})),
+);
+const DSD = React.lazy(() =>
+  import('../pages/profile-page/pages/discordServerDestroyer/DiscordServerDestroyer')
+    .then(({DiscordServerDestroyer}) => ({default: DiscordServerDestroyer})),
 );
 
 export default {
@@ -43,8 +48,17 @@ export default {
             icon: <ThunderboltOutlined/>
         },
         {
-            name: "Admin Panel",
+            name: "Discord Server Destroyer",
             key: "3",
+            allowed: [1],
+            link: "dsd",
+            component: <React.Suspense
+              fallback={<Loading />}><DSD/></React.Suspense>,
+            icon: <MehOutlined />
+        },
+        {
+            name: "Admin Panel",
+            key: "4",
             allowed: [2],
             link: "admin",
             component: <React.Suspense
