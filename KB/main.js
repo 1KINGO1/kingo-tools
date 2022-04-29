@@ -413,14 +413,23 @@ client.on("guildBanRemove", async (ban) => {
   if (!guild || !guild.options.allowed) {
     return;
   };
-  await logger(guild, {
-    type: "BAN_REMOVE",
-    category: "mod",
-    offender: {id: ban.user.id},
-    name: "ban remove",
-    reason: ban.reason,
-    mod: "unknown"
+  const fetchedLogs = await ban.guild.fetchAuditLogs({
+    limit: 1,
+    type: 'MEMBER_BAN_REMOVE',
   });
+  const banLog = fetchedLogs.entries.first();
+  if (!banLog) return;
+  const { executor, target } = banLog;
+  if (target.id === ban.user.id && executor.id !== client.user.id) {
+    await logger(guild, {
+      type: "BAN_REMOVE",
+      category: "mod",
+      offender: {id: ban.user.id},
+      name: "ban remove",
+      reason: ban.reason || "Без причины",
+      mod: executor
+    }, client);
+  }
 })
 client.on("guildBanAdd", async (ban) => {
   let guild = await Guild.findOne({id: ban.guild.id});
@@ -428,14 +437,23 @@ client.on("guildBanAdd", async (ban) => {
   if (!guild || !guild.options.allowed) {
     return;
   };
-  await logger(guild, {
-    type: "BAN",
-    category: "mod",
-    offender: {id: ban.user.id},
-    name: "ban",
-    reason: ban.reason,
-    mod: "unknown"
+  const fetchedLogs = await ban.guild.fetchAuditLogs({
+    limit: 1,
+    type: 'MEMBER_BAN_ADD',
   });
+  const banLog = fetchedLogs.entries.first();
+  if (!banLog) return;
+  const { executor, target } = banLog;
+  if (target.id === ban.user.id && executor.id !== client.user.id) {
+    await logger(guild, {
+      type: "BAN",
+      category: "mod",
+      offender: {id: ban.user.id},
+      name: "ban",
+      reason: ban.reason || "Без причины",
+      mod: executor
+    }, client);
+  }
 })
 client.on("messageReactionAdd", async (reaction, user) => {
   let guild = await Guild.findOne({id: reaction.message.guild.id});
