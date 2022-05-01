@@ -3,6 +3,7 @@ import axios from "axios";
 import {User} from "../store/actions/authActions";
 import {LevelSystemRole} from "../types/LevelSystemRole";
 import {ReactionRole} from "../types/ReactionRole";
+import {CustomCommand} from "../types/CustomCommand";
 
 interface registerResponse{
   err: boolean,
@@ -175,6 +176,30 @@ export const removeRole = async (id: string, guild_id: string) => {
   const {data} = await axios.post(config.API_URL + "/removeReactionRole",{
     id,
     guild_id
+  },{
+    withCredentials: true
+  });
+  return data;
+}
+export const addCommand = async (payload: CustomCommand, guild_id: string) => {
+  const {data} = await axios.post(config.API_URL + "/config",{
+    type: "add_custom_command",
+    payload,
+    guild_id: guild_id || "none",
+    property: "none",
+    module: "customCommands"
+  },{
+    withCredentials: true
+  });
+  return data;
+}
+export const removeCommand = async (payload: string, guild_id: string) => {
+  const {data} = await axios.post(config.API_URL + "/config",{
+    type: "remove_custom_command",
+    payload,
+    guild_id: guild_id || "none",
+    property: "none",
+    module: "customCommands"
   },{
     withCredentials: true
   });

@@ -658,7 +658,7 @@ app.post("/api/config", async (req, res) => {
   /* ==== req body structure ====
 
 
-  * type => change_field | on_module | off_module | change_command | add_levels_rule | remove_levels_rule | check_log_property | uncheck_log_property
+  * type => change_field | on_module | off_module | change_command | add_levels_rule | remove_levels_rule | check_log_property | uncheck_log_property | add_custom_command | remove_custom_command
   * payload => something data
   * guild_id => guild id
   * module => module name in database
@@ -881,6 +881,43 @@ app.post("/api/config", async (req, res) => {
       guild.options = {...guild.options, logger: loggerCopy};
       await guild.save().catch(console.log);
       res.send({err: false})
+      break;
+
+    case "add_custom_command":
+      if (!"name" in payload || !"text" in payload || !"sendChannel" in payload || !"rolesWhiteList" in payload || !"channelWhiteList" in payload){
+        res.send({err: true, message: "Invalid from data!"});
+        return
+      }
+      const {name, text, sendChannel, rolesWhiteList, channelWhiteList} = payload;
+      if (typeof name !== "string" || typeof text !== "string" || typeof sendChannel !== "string"  || !rolesWhiteList instanceof Array || !channelWhiteList instanceof Array){
+        res.send({err: true, message: "Invalid from data!"});
+        return
+      }
+      let сcommand = await JSON.parse(JSON.stringify(guild.options.customCommands)).find(c => c.name === payload.name);
+      if (сcommand){
+        res.send({err: true, message: "Команда с таким именем уже существует"});
+        return
+      }
+      guild.options = {...guild.options, customCommands: [...guild.options.customCommands, payload]};
+      await guild.save();
+      res.send({err: false});
+      break;
+    case "remove_custom_command":
+      if (typeof payload !== "string"){
+        res.send({err: true, message: "Invalid from data!"});
+        return
+      }
+      let comArr = [];
+
+      for(let command of guild.options.customCommands){
+        if (command.name === payload){
+          continue;
+        }
+        comArr.push(command);
+      }
+      guild.options = {...guild.options, customCommands: comArr};
+      await guild.save();
+      res.send({err: false});
       break;
 
     default:

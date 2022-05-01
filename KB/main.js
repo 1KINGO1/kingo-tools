@@ -9,7 +9,7 @@ const client = new Discord.Client({
 });
 const reactionRoles = require("./modules/reactionRoles");
 let colors = require("./utils/colors");
-
+const customCommand = require("./modules/customCommand");
 const {token, prefix} = require('./config.json');
 
 //MODULES
@@ -85,12 +85,18 @@ client.on('messageCreate', async (message, author) => {
   if (!message.content.startsWith(prefix)) return;
   let messageArray = message.content.split(' ');
 
+  //Custom Command
+  let ccommand = guild.options.customCommands.find((command) => prefix + command.name === messageArray[0]);
+  if (ccommand){
+    customCommand(message, ccommand, guild, client);
+    return;
+  }
+
   //Commands
   let command = guild.options.commands.find((command) => command?.alternative?.some(com => prefix + com === messageArray[0]) || prefix + command.name === messageArray[0]);
   if (!command) {
     return;
-  }
-  ;
+  };
   const messageObj = require(`./commands/${command.name}`);
   if (command.on) {
     await messageObj.execute(message, command, guild, client);
@@ -236,7 +242,7 @@ client.on("messageUpdate", async (oldMessage, newMessage) => {
   if (!guild || !guild.options.allowed) {
     return;
   };
-  if (oldMessage.author.bot || newMessage.author.bot){
+  if (oldMessage?.author?.bot || newMessage?.author?.bot){
     return;
   }
   if (oldMessage.content.trim() === newMessage.content.trim()) return;

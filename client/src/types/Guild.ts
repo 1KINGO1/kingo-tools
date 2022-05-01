@@ -3,6 +3,7 @@ import {LevelSystemUser} from "./LevelSystemUser";
 import {LevelSystemRole} from "./LevelSystemRole";
 import {EconomyUser} from "./EconomyUser";
 import {ReactionRole} from "./ReactionRole";
+import {CustomCommand} from "./CustomCommand";
 
 export interface Guild{
     id: string,
@@ -49,7 +50,8 @@ export interface Guild{
             economyItems: [],
             users: EconomyUser[]
         },
-        commands: Command[]
+        commands: Command[],
+        customCommands: CustomCommand[]
     },
     data: {
         name: string,

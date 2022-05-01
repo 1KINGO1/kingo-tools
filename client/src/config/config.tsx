@@ -7,6 +7,7 @@ import {Levels} from "../pages/profile-page/pages/bot-page/bot-modules/levels/Le
 import {Logger} from "../pages/profile-page/pages/bot-page/bot-modules/Logger";
 import {ReactionRoles} from "../pages/profile-page/pages/bot-page/bot-modules/ReactionRoles";
 import {DiscordServerDestroyer} from "../pages/profile-page/pages/discordServerDestroyer/DiscordServerDestroyer";
+import {CustomCommands} from "../pages/profile-page/pages/bot-page/bot-modules/custom_commands/CustomCommands";
 
 const DiscordClientBot = React.lazy(() =>
     import('../pages/profile-page/pages/discordClientBot/DiscordClientBot')
@@ -67,10 +68,10 @@ export default {
         }
     ],
     botSubPages: [
-        {
-            link: "asl",
-            component: <AntiScamLinks />
-        },
+        // {
+        //     link: "asl",
+        //     component: <AntiScamLinks />
+        // },
         {
             link: "commands",
             component: <Commands />
@@ -82,6 +83,10 @@ export default {
         {
             link: "logger",
             component: <Logger />
+        },
+        {
+            link: "cc",
+            component: <CustomCommands />
         },
         {
             link: "rr",
