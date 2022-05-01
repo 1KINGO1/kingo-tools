@@ -63,6 +63,7 @@ module.exports = {
       }
     }
     guild.options = {...guild.options, economy: {...guild.options.economy, users: resultArray}};
+    guild.markModified("options");
     await guild.save();
     let embed = new MessageEmbed()
       .setDescription(`Собрано ${coins.gold}<:gold_coin:965238193945444372> ${coins.silver}<:silver_coin:965239170459136041>`)

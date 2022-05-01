@@ -51,6 +51,7 @@ module.exports = {
       }
     }
     guild.options = {...guild.options, economy: {...guild.options.economy, users: resultArray}};
+    guild.markModified("options");
     await guild.save();
 
     let random = Math.floor(Math.random() * (3 - 0 + 1) + 0);
@@ -80,6 +81,7 @@ module.exports = {
               }
             }
             guild.options = {...guild.options, economy: {...guild.options.economy, users: resultArray}};
+            guild.markModified("options");
             await guild.save();
           } else {
             // adding coins
@@ -99,6 +101,7 @@ module.exports = {
               }
             }
             guild.options = {...guild.options, economy: {...guild.options.economy, users: resultArray}};
+            guild.markModified("options");
             await guild.save();
           }
         }).catch(async () => {
@@ -116,6 +119,7 @@ module.exports = {
             }
           }
           guild.options = {...guild.options, economy: {...guild.options.economy, users: resultArray}};
+          guild.markModified("options");
           await guild.save();
         });
     }
@@ -136,6 +140,7 @@ module.exports = {
         }
       }
       guild.options = {...guild.options, economy: {...guild.options.economy, users: resultArray}};
+      guild.markModified("options");
       await guild.save();
     }
     if (random === 2) {
@@ -163,6 +168,7 @@ module.exports = {
                 }
               }
               guild.options = {...guild.options, economy: {...guild.options.economy, users: resultArray}};
+              guild.markModified("options");
               await guild.save();
               return;
             }
@@ -182,6 +188,7 @@ module.exports = {
               }
             }
             guild.options = {...guild.options, economy: {...guild.options.economy, users: resultArray}};
+            guild.markModified("options");
             await guild.save();
           }
         ).catch(async () => {
@@ -199,6 +206,7 @@ module.exports = {
             }
           }
           guild.options = {...guild.options, economy: {...guild.options.economy, users: resultArray}};
+          guild.markModified("options");
           await guild.save();
         });
     }
@@ -219,6 +227,7 @@ module.exports = {
         }
       }
       guild.options = {...guild.options, economy: {...guild.options.economy, users: resultArray}};
+      guild.markModified("options");
       await guild.save();
     }
   }

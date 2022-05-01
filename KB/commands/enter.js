@@ -13,7 +13,7 @@ module.exports = {
     let guild = message.guild;
     let member = await guild.members.fetch(message.author.id);
     if (!await checkRoles(command, member)){
-      message.reply("Вы не можете банить пользователей!");
+      message.reply("Вы не можете использовать эту команду!");
       return;
     };
     if (!await checkChannels(command, message.channel.id)){
