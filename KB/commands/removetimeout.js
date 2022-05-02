@@ -57,6 +57,12 @@ module.exports = {
       return;
     }
 
+    if (banMember.id === message.author.id){
+      let embed = new MessageEmbed().setDescription(`⛔ Вы не можете размутить себя!`).setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
+      return;
+    }
+
     try{
       await banMember.timeout(0, "Размут")
       let embed = new MessageEmbed().setDescription(`${banMember.user.tag} был размучен ✅`).setColor(colors.green);

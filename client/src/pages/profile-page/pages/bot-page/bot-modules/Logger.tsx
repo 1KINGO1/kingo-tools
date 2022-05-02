@@ -94,6 +94,10 @@ export const Logger: FC = () => {
                       defaultChecked={guild.options.logger.modAllow.includes("BAN_REMOVE")}>BAN_REMOVE</Checkbox>
             <Checkbox onChange={(e) => checkHandler(e.target.checked, "modAllow", "TIMEOUT_REMOVE")}
                       defaultChecked={guild.options.logger.modAllow.includes("TIMEOUT_REMOVE")}>TIMEOUT_REMOVE</Checkbox>
+            <Checkbox onChange={(e) => checkHandler(e.target.checked, "modAllow", "MUTE")}
+                      defaultChecked={guild.options.logger.modAllow.includes("MUTE")}>MUTE</Checkbox>
+            <Checkbox onChange={(e) => checkHandler(e.target.checked, "modAllow", "MUTE_REMOVE")}
+                      defaultChecked={guild.options.logger.modAllow.includes("MUTE_REMOVE")}>MUTE_REMOVE</Checkbox>
           </Flex>
         </FlexBox>
         <FlexBox>

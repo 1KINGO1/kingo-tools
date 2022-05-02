@@ -52,6 +52,12 @@ module.exports = {
       return;
     }
 
+    if (banMember.id === message.author.id){
+      let embed = new MessageEmbed().setDescription(`⛔ Вы не можете кикнуть себя!`).setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
+      return;
+    }
+
     try{
       await guild.members.kick(banMember.id, args[1] || "Без причины");
       let embed = new MessageEmbed().setDescription(`${banMember.user.tag} был кикнут ✅`).setColor(colors.green);

@@ -57,7 +57,56 @@ client.on('ready', async () => {
       await ch.send({embeds: [embed]});
       await r.remove();
     }, r.sendDate - new Date().getTime() <= 0 ? 0 : r.sendDate - new Date().getTime())
-  })
+  });
+  let guilds = await Guild.find({});
+  for (let guild of guilds){
+    let guildObj = await client.guilds.fetch(guild.id);
+    for (let mute of JSON.parse(JSON.stringify(guild.options.mute.users))){
+      let member = await guildObj.members.fetch(mute.id);
+      if (mute.to <= new Date().getTime()){
+        await member.roles.remove(guild.options.mute.role);
+        let resultArr = [];
+        for (let banUser of JSON.parse(JSON.stringify(guild.options.mute.users))) {
+          if (banUser.id === member.id) continue;
+          resultArr.push(banUser);
+        }
+        guild.options = {...guild.options, mute: {...guild.options.mute, users: resultArr}};
+        guild.markModified("options");
+        await guild.save();
+        await logger(guild, {
+          type: "MUTE_REMOVE",
+          category: "mod",
+          offender: member.user,
+          name: "unmute",
+          reason: "Истёк срок",
+          mod: client.user
+        }, client);
+      }
+      else{
+        setTimeout(async () => {
+          try{
+            await member.roles.remove(guild.options.mute.role);
+            let resultArr = [];
+            for (let banUser of JSON.parse(JSON.stringify(guild.options.mute.users))) {
+              if (banUser.id === member.id) continue;
+              resultArr.push(banUser);
+            }
+            guild.options = {...guild.options, mute: {...guild.options.mute, users: resultArr}};
+            guild.markModified("options");
+            await guild.save();
+            await logger(guild, {
+              type: "MUTE_REMOVE",
+              category: "mod",
+              offender: member.user,
+              name: "unmute",
+              reason: "Истёк срок",
+              mod: client.user
+            }, client);
+          }catch (e) {}
+        },+mute.to - new Date().getTime());
+      }
+    }
+  }
 });
 
 client.on('messageCreate', async (message, author) => {
@@ -87,7 +136,7 @@ client.on('messageCreate', async (message, author) => {
 
   //Custom Command
   let ccommand = guild.options.customCommands.find((command) => prefix + command.name === messageArray[0]);
-  if (ccommand){
+  if (ccommand) {
     customCommand(message, ccommand, guild, client);
     return;
   }
@@ -96,7 +145,8 @@ client.on('messageCreate', async (message, author) => {
   let command = guild.options.commands.find((command) => command?.alternative?.some(com => prefix + com === messageArray[0]) || prefix + command.name === messageArray[0]);
   if (!command) {
     return;
-  };
+  }
+  ;
   const messageObj = require(`./commands/${command.name}`);
   if (command.on) {
     await messageObj.execute(message, command, guild, client);
@@ -198,7 +248,12 @@ client.on("guildCreate", async guild => {
         membersAllow: [], // ["MEMBER_JOIN", "MEMBER_LEAVE", "MEMBER_ROLE_ADD", "MEMBER_ROLE_REMOVE", "MEMBER_NICKNAME_CHANGE"],
       },
       reactionRole: [],
-      commands
+      commands,
+      mute: {
+        role: 0,
+        users: []
+      },
+      timeRoles: []
     },
     data: {
       name: guild.name,
@@ -219,7 +274,8 @@ client.on("messageDelete", async message => {
   let guild = await Guild.findOne({id: message.guild.id});
   if (!guild || !guild.options.allowed) {
     return;
-  };
+  }
+  ;
   if (!guild.options.logger.on) return;
   if (!guild.options.logger.messageEventsAllow.includes("MESSAGE_DELETE")) return;
   let channel = await client.channels.fetch(message.channelId);
@@ -241,8 +297,9 @@ client.on("messageUpdate", async (oldMessage, newMessage) => {
   if (!guild.options.logger.on) return;
   if (!guild || !guild.options.allowed) {
     return;
-  };
-  if (oldMessage?.author?.bot || newMessage?.author?.bot){
+  }
+  ;
+  if (oldMessage?.author?.bot || newMessage?.author?.bot) {
     return;
   }
   if (oldMessage.content.trim() === newMessage.content.trim()) return;
@@ -263,12 +320,49 @@ client.on("messageUpdate", async (oldMessage, newMessage) => {
   }
 })
 
+client.on("guildMemberAdd", async member => {
+  let guild = await Guild.findOne({id: member.guild.id});
+  if (!guild || !guild.options.allowed) {
+    return;
+  }
+  let mute = guild.options.mute.users.find(mute => mute.id === member.id);
+  console.log(mute);
+  if (mute) {
+    try {
+      let role = await member.guild.roles.cache.find(r => r.id === guild.options.mute.role);
+      await member.roles.add(role);
+    } catch (e) {}
+    setTimeout(async () => {
+      try {
+        await member.roles.remove(guild.options.mute.role);
+        let resultArr = [];
+        for (let banUser of JSON.parse(JSON.stringify(guild.options.mute.users))) {
+          if (banUser.id === member.id) continue;
+          resultArr.push(banUser);
+        }
+        guild.options = {...guild.options, mute: {...guild.options.mute, users: resultArr}};
+        guild.markModified("options");
+        await guild.save();
+        await logger(guild, {
+          type: "MUTE_REMOVE",
+          category: "mod",
+          offender: member.user,
+          name: "unmute",
+          reason: "Истёк срок",
+          mod: client.user
+        }, client);
+      } catch (e) {
+      }
+    }, +mute.to - new Date().getTime() < 0 ? 0 : +mute.to - new Date().getTime());
+  }
+})
+
 //LOGGER MEMBERS
 client.on("guildMemberAdd", async member => {
   let guild = await Guild.findOne({id: member.guild.id});
   if (!guild || !guild.options.allowed) {
     return;
-  };
+  }
   if (!guild.options.logger.on) return;
   if (!guild.options.logger.membersAllow.includes("MEMBER_JOIN")) return;
   let embed = new MessageEmbed()
@@ -280,8 +374,7 @@ client.on("guildMemberAdd", async member => {
   try {
     let channel = await client.channels.fetch(guild.options.logger.membersChannel);
     await channel.send({embeds: [embed]})
-  } catch (e) {
-  }
+  } catch (e) {}
 })
 client.on("guildMemberRemove", async member => {
   let guild = await Guild.findOne({id: member.guild.id});
@@ -289,7 +382,8 @@ client.on("guildMemberRemove", async member => {
   if (!guild.options.logger.membersAllow.includes("MEMBER_LEAVE")) return;
   if (!guild || !guild.options.allowed) {
     return;
-  };
+  }
+  ;
   let embed = new MessageEmbed()
     .setTitle("Пользователь вышел")
     .setAuthor(member.user.username + "#" + member.user.discriminator, member.user.displayAvatarURL())
@@ -308,7 +402,8 @@ client.on("guildMemberUpdate", async (oldMember, newMember) => {
   let guild = await Guild.findOne({id: newMember.guild.id});
   if (!guild || !guild.options.allowed) {
     return;
-  };
+  }
+  ;
   if (!guild.options.logger.on) return;
   if (JSON.stringify(oldMember.roles.cache) !== JSON.stringify(newMember.roles.cache) && oldMember.roles.cache && newMember.roles.cache && oldMember.roles.cache.size !== newMember.roles.cache.size) {
     let embed = new MessageEmbed()
@@ -361,7 +456,8 @@ client.on("voiceStateUpdate", async (oldState, newState) => {
   if (!guild.options.logger.on) return;
   if (!guild || !guild.options.allowed) {
     return;
-  };
+  }
+  ;
   if (newState.channelId !== null && oldState.channelId !== null && guild.options.logger.voiceAllow.includes("VOICE_CHANGE")) {
     let embed = new MessageEmbed()
       .setTitle("Пользователь поменял войс")
@@ -418,14 +514,15 @@ client.on("guildBanRemove", async (ban) => {
   if (!guild.options.logger.on) return;
   if (!guild || !guild.options.allowed) {
     return;
-  };
+  }
+  ;
   const fetchedLogs = await ban.guild.fetchAuditLogs({
     limit: 1,
     type: 'MEMBER_BAN_REMOVE',
   });
   const banLog = fetchedLogs.entries.first();
   if (!banLog) return;
-  const { executor, target } = banLog;
+  const {executor, target} = banLog;
   if (target.id === ban.user.id && executor.id !== client.user.id) {
     await logger(guild, {
       type: "BAN_REMOVE",
@@ -442,14 +539,15 @@ client.on("guildBanAdd", async (ban) => {
   if (!guild.options.logger.on) return;
   if (!guild || !guild.options.allowed) {
     return;
-  };
+  }
+  ;
   const fetchedLogs = await ban.guild.fetchAuditLogs({
     limit: 1,
     type: 'MEMBER_BAN_ADD',
   });
   const banLog = fetchedLogs.entries.first();
   if (!banLog) return;
-  const { executor, target } = banLog;
+  const {executor, target} = banLog;
   if (target.id === ban.user.id && executor.id !== client.user.id) {
     await logger(guild, {
       type: "BAN",
@@ -466,7 +564,8 @@ client.on("messageReactionAdd", async (reaction, user) => {
   if (!guild.options.logger.on) return;
   if (!guild || !guild.options.allowed) {
     return;
-  };
+  }
+  ;
   reactionRoles(guild, reaction, user, client, "add")
 });
 client.on("messageReactionRemove", async (reaction, user) => {
@@ -474,7 +573,8 @@ client.on("messageReactionRemove", async (reaction, user) => {
   if (!guild.options.logger.on) return;
   if (!guild || !guild.options.allowed) {
     return;
-  };
+  }
+  ;
   reactionRoles(guild, reaction, user, client, "remove")
 })
 client.login(token).then(() => {
@@ -525,5 +625,6 @@ client.login(token).then(() => {
 module.exports = {
   client,
   User,
-  Reminds
+  Reminds,
+  Guild
 }

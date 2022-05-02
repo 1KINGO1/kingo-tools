@@ -50,6 +50,12 @@ module.exports = {
             }
         }
 
+        if (banMember.id === message.author.id){
+            let embed = new MessageEmbed().setDescription(`⛔ Вы не можете забанить себя!`).setColor(colors.grayRed);
+            message.reply({embeds: [embed]});
+            return;
+        }
+
         try{
             await guild.members.ban(banMember?.id || args[0], {reason: args.slice(1,).join(" ") || "Без причины"});
             let embed = new MessageEmbed().setDescription(`${banMember?.user.tag || args[0]} был забанен ✅`).setColor(colors.green);

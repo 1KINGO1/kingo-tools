@@ -12,10 +12,10 @@ module.exports = async function(guild, {type, category, name, mod, offender, rea
   if (type === "BAN" || type === "KICK"){
     color = colors.red;
   }
-  if (type === "TIMEOUT"){
+  if (type === "TIMEOUT" || type === "MUTE"){
     color = colors.orange;
   }
-  if (type === "BAN_REMOVE" || type === "TIMEOUT_REMOVE"){
+  if (type === "BAN_REMOVE" || type === "TIMEOUT_REMOVE" || type === "MUTE_REMOVE"){
     color = colors.green;
   }
 

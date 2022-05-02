@@ -104,7 +104,7 @@ module.exports = {
         category: "mod",
         offender: banMember.user,
         name: "timeout",
-        reason: args[2] || "Без причины",
+        reason: args.slice(2,) || "Без причины",
         duration: time,
         mod: message.author
       }, client)
@@ -144,6 +144,12 @@ module.exports = {
 
     if (banMemberRolePosition >= authorRolePosition && interaction.member.id !== interaction.guild.ownerId) {
       interaction.reply("⛔ Вы не можете мутить пользователя, который имеет позицию роли выше вашей!");
+      return;
+    }
+
+    if (banMember.id === message.author.id){
+      let embed = new MessageEmbed().setDescription(`⛔ Вы не можете мутить себя!`).setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
     }
 

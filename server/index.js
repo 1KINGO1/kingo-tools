@@ -844,7 +844,7 @@ app.post("/api/config", async (req, res) => {
         res.send({err: true, message: "Cвойство не найдено!"});
         return;
       }
-      let allowedProperty = ["BAN", "KICK", "TIMEOUT", "BAN_REMOVE", "TIMEOUT_REMOVE", "MESSAGE_DELETE", "MESSAGE_EDIT", "MESSAGE_PURGED", "VOICE_JOIN", "VOICE_LEAVE", "VOICE_CHANGE","MEMBER_JOIN", "MEMBER_LEAVE", "MEMBER_ROLE_ADD", "MEMBER_ROLE_REMOVE", "MEMBER_NICKNAME_CHANGE"];
+      let allowedProperty = ["BAN", "KICK", "TIMEOUT", "BAN_REMOVE", "TIMEOUT_REMOVE", "MESSAGE_DELETE", "MESSAGE_EDIT", "MESSAGE_PURGED", "VOICE_JOIN", "VOICE_LEAVE", "VOICE_CHANGE","MEMBER_JOIN", "MEMBER_LEAVE", "MEMBER_ROLE_ADD", "MEMBER_ROLE_REMOVE", "MEMBER_NICKNAME_CHANGE", "MUTE", "MUTE_REMOVE"];
       if (!allowedProperty.includes(payload)){
         res.send({err: true, message: "Cвойство не найдено!"});
         return;

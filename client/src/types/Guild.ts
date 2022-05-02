@@ -51,7 +51,12 @@ export interface Guild{
             users: EconomyUser[]
         },
         commands: Command[],
-        customCommands: CustomCommand[]
+        customCommands: CustomCommand[],
+        mute: {
+            role: string,
+            users: {id: string, to: number}[]
+        },
+        timeRoles: {roleId: string, id: string, to: string}[]
     },
     data: {
         name: string,
