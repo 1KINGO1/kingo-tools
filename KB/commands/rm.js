@@ -15,26 +15,31 @@ module.exports = {
     let guild = message.guild;
     let member = await guild.members.fetch(message.author.id);
     if (!await checkRoles(command, member)){
-      message.reply("Вы не можете использовать эту команду!");
+      let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
-    };
+    }
     if (!await checkChannels(command, message.channel.id)){
-      message.reply("Вы не можете использовать эту команду здесь!");
+      let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
     }
     if (!args[0]){
-      message.reply("Укажите время!");
+      let embed = new MessageEmbed().setDescription(`Укажите время! (Пример:  1h30m)`).setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
     }
     if (!args[1]){
-      message.reply("Введите сообщение для напоминания!");
+      let embed = new MessageEmbed().setDescription("Введите сообщение для напоминания!").setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
     }
     let time;
     try {
       time = dateParser(args[0]);
     } catch (e) {
-      message.reply("⛔ Неверный формат даты");
+      let embed = new MessageEmbed().setDescription("⛔ Неверный формат даты").setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
     }
     let remind = new Reminds({
@@ -44,7 +49,8 @@ module.exports = {
     });
 
     await remind.save();
-    message.reply("OK");
+    let embed = new MessageEmbed().setDescription("Ок").setColor(colors.green);
+    message.reply({embeds: [embed]});
     setTimeout(async () => {
       let ch = await message.author.createDM();
       let embed = new MessageEmbed()

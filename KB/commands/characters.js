@@ -2,6 +2,7 @@ const {prefix} = require("../config.json");
 const characters = require("../modules/economy/characters");
 const {checkRoles, checkChannels} = require("../utils/checkAvailability");
 const {MessageEmbed} = require("discord.js");
+const colors = require("../utils/colors");
 module.exports = {
   name: "characters",
   description: "Показывает список всех достурных персонажей.",
@@ -12,13 +13,14 @@ module.exports = {
     let messageArray = message.content.split(' ');
     let args = messageArray.slice(1);
     let member = await message.guild.members.fetch(message.author.id);
-    if (!await checkRoles(command, member)) {
-      message.reply("Вы не можете использовать данную команду!");
+    if (!await checkRoles(command, member)){
+      let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
     }
-    ;
-    if (!await checkChannels(command, message.channel.id)) {
-      message.reply("Вы не можете использовать эту команду здесь!");
+    if (!await checkChannels(command, message.channel.id)){
+      let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
     }
     let user = JSON.parse(JSON.stringify(guild.options.economy.users.find(user => user.id === message.author.id) || ""));

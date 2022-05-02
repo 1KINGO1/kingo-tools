@@ -4,6 +4,7 @@ const axios = require("axios");
 const items = require("../modules/economy/items");
 let iconv = require('iconv-lite');
 const {MessageEmbed} = require("discord.js");
+const colors = require("../utils/colors");
 module.exports = {
   name: "removeitem",
   description: "Удаляет кастомный предмет из магазина.",
@@ -14,22 +15,26 @@ module.exports = {
     let messageArray = message.content.split(' ');
     let args = messageArray.slice(1);
     let member = await message.guild.members.fetch(message.author.id);
-    if (!await checkRoles(command, member)) {
-      message.reply("Вы не можете использовать данную команду!");
+    if (!await checkRoles(command, member)){
+      let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
     }
-    ;
-    if (!await checkChannels(command, message.channel.id)) {
-      message.reply("Вы не можете использовать эту команду здесь!");
+    if (!await checkChannels(command, message.channel.id)){
+      let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
     }
     if (!args[0]){
-      message.reply("Укажите имя предмета!");
+      let embed = new MessageEmbed().setDescription("Укажите имя предмета!").setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
     }
 
     if (!guild.options.economy.economyItems.find(item => item.name.toLowerCase().includes(args[0].toLowerCase()))){
-      return message.reply("Предмет не найден!");
+      let embed = new MessageEmbed().setDescription("Предмет не найден!").setColor(colors.gray);
+      message.reply({embeds: [embed]});
+      return;
     }
     let resultArray = [];
     for (let item of JSON.parse(JSON.stringify(guild.options.economy.economyItems || []))) {

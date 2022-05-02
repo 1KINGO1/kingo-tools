@@ -3,6 +3,8 @@ const {checkRoles, checkChannels} = require("../utils/checkAvailability");
 const axios = require("axios");
 const items = require("../modules/economy/items");
 let iconv = require('iconv-lite');
+const {MessageEmbed} = require("discord.js");
+const colors = require("../utils/colors");
 module.exports = {
   name: "additem",
   description: "Добавляет кастомный предмет в магазин.",
@@ -14,36 +16,45 @@ module.exports = {
     let args = messageArray.slice(1);
     let member = await message.guild.members.fetch(message.author.id);
     if (!await checkRoles(command, member)) {
-      message.reply("Вы не можете использовать данную команду!");
+      let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
     }
-    ;
     if (!await checkChannels(command, message.channel.id)) {
-      message.reply("Вы не можете использовать эту команду здесь!");
+      let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
     }
 
     const file = message.attachments.first()?.url;
     if (!file){
-      return message.reply("Добавте файл с настройками предмета!");
+      let embed = new MessageEmbed().setDescription("Добавьте файл с настройками предмета!").setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
+      return;
     }
     const response = await axios.get(file,  {
       responseType: 'arraybuffer',
       responseEncoding: 'binary'
     });
     if (response.status !== 200){
-      return message.reply("Неудалось прочитать файл!");
+      let embed = new MessageEmbed().setDescription("Неудалось прочитать файл!").setColor(colors.gray);
+      message.reply({embeds: [embed]});
+      return;
     }
     let text = iconv.decode(Buffer.from(response.data), "utf-8");
 
     try{
       text = JSON.parse(text);
     }catch (e) {
-      return message.reply("Настройки должны быть в формате JSON!");
+      let embed = new MessageEmbed().setDescription("Настройки должны быть в формате JSON!").setColor(colors.gray);
+      message.reply({embeds: [embed]});
+      return;
     }
 
     if (!text){
-      message.reply("Настройки должны быть в формате JSON!");
+      let embed = new MessageEmbed().setDescription("Настройки должны быть в формате JSON!").setColor(colors.gray);
+      message.reply({embeds: [embed]});
+      return;
     }
 
     if (!(
@@ -54,7 +65,9 @@ module.exports = {
       "text" in text &&
       "icon" in text
     )){
-      return message.reply(`Объект должен содержать свойства: \n\`name\` - имя предмета \n\`description\` - краткое описание \n\`silverPrice\` - цена в серебряных монетках \n\`goldPrice\` - цена в золотых монетках \n\`text\` - текст, который будет появляться при использовании предмета \n\`icon\` - иконка предмета`);
+      let embed = new MessageEmbed().setDescription(`Объект должен содержать свойства: \n\`name\` - имя предмета \n\`description\` - краткое описание \n\`silverPrice\` - цена в серебряных монетках \n\`goldPrice\` - цена в золотых монетках \n\`text\` - текст, который будет появляться при использовании предмета \n\`icon\` - иконка предмета`).setColor(colors.gray);
+      message.reply({embeds: [embed]});
+      return
     }
 
     if (!(
@@ -65,22 +78,32 @@ module.exports = {
       typeof text.text === "string" &&
       typeof text.icon === "string"
     )){
-      return message.reply(`Введены неверные типы для значений, вот правильные: \n\`name\` - Строка \n\`description\` - Строка \n\`silverPrice\` - Число \n\`goldPrice\` - Число \n\`text\` - Строка\n\`icon\` - Строка`);
+      let embed = new MessageEmbed().setDescription(`Введены неверные типы для значений, вот правильные: \n\`name\` - Строка \n\`description\` - Строка \n\`silverPrice\` - Число \n\`goldPrice\` - Число \n\`text\` - Строка\n\`icon\` - Строка`).setColor(colors.gray);
+      message.reply({embeds: [embed]});
+      return
     }
 
     if (text.silverPrice < 0 || text.goldPrice < 0){
-      return message.reply("Цена не может быть меньше нуля!");
+      let embed = new MessageEmbed().setDescription("Цена не может быть меньше нуля!").setColor(colors.gray);
+      message.reply({embeds: [embed]});
+      return;
     }
 
     if (text.silverPrice === 0 && text.goldPrice === 0){
-      return message.reply("Товар не может быть бесплатным!");
+      let embed = new MessageEmbed().setDescription("Товар не может быть бесплатным!").setColor(colors.gray);
+      message.reply({embeds: [embed]});
+      return;
     }
 
     if (guild.options.economy.economyItems.find(item => item.name.toLowerCase() === text.name) || items.find(item => item.name.toLowerCase() === text.name)){
-      return message.reply("Предмет с таким именем уже есть!");
+      let embed = new MessageEmbed().setDescription("Предмет с таким именем уже есть!").setColor(colors.gray);
+      message.reply({embeds: [embed]});
+      return;
     }
     guild.options = {...guild.options, economy: {...guild.options.economy, economyItems: [...guild.options.economy.economyItems, {name: text.name, description: text.description, silverPrice: text.silverPrice, goldPrice: text.goldPrice, text: text.text, type: "discord_item", icon: text.icon}]}};
     await guild.save();
-    return message.reply("Добавлено.");
+    let embed = new MessageEmbed().setDescription("Добавлено!").setColor(colors.green);
+    message.reply({embeds: [embed]});
+    return;
   }
 }

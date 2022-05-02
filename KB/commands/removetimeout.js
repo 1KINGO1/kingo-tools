@@ -4,6 +4,8 @@ const getUserFromMention = require("../utils/getUserFromMention");
 const dateParser = require("../utils/dateParser");
 const moment = require("moment");
 const logger = require("../modules/loggerMod");
+const {MessageEmbed} = require("discord.js");
+const colors = require("../utils/colors");
 moment.locale("de");
 
 module.exports = {
@@ -18,16 +20,19 @@ module.exports = {
     let guild = message.guild;
     let member = await guild.members.fetch(message.author.id);
     if (!await checkRoles(command, member)){
-      message.reply("Вы не можете размучивать пользователей!");
+      let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
-    };
+    }
     if (!await checkChannels(command, message.channel.id)){
-      message.reply("Вы не можете использовать эту команду здесь!");
+      let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
     }
 
     if (!args[0]){
-      message.reply(`⛔ Неверный формат команды, упомяните или укажите айди пользователя (\`${this.example}\`)`);
+      let embed = new MessageEmbed().setDescription(`⛔ Неверный формат команды, упомяните или укажите айди пользователя (\`${this.example}\`)`).setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
     }
 
@@ -38,7 +43,8 @@ module.exports = {
       }catch (e) {}
     }
     if (!banMember){
-      message.reply("Пользователь не найден.");
+      let embed = new MessageEmbed().setDescription("Пользователь не найден!").setColor(colors.gray);
+      message.reply({embeds: [embed]});
       return;
     }
 
@@ -46,16 +52,19 @@ module.exports = {
     let authorRolePosition = member.roles.cache.reduce((prev, item) => item.position > prev ? item.position : prev, -1);
 
     if (banMemberRolePosition >= authorRolePosition && member.id !== guild.ownerId){
-      message.reply("⛔ Вы не можете размутить пользователя, который имеет позицию роли выше вашей!");
+      let embed = new MessageEmbed().setDescription("⛔ Вы не можете размутить пользователя, который имеет позицию роли выше вашей!").setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
     }
 
     try{
       await banMember.timeout(0, "Размут")
-      message.reply(`${banMember.user.tag} был размучен ✅`);
+      let embed = new MessageEmbed().setDescription(`${banMember.user.tag} был размучен ✅`).setColor(colors.green);
+      message.reply({embeds: [embed]});
       await logger(dbGuild, {type: "TIMEOUT_REMOVE", category: "mod", offender: banMember.user, name: "timeout remove", reason: args[2] || "Без причины", mod: message.author}, client)
     }catch (e){
-      message.reply(`Не удалось замутить ${banMember.user.tag} ❌`);
+      let embed = new MessageEmbed().setDescription(`Не удалось замутить ${banMember.user.tag} ❌`).setColor(colors.gray);
+      message.reply({embeds: [embed]});
     }
   }
 }

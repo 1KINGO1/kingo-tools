@@ -8,6 +8,7 @@ const {SlashCommandBuilder} = require("@discordjs/builders");
 const {MessageEmbed} = require("discord.js");
 const calcLevelByXp = require("../utils/calcLevelByXp");
 const characters = require("../modules/economy/characters");
+const colors = require("../utils/colors");
 moment.locale("de");
 
 module.exports = {
@@ -47,13 +48,14 @@ module.exports = {
     let args = messageArray.slice(1);
     let guild = message.guild;
     let member = await guild.members.fetch(message.author.id);
-    if (!await checkRoles(command, member)) {
-      message.reply("Вы не можете мутить пользователей!");
+    if (!await checkRoles(command, member)){
+      let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
     }
-    ;
-    if (!await checkChannels(command, message.channel.id)) {
-      message.reply("Вы не можете использовать эту команду здесь!");
+    if (!await checkChannels(command, message.channel.id)){
+      let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
     }
 
@@ -112,10 +114,12 @@ module.exports = {
   },
   executeLikeSlash: async function (interaction, command, dbGuild, client) {
     if (!await checkRoles(command, interaction.member)) {
-      return interaction.reply({content: "Вы не можете использовать эту команду!", ephemeral: true});
+      let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
+      return interaction.reply({embeds: [embed], ephemeral: true});
     }
     if (!await checkChannels(command, interaction.channel.id)) {
-      return interaction.reply({content: "Вы не можете использовать эту команду здесь!", ephemeral: true});
+      let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
+      return interaction.reply({embeds: [embed], ephemeral: true});
     }
 
     let time = interaction.options.getString("time");

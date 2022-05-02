@@ -3,6 +3,7 @@ const {checkRoles, checkChannels} = require("../utils/checkAvailability");
 const axios = require("axios");
 const iconv = require("iconv-lite");
 const {MessageEmbed} = require("discord.js");
+const colors = require("../utils/colors");
 module.exports = {
   name: "editembed",
   description: "Изменяет любой embed отправленый ботом",
@@ -13,56 +14,71 @@ module.exports = {
     let args = messageArray.slice(1);
 
     let member = await message.guild.members.fetch(message.author.id);
-    if (!await checkRoles(command, member)) {
-      message.reply("Вы не можете использовать эту команду!");
+    if (!await checkRoles(command, member)){
+      let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
-    };
-    if (!await checkChannels(command, message.channel.id)) {
-      message.reply("Вы не можете использовать эту команду здесь!");
+    }
+    if (!await checkChannels(command, message.channel.id)){
+      let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
     }
     if (!args[0]) {
-      message.reply("Укажите ссылку на сообщение \`channel_id/message_id\`!");
+      let embed = new MessageEmbed().setDescription("Укажите ссылку на сообщение \`channel_id/message_id\`!").setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
     }
     let [channel_id, message_id] = args[0].split("/");
     if (!channel_id || !message_id){
-      message.reply("Укажите ссылку на сообщение \`channel_id/message_id\`!");
+      let embed = new MessageEmbed().setDescription("Укажите ссылку на сообщение \`channel_id/message_id\`!").setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
     }
     let channelObj = await client.channels.fetch(channel_id);
     if (!channelObj || channelObj?.guild.id !== guild.id){
-      message.reply("Канал не найден!");
+      let embed = new MessageEmbed().setDescription("Канал не найден!").setColor(colors.gray);
+      message.reply({embeds: [embed]});
       return;
     }
     let messageObj = await channelObj.messages.fetch(message_id);
     if (!messageObj){
-      message.reply("Сообщение не найдено!");
+      let embed = new MessageEmbed().setDescription("Сообщение не найдено!").setColor(colors.gray);
+      message.reply({embeds: [embed]});
       return;
     }
     if (messageObj.embeds.length === 0){
-      message.reply("Изменять можно только embed сообщения!");
+      let embed = new MessageEmbed().setDescription("Изменять можно только embed сообщения!").setColor(colors.gray);
+      message.reply({embeds: [embed]});
       return;
     }
     const file = message.attachments.first()?.url;
     if (!file){
-      return message.reply("Добавте файл с конфигом embed!");
+      let embed = new MessageEmbed().setDescription("Добавте файл с конфигом embed!").setColor(colors.gray);
+      message.reply({embeds: [embed]});
+      return;
     }
     const response = await axios.get(file,  {
       responseType: 'arraybuffer',
       responseEncoding: 'binary'
     });
     if (response.status !== 200){
-      return message.reply("Неудалось прочитать файл!");
+      let embed = new MessageEmbed().setDescription("Неудалось прочитать файл!").setColor(colors.gray);
+      message.reply({embeds: [embed]});
+      return;
     }
     let text = iconv.decode(Buffer.from(response.data), "utf-8");
     try{
       text = JSON.parse(text);
     }catch (e) {
-      return message.reply("Конфиг embed должен быть в формате JSON!");
+      let embed = new MessageEmbed().setDescription("Конфиг embed должен быть в формате JSON!").setColor(colors.gray);
+      message.reply({embeds: [embed]});
+      return;
     }
     if (!text){
-      message.reply("Конфиг embed должен быть в формате JSON!");
+      let embed = new MessageEmbed().setDescription("Конфиг embed должен быть в формате JSON!").setColor(colors.gray);
+      message.reply({embeds: [embed]});
+      return;
     }
     try{
       let embed;
@@ -73,7 +89,8 @@ module.exports = {
         embed = [new MessageEmbed(text)];
       }
       await messageObj.edit({embeds: embed});
-      message.reply("Успешно!")
+      let replyEmbed = new MessageEmbed().setDescription("Успешно!").setColor(colors.green);
+      message.reply({embeds: [replyEmbed]});
     }catch (e) {}
   }
 }

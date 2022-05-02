@@ -1,5 +1,7 @@
 const {prefix} = require("../config.json");
 const {checkRoles, checkChannels} = require("../utils/checkAvailability");
+const {MessageEmbed} = require("discord.js");
+const colors = require("../utils/colors");
 module.exports = {
   name: "changecolor",
   description: "Устанавливает цвет",
@@ -10,28 +12,32 @@ module.exports = {
     if (!guild.options.levelSystem.on) return;
 
     let member = await message.guild.members.fetch(message.author.id);
-    if (!await checkRoles(command, member)) {
-      message.reply("Вы не можете использовать эту команду!");
+    if (!await checkRoles(command, member)){
+      let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
     }
-    ;
-    if (!await checkChannels(command, message.channel.id)) {
-      message.reply("Вы не можете использовать эту команду здесь!");
+    if (!await checkChannels(command, message.channel.id)){
+      let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
     }
 
     let user = JSON.parse(JSON.stringify(guild.options.levelSystem.users.find(user => user.id === message.author.id) || ""));
     if (!user) {
-      message.reply("Пользователь не найден!");
+      let embed = new MessageEmbed().setDescription("Пользователь не найден!").setColor(colors.gray);
+      message.reply({embeds: [embed]});
       return;
     }
 
     if (message.content.split(" ")[1] !== "main" && message.content.split(" ")[1] !== "second"){
-      message.reply(`⛔ Неверный формат команды, укажите верный тип (\`${this.example}\`)`);
+      let embed = new MessageEmbed().setDescription(`⛔ Неверный формат команды, укажите верный тип (\`${this.example}\`)`).setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
     }
     if (!/#[0-9a-f]{3,6}/.test(message.content.split(" ")[2])){
-      message.reply(`⛔ Неверный формат команды, укажите hex color (\`${this.example}\`)`);
+      let embed = new MessageEmbed().setDescription(`⛔ Неверный формат команды, укажите hex color (\`${this.example}\`)`).setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
     }
 
@@ -50,7 +56,7 @@ module.exports = {
 
     await guild.save();
 
-    message.reply("✅ Цвет изменён.");
-    return;
+    let embed = new MessageEmbed().setDescription(`✅ Цвет изменён.`).setColor(colors.green);
+    message.reply({embeds: [embed]});
   }
 }

@@ -4,5 +4,7 @@ module.exports = {
   orange: "#ffac33",
   red: "#dd2e44",
   blue: "#55acee",
-  purple: "#aa8ed6"
+  purple: "#aa8ed6",
+  gray: "#292B2F",
+  grayRed: "#750e1c"
 }

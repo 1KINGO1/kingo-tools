@@ -1,6 +1,7 @@
 const {prefix} = require("../config.json");
 const {checkRoles, checkChannels} = require("../utils/checkAvailability");
 const {MessageEmbed} = require("discord.js");
+const colors = require("../utils/colors");
 module.exports = {
   name: "enter",
   description: "Добавляет пользователя в систему экономики.",
@@ -13,11 +14,13 @@ module.exports = {
     let guild = message.guild;
     let member = await guild.members.fetch(message.author.id);
     if (!await checkRoles(command, member)){
-      message.reply("Вы не можете использовать эту команду!");
+      let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
-    };
+    }
     if (!await checkChannels(command, message.channel.id)){
-      message.reply("Вы не можете использовать эту команду здесь!");
+      let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
+      message.reply({embeds: [embed]});
       return;
     }
     let user = JSON.parse(JSON.stringify(dbGuild.options.economy.users.find(user => user.id === message.author.id) || ""));
