@@ -37,6 +37,9 @@ module.exports = {
     user.inventory.forEach(item => {
       embed.addField(`${item.name} ${item.icon}`, `Количество:  ${item.amount}`)
     })
+    if (user.inventory.length === 0){
+      embed.setDescription("Здесь пусто :(")
+    }
     message.reply({embeds: [embed]});
   }
 }

@@ -100,12 +100,12 @@ module.exports = {
       //Ник
       context.font = '500 42px "Manrope Bold"';
       context.fillStyle = user.secondThemeColor || "#fff";
-      context.fillText(mentionedMember?.displayName || member.displayName, 240, 85);
+      context.fillText(mentionedMember?.displayName || member.displayName, 235, 85);
 
       //Разделитель
       let widthName = context.measureText(`${mentionedMember?.displayName || member.displayName}`).width;
       context.beginPath();
-      roundRect(context, 240, 92, 240 + widthName, 97, 10);
+      roundRect(context, 235, 92, 235 + widthName, 97, 10);
       context.closePath();
       context.fillStyle = "#fff";
       context.fill();
@@ -137,7 +137,7 @@ module.exports = {
 
       //Линия прогресса (Задний фон)
       context.beginPath();
-      roundRect(context, 240, 160 + 5, canvas.width - widthPercents - 20 - 10, 182 + 5, 8);
+      roundRect(context, 235, 160 + 5, canvas.width - widthPercents - 20 - 10, 182 + 5, 8);
       context.closePath();
       context.lineWidth = 3;
       context.strokeStyle = "#fff";
@@ -147,11 +147,11 @@ module.exports = {
       //Уровень
       context.font = '30px "Manrope Medium"';
       context.fillStyle = "#fff";
-      context.fillText(`level ${statistic.level}`, 240, 150);
+      context.fillText(`level ${statistic.level}`, 235, 150);
 
       //Линия прогресса
       context.beginPath();
-      roundRect(context, 244, 164 + 5, 244 + Math.round((canvas.width - widthPercents - 244) * statistic.levelFarmed / statistic.levelNeedFarm), 178 + 5, 6);
+      roundRect(context, 239, 164 + 5, 244 + Math.round((canvas.width - widthPercents - 244) * statistic.levelFarmed / statistic.levelNeedFarm), 178 + 5, 6);
       context.closePath();
       context.fillStyle = user.themeColor || "#fff";
       context.fill();

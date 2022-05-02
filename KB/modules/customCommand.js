@@ -23,6 +23,9 @@ module.exports = async function(message, options, guild, client){
       .replaceAll("{guild.rolesCount}", message.guild.roles.cache.size)
       .replaceAll("{guild.channelCount}", message.guild.channels.cache.size)
       .replaceAll("{guild.memberCount}", message.guild.memberCount)
+      .replaceAll("{unix}", Math.floor((new Date().getTime())/1000))
+      .replaceAll("{mention.id}", message.mentions.members.first()?.id || "")
+      .replaceAll("{mention.tag}", message.mentions.members.first()?.user?.tag || "")
       .replace(/\{args\[([0-9])(,)?]}/g, (match, p1, p2) => {
         if (p2){
           return args.slice(+p1 - 1,).join(" ")
@@ -30,8 +33,16 @@ module.exports = async function(message, options, guild, client){
         else{
           return args[+p1 - 1]
         }
-      });
-  }catch (e) {return}
+      })
+      //Actions
+      .replace(/<command\.delete>/, () => {
+        try{
+          message.delete();
+        }catch (e) {}
+        return "";
+      })
+
+  }catch (e) {return console.log(e)}
 
   if (options.sendChannel === "current"){
     message.channel.send(JSON.parse(mes));
@@ -40,7 +51,7 @@ module.exports = async function(message, options, guild, client){
     try{
       let channel = await message.guild.channels.fetch(options.sendChannel);
       channel.send(JSON.parse(mes))
-    }catch (e) {return}
+    }catch (e) {return console.log(e)}
   }
 
 }

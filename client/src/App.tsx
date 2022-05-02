@@ -16,7 +16,7 @@ export const App: FC = () => {
     const isAuth = useSelector<RootState>(state => state.auth.isAuth);
     const user = useSelector<RootState>(state => state.auth.user) as User;
     const guildId = useSelector<RootState>(state => state.bot.currentGuild);
-    
+
     return (
         <>
             <AnimatePresence exitBeforeEnter initial={false}>
