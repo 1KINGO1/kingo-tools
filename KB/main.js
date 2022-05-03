@@ -339,6 +339,7 @@ client.on("messageUpdate", async (oldMessage, newMessage) => {
   }
 })
 
+//Mute
 client.on("guildMemberAdd", async member => {
   let guild = await Guild.findOne({id: member.guild.id});
   if (!guild || !guild.options.allowed) {
@@ -483,7 +484,7 @@ client.on("voiceStateUpdate", async (oldState, newState) => {
       .setAuthor(oldState.member.user.username + "#" + oldState.member.user.discriminator, oldState.member.user.displayAvatarURL())
       .setFooter(`ID: ${oldState.member.id}`)
       .setTimestamp(new Date())
-      .setDescription(`**After**: <#${oldState.channelId}>\n**Before**: <#${newState.channelId}>`)
+      .setDescription(`**До**: <#${oldState.channelId}>\n**После**: <#${newState.channelId}>`)
       .setColor(colors.blue)
     try {
       let channel = await client.channels.fetch(guild.options.logger.voiceChannel);
@@ -495,12 +496,12 @@ client.on("voiceStateUpdate", async (oldState, newState) => {
   }
   if (newState.channelId === null && guild.options.logger.voiceAllow.includes("VOICE_LEAVE")) {
     let embed = new MessageEmbed()
-      .setTitle("Пользователь вышел с канала")
+      .setTitle("Пользователь вышел с войса")
       .setAuthor(oldState.member.user.username + "#" + oldState.member.user.discriminator, oldState.member.user.displayAvatarURL())
       .setFooter(`ID: ${oldState.member.id}`)
       .setTimestamp(new Date())
       .setDescription(`${oldState.member.user.username + "#" + oldState.member.user.discriminator} вышел с <#${oldState.channelId}>`)
-      .setColor(colors.orange)
+      .setColor(colors.red)
     try {
       let channel = await client.channels.fetch(guild.options.logger.voiceChannel);
       await channel.send({embeds: [embed]})
