@@ -296,9 +296,10 @@ client.on("messageDelete", async message => {
   if (!guild.options.logger.messageEventsAllow.includes("MESSAGE_DELETE")) return;
   let channel = await client.channels.fetch(message.channelId);
   let embed = new MessageEmbed()
-    .setTitle("Сообщение удалено в " + channel.name)
-    .setAuthor(message.author.username + "#" + message.author.discriminator, message.author.displayAvatarURL())
-    .setDescription(message.content)
+    .setTitle("Сообщение удалено")
+    .addField("Удалённое сообщение:", `\`\`\`${message.content}\`\`\``)
+    .addField("Автор", `**${message.author.tag}** (<@${message.author.id}>)`, true)
+    .addField("Канал", `**#${message.channel.name}** (<#${message.channel.id}>)`, true)
     .setFooter(`ID: ${message.id}`)
     .setTimestamp(new Date())
     .setColor(colors.red)
@@ -323,9 +324,11 @@ client.on("messageUpdate", async (oldMessage, newMessage) => {
   if (!guild.options.logger.messageEventsAllow.includes("MESSAGE_EDIT")) return;
   let channel = await client.channels.fetch(newMessage.channelId);
   let embed = new MessageEmbed()
-    .setTitle("Сообщение изменено в " + channel.name)
-    .setAuthor(newMessage.author.username + "#" + newMessage.author.discriminator, newMessage.author.displayAvatarURL())
-    .setDescription(`**Before**: \n\`\`\`${oldMessage.content}\`\`\`\n**After**: \n\`\`\`${newMessage.content}\`\`\``)
+    .setTitle("Сообщение изменено")
+    .addField("До:", `\`\`\`${oldMessage.content}\`\`\``)
+    .addField("После:", `\`\`\`${newMessage.content}\`\`\``)
+    .addField("Автор", `**${newMessage.author.tag}** (<@${newMessage.author.id}>)`, true)
+    .addField("Канал", `**#${newMessage.channel.name}** (<#${newMessage.channel.id}>)`, true)
     .setFooter(`ID: ${newMessage.id}`)
     .setTimestamp(new Date())
     .setColor(colors.yellow)
