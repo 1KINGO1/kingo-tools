@@ -106,6 +106,22 @@ client.on('ready', async () => {
         },+mute.to - new Date().getTime());
       }
     }
+    for (let trole of JSON.parse(JSON.stringify(guild.options.timeRoles))){
+      let member = await guildObj.members.fetch(trole.id);
+      setTimeout(async () => {
+        try{
+          await member.roles.remove(trole.roleId);
+        }catch (e){}
+        let resultArr = [];
+        for (let role of JSON.parse(JSON.stringify(guild.options.timeRoles))){
+          if (trole.roleId === role.roleId) continue;
+          resultArr.push(role);
+        }
+        guild.options = {...guild.options, timeRoles: resultArr};
+        guild.markModified("options");
+        await guild.save();
+      }, trole.to <= new Date().getTime() ? 0 : trole.to - new Date().getTime())
+    }
   }
 });
 
