@@ -6,10 +6,10 @@ let iconv = require('iconv-lite');
 const {MessageEmbed} = require("discord.js");
 const colors = require("../utils/colors");
 module.exports = {
-  name: "removeitem",
-  description: "Удаляет кастомный предмет из магазина.",
-  example: `${prefix}removeitem [item name]`,
-  category: "economy",
+  name: "allroles",
+  description: "Показывает список всех ролей.",
+  example: `${prefix}allroles`,
+  category: "roles",
   execute: async function (message, command, guild) {
     if (!guild.options.economy.on) return;
     let messageArray = message.content.split(' ');

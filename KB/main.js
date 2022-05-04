@@ -295,11 +295,12 @@ client.on("messageDelete", async message => {
   if (!guild.options.logger.on) return;
   if (!guild.options.logger.messageEventsAllow.includes("MESSAGE_DELETE")) return;
   let channel = await client.channels.fetch(message.channelId);
+  if (!message.content) return;
   let embed = new MessageEmbed()
     .setTitle("Сообщение удалено")
     .addField("Удалённое сообщение:", `\`\`\`${message.content}\`\`\``)
-    .addField("Автор", `**${message.author.tag}** (<@${message.author.id}>)`, true)
-    .addField("Канал", `**#${message.channel.name}** (<#${message.channel.id}>)`, true)
+    .addField("Автор", `**${message.author?.tag || "???"}** (<@${message.author?.id}>)`, true)
+    .addField("Канал", `**#${message.channel?.name || "???"}** (<#${message.channel?.id}>)`, true)
     .setFooter(`ID: ${message.id}`)
     .setTimestamp(new Date())
     .setColor(colors.red)
@@ -332,6 +333,35 @@ client.on("messageUpdate", async (oldMessage, newMessage) => {
     .setFooter(`ID: ${newMessage.id}`)
     .setTimestamp(new Date())
     .setColor(colors.yellow)
+  try {
+    let channel = await client.channels.fetch(guild.options.logger.messageEventsChannel);
+    await channel.send({embeds: [embed]})
+  } catch (e) {
+  }
+})
+client.on("messageDeleteBulk", async (messages) => {
+  messages = messages.reverse();
+  let guild = await Guild.findOne({id: messages.first().guildId});
+  if (!guild.options.logger.on) return;
+  if (!guild || !guild.options.allowed) {
+    return;
+  }
+  let guildObj = await client.guilds.fetch(messages.first().guildId);
+  let channel = await client.channels.fetch(messages.first().channelId);
+  if (!guild.options.logger.messageEventsAllow.includes("MESSAGE_PURGED")) return;
+  let embed = new MessageEmbed()
+    .setTitle(`${messages.size} очищено в #${channel.name}`)
+    .setTimestamp(new Date())
+    .setColor(colors.red);
+  let description = [];
+  for (let message of messages){
+    description.push(`[\`${message[1].author.tag}\`]: ${message[1].content || ` *[embed or file]*`}`);
+  }
+  if (description.length > 20){
+    description = description.slice(description.length - 20, description.length);
+    embed.setFooter("20 последних")
+  }
+  embed.setDescription(description.join(`\n`));
   try {
     let channel = await client.channels.fetch(guild.options.logger.messageEventsChannel);
     await channel.send({embeds: [embed]})

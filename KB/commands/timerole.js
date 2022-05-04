@@ -10,7 +10,7 @@ module.exports = {
   description: "Даёт роль на время.",
   example: `${prefix}timerole [user] [role id] [time]`,
   alternative: ["tr"],
-  category: "utils",
+  category: "roles",
   execute: async function (message, command, dbGuild, client) {
     let messageArray = message.content.split(' ');
     let args = messageArray.slice(1);
