@@ -17,29 +17,29 @@ module.exports = {
         let member = await guild.members.fetch(message.author.id);
         if (!await checkRoles(command, member)){
             let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
-            message.reply({embeds: [embed]});
+            message.reply({embeds: [embed]}).catch(e => e);
             return;
         }
         if (!await checkChannels(command, message.channel.id)){
             let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
-            message.reply({embeds: [embed]});
+            message.reply({embeds: [embed]}).catch(e => e);
             return;
         }
 
         if (!args[0]){
             let embed = new MessageEmbed().setDescription(`⛔ Неверный формат команды, упомяните или укажите айди пользователя (\`${this.example}\`)`).setColor(colors.grayRed);
-            message.reply({embeds: [embed]});
+            message.reply({embeds: [embed]}).catch(e => e);
             return;
         }
 
         try{
-            await guild.members.unban(args[0], args[1] || "Без причины");
+            await guild.members.unban(args[0], args[1] || "Без причины").catch(e => e);
             let embed = new MessageEmbed().setDescription(`<@${args[0]}> был разбанен ✅`).setColor(colors.green);
-            message.reply({embeds: [embed]});
+            message.reply({embeds: [embed]}).catch(e => e);
             await logger(dbGuild, {type: "BAN_REMOVE", category: "mod", offender: {id: args[0]}, name: "ban remove", reason: args[2] || "Без причины", mod: message.author}, client)
         }catch (e){
             let embed = new MessageEmbed().setDescription(`Не удалось разбанить <@${args[0]}> ❌`).setColor(colors.gray);
-            message.reply({embeds: [embed]});
+            message.reply({embeds: [embed]}).catch(e => e);
         }
     }
 }

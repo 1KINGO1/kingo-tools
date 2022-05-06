@@ -15,12 +15,12 @@ module.exports = {
     let member = await message.guild.members.fetch(message.author.id);
     if (!await checkRoles(command, member)){
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!await checkChannels(command, message.channel.id)){
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     let user = JSON.parse(JSON.stringify(guild.options.economy.users.find(user => user.id === message.author.id) || ""));
@@ -28,7 +28,7 @@ module.exports = {
       let embed = new MessageEmbed()
         .setDescription("👹 Вы не являетесь участником экономики.")
         .setColor("#eb4034");
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
 
@@ -36,7 +36,7 @@ module.exports = {
       let embed = new MessageEmbed()
         .setDescription("👹 Укажите тип магазина (game или discord).")
         .setColor("#eb4034");
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
 
@@ -45,7 +45,7 @@ module.exports = {
         .setTitle("Список всех " + args[0] + " предметов")
         .setColor("#378f00");
       items.forEach(item => embed.addField(`${item.name} ${item.icon}`, `${item.description}\nСтоимость: **${item.goldPrice ? item.goldPrice + "<:gold_coin:965238193945444372>" : item.silverPrice ? item.silverPrice + "<:silver_coin:965239170459136041>" : "Бесплатно"}**`))
-      await message.reply({embeds: [embed]})
+      await message.reply({embeds: [embed]}).catch(e => e)
     }
     if (args[0] === "discord"){
       let embed = new MessageEmbed()
@@ -57,7 +57,7 @@ module.exports = {
       else{
         guild.options.economy.economyItems.forEach(item => embed.addField(`${item.name} ${item.icon}`, `${item.description}\nСтоимость: **${item.goldPrice ? item.goldPrice + "<:gold_coin:965238193945444372>" : "" + " " + item.silverPrice ? item.silverPrice + "<:silver_coin:965239170459136041>" : ""}**`))
       }
-      await message.reply({embeds: [embed]})
+      await message.reply({embeds: [embed]}).catch(e => e)
     }
   }
 }

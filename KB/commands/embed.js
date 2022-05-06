@@ -16,23 +16,23 @@ module.exports = {
     let member = await message.guild.members.fetch(message.author.id);
     if (!await checkRoles(command, member)){
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!await checkChannels(command, message.channel.id)){
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!args[0]) {
       let embed = new MessageEmbed().setDescription("Укажите айди канала для отправки!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     const file = message.attachments.first()?.url;
     if (!file){
       let embed = new MessageEmbed().setDescription("Добавте файл с конфигом embed!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return
     }
     const response = await axios.get(file,  {
@@ -41,7 +41,7 @@ module.exports = {
     });
     if (response.status !== 200){
       let embed = new MessageEmbed().setDescription("Неудалось прочитать файл!").setColor(colors.gray);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     let text = iconv.decode(Buffer.from(response.data), "win1251");
@@ -49,12 +49,12 @@ module.exports = {
       text = JSON.parse(text);
     }catch (e) {
       let embed = new MessageEmbed().setDescription("Конфиг embed должен быть в формате JSON!").setColor(colors.gray);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!text){
       let embed = new MessageEmbed().setDescription("Конфиг embed должен быть в формате JSON!").setColor(colors.gray);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     try{
@@ -66,9 +66,9 @@ module.exports = {
         embed = [new MessageEmbed(text)];
       }
       let channel = await client.channels.fetch(args[0]);
-      await channel.send({embeds: embed});
+      await channel.send({embeds: embed}).catch(e => e);
       let replyEmbed = new MessageEmbed().setDescription("Успешно!").setColor(colors.green);
-      message.reply({embeds: [replyEmbed]});
+      message.reply({embeds: [replyEmbed]}).catch(e => e);
     }catch (e) {}
   }
 }

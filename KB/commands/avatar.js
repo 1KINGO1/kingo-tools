@@ -16,12 +16,12 @@ module.exports = {
     let member = await guild.members.fetch(message.author.id);
     if (!await checkRoles(command, member)){
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!await checkChannels(command, message.channel.id)){
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
 
@@ -36,7 +36,7 @@ module.exports = {
       }
       if (!mentionedUser){
         let embed = new MessageEmbed().setDescription("Пользователь не найден!").setColor(colors.gray);
-        message.reply({embeds: [embed]});
+        message.reply({embeds: [embed]}).catch(e => e);
         return;
       }
       else{
@@ -48,6 +48,6 @@ module.exports = {
       .setColor("#7f6ce5")
       .setTitle(`Аватар ${user.user.tag}`)
       .setImage(user.user.displayAvatarURL({size:1024,dynamic:true}));
-    await message.reply({embeds: [embed]}).catch(e => {})
+    await message.reply({embeds: [embed]}).catch(e => e)
   }
 }

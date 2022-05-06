@@ -17,30 +17,30 @@ module.exports = {
     let member = await guild.members.fetch(message.author.id);
     if (!await checkRoles(command, member)) {
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!await checkChannels(command, message.channel.id)) {
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!args[0]) {
       let embed = new MessageEmbed().setDescription(`Неверный формат команды! (\`${this.example}\`)`).setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
 
     let role = await getUserFromMention(args[0], guild);
     if (!role){
       try{
-        role = await message.guild.roles.fetch(args[0]);
+        role = await message.guild.roles.fetch(args[0]).catch(e => e);
       }catch (e) {}
     }
 
     if (!role){
       let embed = new MessageEmbed().setDescription("⛔ Роль не найдена!").setColor(colors.gray);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     let count = 1;
@@ -51,6 +51,6 @@ module.exports = {
       }).slice(0,50).join("\n") || "Нет пользователей.")
       .setTimestamp(new Date())
       .setFooter(`Первые 50 человек`);
-    message.reply({embeds: [embed]});
+    message.reply({embeds: [embed]}).catch(e => e);
   }
 }

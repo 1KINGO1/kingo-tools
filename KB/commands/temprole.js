@@ -6,9 +6,9 @@ const {MessageEmbed} = require("discord.js");
 let colors = require("../utils/colors");
 const getUserFromMention = require("../utils/getUserFromMention");
 module.exports = {
-  name: "timerole",
+  name: "temprole",
   description: "Даёт роль на время.",
-  example: `${prefix}timerole [user] [role id] [time]`,
+  example: `${prefix}temprole [user] [role id] [time]`,
   alternative: ["tr"],
   category: "roles",
   execute: async function (message, command, dbGuild, client) {
@@ -18,17 +18,17 @@ module.exports = {
     let member = await guild.members.fetch(message.author.id);
     if (!await checkRoles(command, member)) {
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!await checkChannels(command, message.channel.id)) {
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!args[0] || !args[1] || !args[2]) {
       let embed = new MessageEmbed().setDescription(`Неверный формат команды! (\`${this.example}\`)`).setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
 
@@ -41,20 +41,20 @@ module.exports = {
 
     if (!banMember){
       let embed = new MessageEmbed().setDescription("⛔ Пользователь не найден!").setColor(colors.gray);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     let role = message.guild.roles.cache.find(r => r.id === args[1]);
     if (!role){
       let embed = new MessageEmbed().setDescription("⛔ Роль не найдена!").setColor(colors.gray);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
 
     let timeRole = await dbGuild.options.timeRoles.find(r => r.roleId === args[1] && r.id === message.author.id);
     if (timeRole){
       let embed = new MessageEmbed().setDescription("⛔ У пользователя уже есть эта роль!").setColor(colors.gray);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
 
@@ -63,14 +63,14 @@ module.exports = {
       time = dateParser(args[2]);
     } catch (e) {
       let embed = new MessageEmbed().setDescription("⛔ Неверный формат даты").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     try{
       await banMember.roles.add(role);
     }catch (e) {
       let embed = new MessageEmbed().setDescription("⛔ Не получилось дать пользователю роль!").setColor(colors.gray);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
 
@@ -78,7 +78,7 @@ module.exports = {
     dbGuild.markModified("options");
     await dbGuild.save();
     let embed = new MessageEmbed().setDescription("Успешно!").setColor(colors.green);
-    message.reply({embeds: [embed]});
+    message.reply({embeds: [embed]}).catch(e => e)
 
     setTimeout(async () => {
       try{

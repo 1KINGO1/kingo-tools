@@ -14,12 +14,12 @@ module.exports = {
     let member = await message.guild.members.fetch(message.author.id);
     if (!await checkRoles(command, member)){
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!await checkChannels(command, message.channel.id)){
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     let user = JSON.parse(JSON.stringify(guild.options.economy.users.find(user => user.id === message.author.id) || ""));
@@ -27,28 +27,28 @@ module.exports = {
       let embed = new MessageEmbed()
         .setDescription("👹 Вы не являетесь участником экономики.")
         .setColor("#eb4034");
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (user.boxCountdown > new Date().getTime()){
       let embed = new MessageEmbed()
         .setDescription(`👹 Вы сможете играть снова <t:${Math.floor(user.boxCountdown/1000)}:R>.`)
         .setColor("#eb4034");
-      await message.reply({embeds: [embed]});
+      await message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!args[0] || +args < 100){
       let embed = new MessageEmbed()
         .setDescription("👹 Нужно указать количество серебряных монет >= 100.")
         .setColor("#eb4034");
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (user.silverCoins < +args[0]){
       let embed = new MessageEmbed()
         .setDescription("👹 Недостаточно средств.")
         .setColor("#eb4034");
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     user.boxCountdown  = new Date().getTime() + 1000 * 60 * 10;
@@ -114,7 +114,7 @@ module.exports = {
         let embed = new MessageEmbed()
           .setDescription("👹 Вы не указали коробку, средства не будут списаны.")
           .setColor("#eb4034");
-        message.reply({embeds: [embed]});
+        message.reply({embeds: [embed]}).catch(e => e);
       });
   }
 }

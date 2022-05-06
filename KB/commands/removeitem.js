@@ -17,23 +17,23 @@ module.exports = {
     let member = await message.guild.members.fetch(message.author.id);
     if (!await checkRoles(command, member)){
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!await checkChannels(command, message.channel.id)){
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!args[0]){
       let embed = new MessageEmbed().setDescription("Укажите имя предмета!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
 
     if (!guild.options.economy.economyItems.find(item => item.name.toLowerCase().includes(args[0].toLowerCase()))){
       let embed = new MessageEmbed().setDescription("Предмет не найден!").setColor(colors.gray);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     let resultArray = [];
@@ -42,7 +42,7 @@ module.exports = {
         let embed = new MessageEmbed()
           .setDescription(`Предмет \`${item.name}\` удалён!`)
           .setColor("#378f00");
-        message.reply({embeds: [embed]});
+        message.reply({embeds: [embed]}).catch(e => e);
         continue;
       }
       resultArray.push(item);

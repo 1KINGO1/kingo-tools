@@ -14,12 +14,12 @@ module.exports = {
     let member = await message.guild.members.fetch(message.author.id);
     if (!await checkRoles(command, member)){
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!await checkChannels(command, message.channel.id)){
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     let user = JSON.parse(JSON.stringify(guild.options.economy.users.find(user => user.id === message.author.id) || ""));
@@ -27,7 +27,7 @@ module.exports = {
       let embed = new MessageEmbed()
         .setDescription("👹 Вы не являетесь участником экономики.")
         .setColor("#eb4034");
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     let farms = user.inventory.filter(item => ["farm"].includes(item.type));
@@ -37,7 +37,7 @@ module.exports = {
       let embed = new MessageEmbed()
         .setDescription("👹 У вас нет доступных ферм!")
         .setColor("#eb4034");
-      return message.reply({embeds: [embed]});
+      return message.reply({embeds: [embed]}).catch(e => e);
     }
 
     let countdown = user.farmLastCollect;

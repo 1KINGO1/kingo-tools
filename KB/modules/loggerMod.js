@@ -33,7 +33,7 @@ module.exports = async function(guild, {type, category, name, mod, offender, rea
         .setFooter(`ID: ${offender?.id || offender}`)
         .setTimestamp(new Date())
         .setColor(color)
-      await channel.send({embeds: [embed]});
+      await channel.send({embeds: [embed]}).catch(e => e);
     }catch (e) {console.log(e)}
 
   }

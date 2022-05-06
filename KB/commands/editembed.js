@@ -16,46 +16,46 @@ module.exports = {
     let member = await message.guild.members.fetch(message.author.id);
     if (!await checkRoles(command, member)){
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!await checkChannels(command, message.channel.id)){
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!args[0]) {
       let embed = new MessageEmbed().setDescription("Укажите ссылку на сообщение \`channel_id/message_id\`!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     let [channel_id, message_id] = args[0].split("/");
     if (!channel_id || !message_id){
       let embed = new MessageEmbed().setDescription("Укажите ссылку на сообщение \`channel_id/message_id\`!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     let channelObj = await client.channels.fetch(channel_id);
     if (!channelObj || channelObj?.guild.id !== guild.id){
       let embed = new MessageEmbed().setDescription("Канал не найден!").setColor(colors.gray);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     let messageObj = await channelObj.messages.fetch(message_id);
     if (!messageObj){
       let embed = new MessageEmbed().setDescription("Сообщение не найдено!").setColor(colors.gray);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (messageObj.embeds.length === 0){
       let embed = new MessageEmbed().setDescription("Изменять можно только embed сообщения!").setColor(colors.gray);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     const file = message.attachments.first()?.url;
     if (!file){
       let embed = new MessageEmbed().setDescription("Добавте файл с конфигом embed!").setColor(colors.gray);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     const response = await axios.get(file,  {
@@ -64,7 +64,7 @@ module.exports = {
     });
     if (response.status !== 200){
       let embed = new MessageEmbed().setDescription("Неудалось прочитать файл!").setColor(colors.gray);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     let text = iconv.decode(Buffer.from(response.data), "utf-8");
@@ -72,12 +72,12 @@ module.exports = {
       text = JSON.parse(text);
     }catch (e) {
       let embed = new MessageEmbed().setDescription("Конфиг embed должен быть в формате JSON!").setColor(colors.gray);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!text){
       let embed = new MessageEmbed().setDescription("Конфиг embed должен быть в формате JSON!").setColor(colors.gray);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     try{
@@ -90,7 +90,7 @@ module.exports = {
       }
       await messageObj.edit({embeds: embed});
       let replyEmbed = new MessageEmbed().setDescription("Успешно!").setColor(colors.green);
-      message.reply({embeds: [replyEmbed]});
+      message.reply({embeds: [replyEmbed]}).catch(e => e);
     }catch (e) {}
   }
 }

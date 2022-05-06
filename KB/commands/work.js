@@ -17,12 +17,12 @@ module.exports = {
     let member = await message.guild.members.fetch(message.author.id);
     if (!await checkRoles(command, member)){
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!await checkChannels(command, message.channel.id)){
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     let user = JSON.parse(JSON.stringify(guild.options.economy.users.find(user => user.id === message.author.id) || ""));
@@ -30,7 +30,7 @@ module.exports = {
       let embed = new MessageEmbed()
         .setDescription("👹 Вы не являетесь участником экономики.")
         .setColor("#eb4034");
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
 
@@ -38,7 +38,7 @@ module.exports = {
       let embed = new MessageEmbed()
         .setDescription(`👹 Вы сможете работать <t:${Math.floor(user.workCountdown/1000)}:R>.`)
         .setColor("#eb4034");
-      await message.reply({embeds: [embed]});
+      await message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
 
@@ -63,7 +63,7 @@ module.exports = {
       let embed = new MessageEmbed()
         .setDescription("👹 Решите пример " + question + ". У вас 30 секунд.")
         .setColor("#378f00");
-      await message.reply({embeds: [embed]});
+      await message.reply({embeds: [embed]}).catch(e => e);
 
       let filter = (mes) => mes.author.id === message.author.id;
       await message.channel.awaitMessages({filter, max: 1, time: 30000, errors: ['time']})
@@ -72,7 +72,7 @@ module.exports = {
             let embed = new MessageEmbed()
               .setDescription("👹 Ответ не правильный!")
               .setColor("#eb4034");
-            await message.reply({embeds: [embed]});
+            await message.reply({embeds: [embed]}).catch(e => e);
             user.workCountdown  = new Date().getTime() + 1000 * 60 * 60 * 3;
             let resultArray = [];
             for (let usr of JSON.parse(JSON.stringify(guild.options.economy.users || []))) {
@@ -91,7 +91,7 @@ module.exports = {
             let embed = new MessageEmbed()
               .setDescription("👹 Поздравляю, вы получили " + coins + "<:silver_coin:965239170459136041>")
               .setColor("#378f00");
-            await message.reply({embeds: [embed]});
+            await message.reply({embeds: [embed]}).catch(e => e);
             user.silverCoins += coins;
             user.workCountdown  = new Date().getTime() + 1000 * 60 * 60 * 3;
             let resultArray = [];
@@ -110,7 +110,7 @@ module.exports = {
           let embed = new MessageEmbed()
             .setDescription("👹 Вы не успели ответить! Правильный ответ - " + +eval(question))
             .setColor("#eb4034");
-          message.reply({embeds: [embed]});
+          message.reply({embeds: [embed]}).catch(e => e);
           user.workCountdown = new Date().getTime() + 1000 * 60 * 60 * 3;
           let resultArray = [];
           for (let usr of JSON.parse(JSON.stringify(guild.options.economy.users || []))) {
@@ -130,7 +130,7 @@ module.exports = {
       let embed = new MessageEmbed()
         .setDescription("👹 Поздравляю, вы получили " + coins + "<:silver_coin:965239170459136041>")
         .setColor("#378f00");
-      await message.reply({embeds: [embed]});
+      await message.reply({embeds: [embed]}).catch(e => e);
       user.silverCoins += coins;
       user.workCountdown  = new Date().getTime() + 1000 * 60 * 60 * 3
       let resultArray = [];
@@ -151,7 +151,7 @@ module.exports = {
       let embed = new MessageEmbed()
         .setDescription(`👹 Посчитайте количество паучков на паутине. У вас 45 секунд.\n${board.join("")}`)
         .setColor("#378f00");
-      await message.reply({embeds: [embed]});
+      await message.reply({embeds: [embed]}).catch(e => e);
       let filter = (mes) => mes.author.id === message.author.id;
       await message.channel.awaitMessages({filter, max: 1, time: 45000, errors: ['time']})
         .then(async collected => {
@@ -159,7 +159,7 @@ module.exports = {
               let embed = new MessageEmbed()
                 .setDescription("👹 Ответ не правильный!")
                 .setColor("#eb4034");
-              await message.reply({embeds: [embed]});
+              await message.reply({embeds: [embed]}).catch(e => e);
               user.workCountdown  = new Date().getTime() + 1000 * 60 * 60 * 3;
               let resultArray = [];
               for (let usr of JSON.parse(JSON.stringify(guild.options.economy.users || []))) {
@@ -178,7 +178,7 @@ module.exports = {
             let embed = new MessageEmbed()
               .setDescription("👹 Поздравляю, вы получили " + coins + "<:silver_coin:965239170459136041>")
               .setColor("#378f00");
-            await message.reply({embeds: [embed]});
+            await message.reply({embeds: [embed]}).catch(e => e);
             user.silverCoins += coins;
             user.workCountdown  = new Date().getTime() + 1000 * 60 * 60 * 3
             let resultArray = [];
@@ -197,7 +197,7 @@ module.exports = {
           let embed = new MessageEmbed()
             .setDescription("👹 Вы не успели ответить! Правильный ответ - " + board.filter(item => item === "🕷").length)
             .setColor("#eb4034");
-          message.reply({embeds: [embed]});
+          message.reply({embeds: [embed]}).catch(e => e);
           user.workCountdown  = new Date().getTime() + 1000 * 60 * 3;
           let resultArray = [];
           for (let usr of JSON.parse(JSON.stringify(guild.options.economy.users || []))) {
@@ -217,7 +217,7 @@ module.exports = {
       let embed = new MessageEmbed()
         .setDescription(`${characters.find(ch => ch.name === user.selectedCharacter)?.icon} Ваш герой принёс вам ${coins}<:silver_coin:965239170459136041>`)
         .setColor("#378f00");
-      await message.reply({embeds: [embed]});
+      await message.reply({embeds: [embed]}).catch(e => e);
       user.silverCoins += coins;
       user.workCountdown  = new Date().getTime() + 1000 * 60 * 60 * 3
       let resultArray = [];

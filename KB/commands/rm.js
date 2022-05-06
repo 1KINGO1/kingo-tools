@@ -16,22 +16,22 @@ module.exports = {
     let member = await guild.members.fetch(message.author.id);
     if (!await checkRoles(command, member)){
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!await checkChannels(command, message.channel.id)){
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!args[0]){
       let embed = new MessageEmbed().setDescription(`Укажите время! (Пример:  1h30m)`).setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!args[1]){
       let embed = new MessageEmbed().setDescription("Введите сообщение для напоминания!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     let time;
@@ -39,7 +39,7 @@ module.exports = {
       time = dateParser(args[0]);
     } catch (e) {
       let embed = new MessageEmbed().setDescription("⛔ Неверный формат даты").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     let remind = new Reminds({
@@ -50,14 +50,14 @@ module.exports = {
 
     await remind.save();
     let embed = new MessageEmbed().setDescription("Ок").setColor(colors.green);
-    message.reply({embeds: [embed]});
+    message.reply({embeds: [embed]}).catch(e => e);
     setTimeout(async () => {
       let ch = await message.author.createDM();
       let embed = new MessageEmbed()
         .setTitle("Вы просили напомнить вам:")
         .setDescription(args.slice(1,).join(" "))
         .setColor(colors.green);
-      await ch.send({embeds: [embed]});
+      await ch.send({embeds: [embed]}).catch(e => e);
       await remind.remove();
     }, time)
   }

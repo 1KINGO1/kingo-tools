@@ -12,7 +12,7 @@ const BotPageWrapper = styled.div`
   width: 100%;
   height: 100%;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: auto; 
   &::-webkit-scrollbar {
     width: 10px;
   }

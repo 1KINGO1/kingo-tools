@@ -13,10 +13,10 @@ const colors = require("../utils/colors");
 moment.locale("de");
 
 module.exports = {
-  name: "activemutes",
-  description: "Показывает активные муты.",
-  example: `${prefix}activemutes`,
-  category: "config",
+  name: "mutes",
+  description: "Список активных мутов.",
+  example: `${prefix}mutes`,
+  category: "mod",
   execute: async function (message, command, dbGuild, client) {
     let messageArray = message.content.split(' ');
     let args = messageArray.slice(1);
@@ -33,19 +33,19 @@ module.exports = {
       return;
     }
 
-    let embed = new MessageEmbed()
-      .setTitle(`Активные муты ${message.guild.name}`)
-      .setColor(colors.blue);
-
-    let description = ``;
-
     let mutes = JSON.parse(JSON.stringify(dbGuild.options.mute.users));
-
-    for (const muteIndex in mutes) {
-      let member = await message.guild.members.fetch(mutes[muteIndex].id);
-      description = description +  `${+muteIndex + 1}. ${member.user.tag} (<@${member.user.id}>) - <t:${Math.floor((mutes[muteIndex].to)/1000)}:f> \n`;
+    let embed = new MessageEmbed()
+      .setTimestamp(new Date())
+      .setTitle(`Активные муты ${message.guild.name}`)
+      .setColor(colors.gray);
+    let description = [];
+    for (let muteId in mutes){
+      description.push(`${+muteId + 1}. <@${mutes[muteId].id}> До: <t:${Math.floor((mutes[muteId].to)/1000)}:f>`)
+    };
+    embed.setDescription(description.join("\n"));
+    if (description.length === 0){
+      embed.setDescription("Нет активных мутов");
     }
-    embed.setDescription(description || "Нет активных мутов!");
     message.reply({embeds: [embed]}).catch(e => e)
   }
 }

@@ -1,14 +1,18 @@
 const {checkRoles, checkChannels} = require("../utils/checkAvailability");
+const {MessageEmbed} = require("discord.js");
+const colors = require("../utils/colors");
 module.exports = async function(message, options, guild, client){
   let member = await message.guild.members.fetch(message.author.id);
   let args = message.content.split(" ").slice(1, );
 
   if (!await checkRoles(options, member)) {
-    message.reply("Вы не можете использовать данную команду!");
+    let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
+    message.reply({embeds: [embed]}).catch(e => e);
     return;
   }
   if (!await checkChannels(options, message.channel.id) && options.sendChannel !== "current") {
-    message.reply("Вы не можете использовать эту команду здесь!");
+    let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
+    message.reply({embeds: [embed]}).catch(e => e);
     return;
   }
   let mes;
@@ -35,9 +39,23 @@ module.exports = async function(message, options, guild, client){
         }
       })
       //Actions
-      .replace(/<command\.delete>/, () => {
+      .replace(/<command\.delete>/g, () => {
         try{
           message.delete();
+        }catch (e) {}
+        return "";
+      })
+      .replace(/<author\.role\.add\(([0-9]+)\)>/g, (match, p1) => {
+        try{
+          message.guild.roles.fetch(p1).then(role => {
+            member.roles.add(role);
+          }).catch(e => e);
+        }catch (e) {}
+        return "";
+      })
+      .replace(/<author\.role\.remove\(([0-9]+)\)>/g, (match, p1) => {
+        try{
+            member.roles.remove(p1).catch(e => e)
         }catch (e) {}
         return "";
       })
@@ -45,12 +63,12 @@ module.exports = async function(message, options, guild, client){
   }catch (e) {return console.log(e)}
 
   if (options.sendChannel === "current"){
-    message.channel.send(JSON.parse(mes));
+    await message.channel.send(JSON.parse(mes)).catch(e => e);
   }
   else{
     try{
-      let channel = await message.guild.channels.fetch(options.sendChannel);
-      channel.send(JSON.parse(mes))
+      let channel = await message.guild.channels.fetch(options.sendChannel).catch(e => e);
+      channel.send(JSON.parse(mes)).catch(e => e);
     }catch (e) {return console.log(e)}
   }
 

@@ -24,17 +24,17 @@ module.exports = {
     let member = await guild.members.fetch(message.author.id);
     if (!await checkRoles(command, member)) {
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!await checkChannels(command, message.channel.id)) {
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
 
     if (!args[0]) {
-      message.reply(`⛔ Неверный формат команды, упомяните или укажите айди пользователя (\`${this.example}\`)`);
+      message.reply(`⛔ Неверный формат команды, упомяните или укажите айди пользователя (\`${this.example}\`)`).catch(e => e);
       return;
     }
 
@@ -43,19 +43,19 @@ module.exports = {
       role = await guild.roles.cache.find(r => r.id === dbGuild.options.mute.role);
     } catch (e) {
       let embed = new MessageEmbed().setDescription("Роль для мута не найдена!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
 
     let banMember = await getUserFromMention(args[0], guild);
     if (!banMember) {
       try {
-        banMember = await guild.members.fetch(args[0]);
+        banMember = await guild.members.fetch(args[0]).catch(e => e);
       } catch (e) {
       }
     }
     if (!banMember) {
-      message.reply("Пользователь не найден.");
+      message.reply("Пользователь не найден.").catch(e => e);
       return;
     }
 
@@ -63,18 +63,18 @@ module.exports = {
     let authorRolePosition = member.roles.cache.reduce((prev, item) => item.position > prev ? item.position : prev, -1);
 
     if (banMemberRolePosition >= authorRolePosition && member.id !== guild.ownerId) {
-      message.reply("⛔ Вы не можете размучивать пользователя, который имеет позицию роли выше вашей!");
+      message.reply("⛔ Вы не можете размучивать пользователя, который имеет позицию роли выше вашей!").catch(e => e);
       return;
     }
 
     if (banMember.id === message.author.id) {
       let embed = new MessageEmbed().setDescription(`⛔ Вы не можете размутить себя!`).setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
 
     if (!dbGuild.options.mute.users.find(u => u.id === banMember.id)){
-      message.reply(`⛔ Пользователь не в муте!`);
+      message.reply(`⛔ Пользователь не в муте!`).catch(e => e);
       return;
     }
 
@@ -96,8 +96,8 @@ module.exports = {
         reason: args.slice(1,).join(" ") || "Без причины",
         mod: client.user
       }, client)
-      await message.reply(`${banMember.user.tag} был размучен ✅`);
+      await message.reply(`${banMember.user.tag} был размучен ✅`).catch(e => e);
     }
-    catch (e) {message.reply(`Не удалось размутить ${banMember.user.tag} ❌`)};
+    catch (e) {message.reply(`Не удалось размутить ${banMember.user.tag} ❌`).catch(e => e)};
   }
 }

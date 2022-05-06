@@ -542,11 +542,11 @@ client.on("voiceStateUpdate", async (oldState, newState) => {
   }
   if (oldState.channelId === null && guild.options.logger.voiceAllow.includes("VOICE_JOIN")) {
     let embed = new MessageEmbed()
-      .setTitle("Пользователь зашёл в канал")
+      .setTitle("Пользователь зашёл в войс")
       .setAuthor(newState.member.user.username + "#" + newState.member.user.discriminator, newState.member.user.displayAvatarURL())
       .setFooter(`ID: ${oldState.member.id}`)
       .setTimestamp(new Date())
-      .setDescription(`${newState.member.user.username + "#" + newState.member.user.discriminator} зашёл в с <#${newState.channelId}>`)
+      .setDescription(`${newState.member.user.username + "#" + newState.member.user.discriminator} зашёл в <#${newState.channelId}>`)
       .setColor(colors.green)
     try {
       let channel = await client.channels.fetch(guild.options.logger.voiceChannel);

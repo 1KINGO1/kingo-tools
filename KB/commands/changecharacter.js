@@ -15,12 +15,12 @@ module.exports = {
     let member = await message.guild.members.fetch(message.author.id);
     if (!await checkRoles(command, member)){
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!await checkChannels(command, message.channel.id)){
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     let user = JSON.parse(JSON.stringify(guild.options.economy.users.find(user => user.id === message.author.id) || ""));
@@ -28,14 +28,14 @@ module.exports = {
       let embed = new MessageEmbed()
         .setDescription("👹 Вы не являетесь участником экономики.")
         .setColor("#eb4034");
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!args[0]){
       let embed = new MessageEmbed()
         .setDescription("👹 Введите имя героя.")
         .setColor("#eb4034");
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     let character = characters.find(ch => ch.name === args[0]);
@@ -43,14 +43,14 @@ module.exports = {
       let embed = new MessageEmbed()
         .setDescription("👹 Герой не найден.")
         .setColor("#eb4034");
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (user.silverCoins < character.silverPrice || user.goldCoins < character.goldPrice){
       let embed = new MessageEmbed()
         .setDescription("👹 Недостаточно средств.")
         .setColor("#eb4034");
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     user.silverCoins -= character.silverPrice;
@@ -74,6 +74,6 @@ module.exports = {
     let embed = new MessageEmbed()
       .setDescription("Персонаж сменён!")
       .setColor("#378f00");
-    message.reply({embeds: [embed]});
+    message.reply({embeds: [embed]}).catch(e => e);
   }
 }

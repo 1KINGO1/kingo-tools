@@ -17,12 +17,12 @@ module.exports = {
     let member = await message.guild.members.fetch(message.author.id);
     if (!await checkRoles(command, member)){
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!await checkChannels(command, message.channel.id)){
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     let user1 = await message.guild.members.fetch(message.author.id);
@@ -31,14 +31,14 @@ module.exports = {
       let embed = new MessageEmbed()
         .setDescription("👹 Вы не являетесь участником экономики.")
         .setColor("#eb4034");
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if(user1DB.isDead){
       let embed = new MessageEmbed()
         .setDescription("👹 Вы мёртвы.")
         .setColor("#eb4034");
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!args[0]){
@@ -48,7 +48,7 @@ module.exports = {
     let user2 = await getUserFromMention(args[0], message.guild);
     if (!user2){
       try{
-        user2 = await message.guild.members.fetch(args[0]);
+        user2 = await message.guild.members.fetch(args[0]).catch(e => e);
       }catch (e) {}
     }
     if (!user2){
@@ -60,14 +60,14 @@ module.exports = {
       let embed = new MessageEmbed()
         .setDescription("👹 Пользователь не найден.")
         .setColor("#eb4034");
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (user2DB.isDied){
       let embed = new MessageEmbed()
         .setDescription("👹 Пользователь мёртв.")
         .setColor("#eb4034");
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
 
@@ -90,6 +90,6 @@ module.exports = {
       .setAuthor({name: `${user1.user.tag}`, iconURL: user1.user.displayAvatarURL({size:1024,dynamic:true})})
       .addField("Здоровье", user1DB.hp  + "<:heart:968138260918448169>", true)
       .addField("Защита", user1DB.defence  + "🛡️", true);
-    message.channel.send({embeds: [enemyEmbed, profileEmbed]});
+    message.channel.send({embeds: [enemyEmbed, profileEmbed]}).catch(e => e);
   }
 }

@@ -25,21 +25,21 @@ module.exports = {
     let member = await guild.members.fetch(message.author.id);
     if (!await checkRoles(command, member)){
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!await checkChannels(command, message.channel.id)){
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
 
     if (!args[0]) {
-      message.reply(`⛔ Неверный формат команды, упомяните или укажите айди пользователя (\`${this.example}\`)`);
+      message.reply(`⛔ Неверный формат команды, упомяните или укажите айди пользователя (\`${this.example}\`)`).catch(e => e);
       return;
     }
     if (!args[1]) {
-      message.reply(`⛔ Неверный формат команды, укажите срок наказания (\`${this.example}\`)`);
+      message.reply(`⛔ Неверный формат команды, укажите срок наказания (\`${this.example}\`)`).catch(e => e);
       return;
     }
 
@@ -48,18 +48,18 @@ module.exports = {
       role = await guild.roles.cache.find(r => r.id === dbGuild.options.mute.role);
     }catch (e) {
       let embed = new MessageEmbed().setDescription("Роль для мута не найдена!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
 
     let banMember = await getUserFromMention(args[0], guild);
     if (!banMember) {
       try {
-        banMember = await guild.members.fetch(args[0]);
+        banMember = await guild.members.fetch(args[0]).catch(e => e);
       } catch (e) {}
     }
     if (!banMember) {
-      message.reply("Пользователь не найден.");
+      message.reply("Пользователь не найден.").catch(e => e);
       return;
     }
 
@@ -67,11 +67,11 @@ module.exports = {
     try {
       time = dateParser(args[1]);
     } catch (e) {
-      message.reply("⛔ Неверный формат даты");
+      message.reply("⛔ Неверный формат даты").catch(e => e);
       return;
     }
     if (dbGuild.options.mute.users.find(u => u.id === banMember.id)){
-      message.reply(`⛔ Пользователь уже в муте!`);
+      message.reply(`⛔ Пользователь уже в муте!`).catch(e => e);
       return;
     }
 
@@ -79,13 +79,13 @@ module.exports = {
     let authorRolePosition = member.roles.cache.reduce((prev, item) => item.position > prev ? item.position : prev, -1);
 
     if (banMemberRolePosition >= authorRolePosition && member.id !== guild.ownerId) {
-      message.reply("⛔ Вы не можете мутить пользователя, который имеет позицию роли выше вашей!");
+      message.reply("⛔ Вы не можете мутить пользователя, который имеет позицию роли выше вашей!").catch(e => e);
       return;
     }
 
     if (banMember.id === message.author.id){
       let embed = new MessageEmbed().setDescription(`⛔ Вы не можете мутить себя!`).setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
 
@@ -112,7 +112,6 @@ module.exports = {
       setTimeout(async () => {
         try{
           dbGuild = await Guild.findOne({id: dbGuild.id});
-          console.log(dbGuild.options.mute.users)
           if (!dbGuild.options.mute.users.find(u => u.id === banMember.id)){
             return;
           }
@@ -136,10 +135,9 @@ module.exports = {
         }catch (e) {console.log(e)}
       }, time);
 
-      await message.reply(`${banMember.user.tag} был замучен ✅`);
+      await message.reply(`${banMember.user.tag} был замучен ✅`).catch(e => e);
     } catch (e) {
-      console.log(e)
-      message.reply(`Не удалось замутить ${banMember.user.tag} ❌`);
+      message.reply(`Не удалось замутить ${banMember.user.tag} ❌`).catch(e => e);
     }
   }
 }

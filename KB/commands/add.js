@@ -16,28 +16,28 @@ module.exports = {
     let member = await message.guild.members.fetch(message.author.id);
     if (!await checkRoles(command, member)) {
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!await checkChannels(command, message.channel.id)) {
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду здесь!").setColor(colors.grayRed);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
 
     if (!args[0]) {
       let embed = new MessageEmbed().setDescription("Укажите изменяемое свойство!").setColor(colors.gray);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!args[1]) {
       let embed = new MessageEmbed().setDescription("Укажите айди пользователя или упомяните его!").setColor(colors.gray);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
     if (!args[2]) {
       let embed = new MessageEmbed().setDescription("Укажите устанавливаемое значение!").setColor(colors.gray);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
 
@@ -50,7 +50,7 @@ module.exports = {
     }
     if (!mentionedUser) {
       let embed = new MessageEmbed().setDescription("Пользователь не найден!").setColor(colors.gray);
-      message.reply({embeds: [embed]});
+      message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
 
@@ -60,12 +60,12 @@ module.exports = {
           let user = JSON.parse(JSON.stringify(guild.options.levelSystem.users.find(user => user.id === mentionedUser.user.id) || ""));
           if (!user) {
             let embed = new MessageEmbed().setDescription("Пользователь не найден!").setColor(colors.gray);
-            message.reply({embeds: [embed]});
+            message.reply({embeds: [embed]}).catch(e => e);
             return;
           }
           if (isNaN(+args[2]) || +args[2] <= 0) {
             let embed = new MessageEmbed().setDescription("Неверный тип значение, введите **натуральное число**").setColor(colors.gray);
-            message.reply({embeds: [embed]});
+            message.reply({embeds: [embed]}).catch(e => e);
             return;
           }
           let statistic = calcLevelByXp(user.totalXP);
@@ -99,12 +99,12 @@ module.exports = {
           let user = JSON.parse(JSON.stringify(guild.options.levelSystem.users.find(user => user.id === mentionedUser.user.id) || ""));
           if (!user) {
             let embed = new MessageEmbed().setDescription("Пользователь не найден!").setColor(colors.gray);
-            message.reply({embeds: [embed]});
+            message.reply({embeds: [embed]}).catch(e => e);
             return;
           }
           if (isNaN(+args[2]) || +args[2] <= 0) {
             let embed = new MessageEmbed().setDescription("Неверный тип значение, введите **натуральное число**").setColor(colors.gray);
-            message.reply({embeds: [embed]});
+            message.reply({embeds: [embed]}).catch(e => e);
             return;
           }
           user.totalXP = user.totalXP + +args[2]
@@ -119,18 +119,18 @@ module.exports = {
           guild.options = {...guild.options, levelSystem: {...guild.options.levelSystem, users: resultArray}}
           await guild.save();
           let embed = new MessageEmbed().setDescription("Успешно!").setColor(colors.green);
-          message.reply({embeds: [embed]});
+          message.reply({embeds: [embed]}).catch(e => e);
           return;
         }catch (e) {
           let embed = new MessageEmbed().setDescription("Произошла ошибка!").setColor(colors.grayRed);
-          message.reply({embeds: [embed]});
+          message.reply({embeds: [embed]}).catch(e => e);
           return;
         }
         break;
 
       default:
         let embed = new MessageEmbed().setDescription("Свойство не найдено!").setColor(colors.grayRed);
-        message.reply({embeds: [embed]});
+        message.reply({embeds: [embed]}).catch(e => e);
         return;
     }
 
