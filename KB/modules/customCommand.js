@@ -1,6 +1,7 @@
 const {checkRoles, checkChannels} = require("../utils/checkAvailability");
 const {MessageEmbed} = require("discord.js");
 const colors = require("../utils/colors");
+const randexp = require('randexp').randexp;
 module.exports = async function(message, options, guild, client){
   let member = await message.guild.members.fetch(message.author.id);
   let args = message.content.split(" ").slice(1, );
@@ -18,6 +19,30 @@ module.exports = async function(message, options, guild, client){
   let mes;
   try{
     mes = options.text
+      //Logic
+      .replace(/\|(.+)\?(.+):(.+)\|/g, (match, p1, p2, p3) => {
+
+        let result = "";
+
+        if (!/args\[[0-9]+]/.test(p1) &&
+            !/mention/.test(p1)
+        ){
+          return "";
+        }
+
+        //args
+        if (/args\[[0-9]+]/.test(p1)){
+          p1.replace(/args\[([0-9]+)]/, (match, p1) => {
+            if (args[+p1 - 1]){
+              result = p2
+            }
+            else result = p3;
+          })
+        }
+
+        return result;
+      })
+      //Basic
       .replaceAll("{author.id}", message.author.id)
       .replaceAll("{author.tag}", message.author.tag)
       .replaceAll("{channel.id}", message.channel.id)
@@ -38,6 +63,14 @@ module.exports = async function(message, options, guild, client){
           return args[+p1 - 1]
         }
       })
+      .replace(/\{rr\((.+)\)}/g, (match, p1) => {
+        try{
+          let regex = new RegExp(p1);
+          return randexp(regex);
+        }catch (e) {
+          return "";
+        }
+      })
       //Actions
       .replace(/<command\.delete>/g, () => {
         try{
@@ -56,6 +89,24 @@ module.exports = async function(message, options, guild, client){
       .replace(/<author\.role\.remove\(([0-9]+)\)>/g, (match, p1) => {
         try{
             member.roles.remove(p1).catch(e => e)
+        }catch (e) {}
+        return "";
+      })
+      .replace(/<mention\.role\.add\(([0-9]+)\)>/g, (match, p1) => {
+        try{
+          message.guild.members.fetch(message.mentions.members.first()?.id).then(member => {
+            message.guild.roles.fetch(p1).then(role => {
+              member.roles.add(role);
+            }).catch(e => e);
+          })
+        }catch (e) {}
+        return "";
+      })
+      .replace(/<mention\.role\.remove\(([0-9]+)\)>/g, (match, p1) => {
+        try{
+          message.guild.members.fetch(message.mentions.members.first()?.id).then(member => {
+            member.roles.remove(p1).catch(e => e)
+          })
         }catch (e) {}
         return "";
       })
