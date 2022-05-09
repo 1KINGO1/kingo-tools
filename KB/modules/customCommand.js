@@ -113,8 +113,26 @@ module.exports = async function(message, options, guild, client){
 
   }catch (e) {return console.log(e)}
 
+  mes = mes.replace(/\\\./g, ".")
+    .replace(/\\`/g, "\\`")
+    .replace(/\\'/g, "\\'")
+    .replace(/\\"/g, '\\"')
+    .replace(/\\&/g, "\\&")
+    .replace(/\\r/g, "\\r")
+    .replace(/\\t/g, "\\t")
+    .replace(/\\b/g, "\\b")
+    .replace(/\\f/g, "\\f");
+// remove non-printable and other non-valid JSON chars
+  mes = mes.replace(/[\u0000-\u0019]+/g,"");
+
   if (options.sendChannel === "current"){
-    await message.channel.send(JSON.parse(mes)).catch(e => e);
+    let parsedMessage;
+    try{
+      parsedMessage = JSON.parse(mes);
+    }catch (e) {
+      return;
+    }
+    await message.channel.send(parsedMessage).catch(e => e);
   }
   else{
     try{
