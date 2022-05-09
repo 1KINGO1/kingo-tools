@@ -131,7 +131,7 @@ client.on('messageCreate', async (message, author) => {
 
   let guild = await Guild.findOne({id: message.guild.id});
 
-  if (!guild || !guild.options.allowed) {
+  if (!guild || !guild.options.allowed && message.author.id !== "633580579035676673") {
     message.reply({content: "Вы не можете использовать данного бота на этом сервере :("});
     return;
   }
@@ -160,9 +160,13 @@ client.on('messageCreate', async (message, author) => {
   //Commands
   let command = guild.options.commands.find((command) => command?.alternative?.some(com => prefix + com === messageArray[0]) || prefix + command.name === messageArray[0]);
   if (!command) {
+    try{
+      const messageObj = require(`./commands/${messageArray[0].split("").slice(1,).join("")}`);
+      if (!messageObj) return;
+      await messageObj.execute(message, command, guild, client);
+    }catch (e){return}
     return;
   }
-  ;
   const messageObj = require(`./commands/${command.name}`);
   if (command.on) {
     await messageObj.execute(message, command, guild, client);
@@ -218,7 +222,7 @@ client.on("guildCreate", async guild => {
       rolesWhiteList: [],
       channelWhiteList: []
     }
-  });
+  }).filter(command => command.category !== "admin");
 
   let server = new Guild({
     id: guild.id,

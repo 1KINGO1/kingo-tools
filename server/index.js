@@ -1052,7 +1052,7 @@ app.post("/api/updateGuildData", async (req, res) => {
     return;
   }
 
-  const pathArray = fs.readdirSync(path.join(path.dirname(__dirname), "KB", "commands"), {withFileTypes: true});
+  const pathArray = fs.readdirSync(path.join(path.dirname(__dirname), "KB", "commands"), {withFileTypes: true}).filter(command => command.category !== "admin");
 
   let newCommands = [];
 
