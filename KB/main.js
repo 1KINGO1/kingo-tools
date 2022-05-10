@@ -18,6 +18,7 @@ const levels = require("./modules/levels");
 const path = require("path");
 const {REST} = require("@discordjs/rest");
 const logger = require("./modules/loggerMod");
+const moment = require("moment");
 
 mongoose.connect('mongodb+srv://fsdfsdfsdf:aYZdwxlnetcEVTzr@cluster0.epd8a.mongodb.net/kingo-tools?retryWrites=true&w=majority').then(() => {
   console.log("Database connected")
@@ -291,6 +292,7 @@ client.on("guildDelete", async guild => {
 
 //LOGGER MESSAGES
 client.on("messageDelete", async message => {
+  console.log(message)
   let guild = await Guild.findOne({id: message.guild.id});
   if (!guild || !guild.options.allowed) {
     return;
@@ -299,15 +301,24 @@ client.on("messageDelete", async message => {
   if (!guild.options.logger.on) return;
   if (!guild.options.logger.messageEventsAllow.includes("MESSAGE_DELETE")) return;
   let channel = await client.channels.fetch(message.channelId);
-  if (!message.content) return;
+  console.log(message.attachments);
+  if (!message.content && !message.attachments.size) return;
   let embed = new MessageEmbed()
     .setTitle("Сообщение удалено")
-    .addField("Удалённое сообщение:", `\`\`\`${message.content}\`\`\``)
-    .addField("Автор", `**${message.author?.tag || "???"}** (<@${message.author?.id}>)`, true)
-    .addField("Канал", `**#${message.channel?.name || "???"}** (<#${message.channel?.id}>)`, true)
-    .setFooter(`ID: ${message.id}`)
-    .setTimestamp(new Date())
-    .setColor(colors.red)
+    .setFooter(`ID: ${message.id}\nСообщение было отослано: ${moment(message.createdTimestamp)}`)
+    .setColor(colors.red);
+  if (message.content){
+    embed.addField("Удалённое сообщение:", `\`\`\`${message.content}\`\`\``);
+  }
+  if (message.attachments.size !== 0){
+    let attachments = [];
+    for (let attachment of message.attachments){
+      attachments.push(`[${attachment[1].name}](${attachment[1].url})`)
+    }
+    embed.addField("Прикреплённые файлы:", `${attachments.join("\n")}`)
+  }
+  embed.addField("Автор", `**${message.author?.tag || "???"}** (<@${message.author?.id}>)`, true)
+       .addField("Канал", `**#${message.channel?.name || "???"}** (<#${message.channel?.id}>)`, true);
   try {
     let channel = await client.channels.fetch(guild.options.logger.messageEventsChannel);
     await channel.send({embeds: [embed]})

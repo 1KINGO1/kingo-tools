@@ -44,7 +44,7 @@ module.exports = {
       message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
-    let text = iconv.decode(Buffer.from(response.data), "win1251");
+    let text = iconv.decode(Buffer.from(response.data), "utf-8");
     try{
       text = JSON.parse(text);
     }catch (e) {
