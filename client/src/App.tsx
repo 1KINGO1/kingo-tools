@@ -10,7 +10,6 @@ import {useLocation} from 'react-router-dom';
 import {BioButton} from "./components/BioButton";
 
 export const App: FC = () => {
-
     const location = useLocation();
 
     const isAuth = useSelector<RootState>(state => state.auth.isAuth);

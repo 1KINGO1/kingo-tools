@@ -136,7 +136,6 @@ client.on('messageCreate', async (message, author) => {
     message.reply({content: "Вы не можете использовать данного бота на этом сервере :("});
     return;
   }
-  ;
 
   //Anti Scam Links
   if (guild?.options?.antiScamLinks?.on) {
@@ -168,10 +167,12 @@ client.on('messageCreate', async (message, author) => {
     }catch (e){return}
     return;
   }
-  const messageObj = require(`./commands/${command.name}`);
-  if (command.on) {
-    await messageObj.execute(message, command, guild, client);
-  }
+  try{
+    const messageObj = require(`./commands/${command.name}`);
+    if (command.on) {
+      await messageObj.execute(message, command, guild, client);
+    }
+  }catch (e) {}
 
 });
 client.on('interactionCreate', async (interaction) => {
@@ -207,11 +208,16 @@ client.on("guildCreate", async guild => {
   }
 
   const pathArray = fs.readdirSync(path.join(__dirname, "commands"), {withFileTypes: true});
+  const musicPathArray = fs.readdirSync(path.join(path.dirname(__dirname), "KMB", "commands"), {withFileTypes: true})
 
   let commands = [];
 
   for (const p of pathArray) {
     const command = require("./commands/" + p.name);
+    commands.push(command);
+  }
+  for (const p of musicPathArray) {
+    const command = require("../KMB/commands/" + p.name);
     commands.push(command);
   }
 
@@ -522,7 +528,7 @@ client.on("voiceStateUpdate", async (oldState, newState) => {
   if (!guild || !guild.options.allowed) {
     return;
   }
-  ;
+  if (oldState.channelId === newState.channelId) return;
   if (newState.channelId !== null && oldState.channelId !== null && guild.options.logger.voiceAllow.includes("VOICE_CHANGE")) {
     let embed = new MessageEmbed()
       .setTitle("Пользователь поменял войс")

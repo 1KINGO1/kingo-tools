@@ -2,6 +2,7 @@
   "name": "tools",
   "version": "1.0.0",
   "dependencies": {
+    "dotenv": "^16.0.1"
   },
   "scripts": {
     "start": "cd KB && npm install && cd ../server && npm install && node index.js"

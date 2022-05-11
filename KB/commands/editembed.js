@@ -35,7 +35,7 @@ module.exports = {
       message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
-    let channelObj = await client.channels.fetch(channel_id);
+    let channelObj = await message.guild.channels.fetch(channel_id);
     if (!channelObj || channelObj?.guild.id !== guild.id){
       let embed = new MessageEmbed().setDescription("Канал не найден!").setColor(colors.gray);
       message.reply({embeds: [embed]}).catch(e => e);

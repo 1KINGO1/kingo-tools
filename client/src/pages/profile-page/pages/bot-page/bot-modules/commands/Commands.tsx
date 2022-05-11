@@ -88,6 +88,7 @@ export const Commands: FC = () => {
                         <Tabs.TabPane tab="Economy" key="6" />
                         <Tabs.TabPane tab="Roles" key="7" />
                         <Tabs.TabPane tab="Utils" key="8" />
+                        <Tabs.TabPane tab="Music" key="9" />
                     </Tabs>
                 }
             />
@@ -216,6 +217,23 @@ export const Commands: FC = () => {
             <CommandsGrid>
               {commands
                 .filter(command => command.category === "utils")
+                .map(command => <Command on={command.on}
+                                         name={command.name}
+                                         description={command.description}
+                                         example={command.example}
+                                         isSlash={command?.isSlash}
+                                         options={{rolesWhiteList: command.rolesWhiteList,
+                                           channelWhiteList: command.channelWhiteList}}
+                  />
+                )
+              }
+
+            </CommandsGrid> : ""
+          }
+          {currentPageId === "9" ?
+            <CommandsGrid>
+              {commands
+                .filter(command => command.category === "music")
                 .map(command => <Command on={command.on}
                                          name={command.name}
                                          description={command.description}

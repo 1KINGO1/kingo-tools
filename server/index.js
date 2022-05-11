@@ -10,6 +10,7 @@ const axios = require("axios");
 const path = require("path");
 const fs = require("fs");
 const {client} = require("../KB/main");
+const {m_client} = require("../KMB/main");
 const http = require("http");
 
 mongoose.connect('mongodb+srv://fsdfsdfsdf:aYZdwxlnetcEVTzr@cluster0.epd8a.mongodb.net/kingo-tools?retryWrites=true&w=majority').then(() => {
@@ -1054,10 +1055,17 @@ app.post("/api/updateGuildData", async (req, res) => {
 
   const pathArray = fs.readdirSync(path.join(path.dirname(__dirname), "KB", "commands"), {withFileTypes: true}).filter(command => command.category !== "admin");
 
+  const musicPathArray = fs.readdirSync(path.join(path.dirname(__dirname), "KMB", "commands"), {withFileTypes: true}).filter(command => command.category !== "admin");
+
   let newCommands = [];
 
   for (const p of pathArray){
     const command = require("../KB/commands/" + p.name);
+    newCommands.push(command);
+  }
+
+  for (const p of musicPathArray){
+    const command = require("../KMB/commands/" + p.name);
     newCommands.push(command);
   }
 

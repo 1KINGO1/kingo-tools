@@ -5,7 +5,7 @@ export interface Command{
     description: string,
     alternative: string[],
     isSlash: boolean,
-    category: "mod" | "fan" | "config" | "games" | "levels"  | "economy" | "roles" |  "utils",
+    category: "mod" | "fan" | "config" | "games" | "levels"  | "economy" | "roles" | "utils" | "music",
     rolesWhiteList: string[],
     channelWhiteList: string[]
 }
