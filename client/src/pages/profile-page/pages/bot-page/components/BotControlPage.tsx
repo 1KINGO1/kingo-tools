@@ -10,6 +10,7 @@ import {Guild} from "../../../../../types/Guild";
 import {removeGuild, setGuildData} from "../../../../../store/actions/botActions";
 import {ModuleButton} from "./ModuleButton";
 import {Loading} from "../../../../../components/Loading";
+import { motion } from "framer-motion";
 
 const Header = styled.div`
   padding: 10px;
@@ -65,7 +66,8 @@ export const BotControlPage: FC = () => {
                     Добавить <RobotOutlined />
                 </Button>
             }
-        /> : <>
+        /> : <motion.div  initial={{opacity: 0}}
+                          animate={{opacity: 1}}>
 
             <Header>
                 <Avatar size={32} src={guild?.data.avatar} />
@@ -117,6 +119,6 @@ export const BotControlPage: FC = () => {
                               link="cc"
                 />
             </Buttons>
-        </>
+        </motion.div>
     )
 }

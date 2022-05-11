@@ -7,6 +7,7 @@ import {RootState} from "../../../../../../store/store";
 import {InfoCircleOutlined, SettingOutlined} from "@ant-design/icons";
 import {Select} from 'antd';
 import {Guild} from "../../../../../../types/Guild";
+import {motion} from "framer-motion";
 
 const {Option} = Select;
 
@@ -22,7 +23,7 @@ interface CommandProps {
   }
 }
 
-const CommandWrapper = styled.div<any>`
+const CommandWrapper = styled(motion.div)<any>`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -123,7 +124,7 @@ export const Command: FC<CommandProps> = ({name, description, on, example, isSla
   };
 
   return (
-    <CommandWrapper on={isOn}>
+    <CommandWrapper on={isOn} layout transition={{duration: 0.5, type: "ease"}}>
       <CommandTitle>
         {name} {isSlash ? <Tooltip placement="top" title="Команда также может быть использована в качестве слэш команды"
                                    color="#2db7f5"><SlashMark>Slash</SlashMark></Tooltip> : ""}
