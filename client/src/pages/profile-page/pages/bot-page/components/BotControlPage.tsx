@@ -7,10 +7,11 @@ import {Avatar, Button, message, Result} from "antd";
 import styled from "styled-components";
 import {Text} from "../../../../../components/Text";
 import {Guild} from "../../../../../types/Guild";
-import {removeGuild, setGuildData} from "../../../../../store/actions/botActions";
+import {removeGuild, setGuild, setGuildData} from "../../../../../store/actions/botActions";
 import {ModuleButton} from "./ModuleButton";
 import {Loading} from "../../../../../components/Loading";
 import { motion } from "framer-motion";
+import {ArrowLeftOutlined} from "@ant-design/icons";
 
 const Header = styled.div`
   padding: 10px;
@@ -62,9 +63,14 @@ export const BotControlPage: FC = () => {
             status="warning"
             title="Добавьте бота на ваш сервер"
             extra={
+            <>
                 <Button type="primary" key="console" onClick={() => window.location.href = "https://discord.com/oauth2/authorize?client_id=956507803395178549&permissions=8&scope=bot%20applications.commands"}>
                     Добавить <RobotOutlined />
                 </Button>
+                <Button key="console" onClick={() => dispatch(setGuild(""))}>
+                    Назад <ArrowLeftOutlined />
+                </Button>
+            </>
             }
         /> : <motion.div  initial={{opacity: 0}}
                           animate={{opacity: 1}}>

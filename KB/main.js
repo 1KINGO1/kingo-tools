@@ -19,10 +19,19 @@ const path = require("path");
 const {REST} = require("@discordjs/rest");
 const logger = require("./modules/loggerMod");
 const moment = require("moment");
+const axios = require("axios");
 
 mongoose.connect('mongodb+srv://fsdfsdfsdf:aYZdwxlnetcEVTzr@cluster0.epd8a.mongodb.net/kingo-tools?retryWrites=true&w=majority').then(() => {
   console.log("Database connected")
 });
+
+async function log(mes){
+  const {data} = await axios.post(`https://discord.com/api/webhooks/974027011448274994/nfFpf_wJkZHChS81dPSDGe_5C7y3xHv996XnPtEHHdWHnnhRPg1SfmEC60Wtl-TtM7J6`, {
+    content: mes
+  });
+  console.log(data);
+}
+
 
 const User = mongoose.model('User', {
   login: String,
@@ -123,6 +132,7 @@ client.on('ready', async () => {
         await guild.save();
       }, trole.to <= new Date().getTime() ? 0 : trole.to - new Date().getTime())
     }
+    log("**Бот запущен!**")
   }
 });
 
@@ -289,11 +299,13 @@ client.on("guildCreate", async guild => {
     }
   });
   await server.save();
+  log(`**Новый сервер** - \`${guild.name}\` \`${guild.id}\``)
 })
 client.on("guildDelete", async guild => {
 
   let server = Guild.findOne({id: guild.id});
   await server.remove();
+  log(`**Сервер удалён** - \`${guild.name}\` \`${guild.id}\``)
 })
 
 //LOGGER MESSAGES

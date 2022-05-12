@@ -1106,7 +1106,6 @@ app.post("/api/updateGuildData", async (req, res) => {
 });
 
 app.get("*", async (req, res) => {
-  await log(`**[** \`${req.path}\` \`${req.method}\` **]** - ${req.headers['x-forwarded-for']?.split(',').shift()}`);
   res.sendFile(path.join(path.dirname(__dirname), "client" ,"build", "index.html"));
 })
 app.listen(process.env.PORT || 3001, () => {

@@ -1,4 +1,4 @@
-import {Button, PageHeader, Tabs} from "antd";
+import {Alert, Button, PageHeader, Tabs} from "antd";
 import {FC, useState} from "react";
 import styled from "styled-components";
 import {useSelector} from "react-redux";
@@ -231,21 +231,30 @@ export const Commands: FC = () => {
             </CommandsGrid> : ""
           }
           {currentPageId === "9" ?
-            <CommandsGrid>
-              {commands
-                .filter(command => command.category === "music")
-                .map(command => <Command on={command.on}
-                                         name={command.name}
-                                         description={command.description}
-                                         example={command.example}
-                                         isSlash={command?.isSlash}
-                                         options={{rolesWhiteList: command.rolesWhiteList,
-                                           channelWhiteList: command.channelWhiteList}}
-                  />
-                )
-              }
+            <>
+              <Alert
+                message="Другой бот!"
+                description={<p>Функция  доступна в другом боте, <a href="https://discord.com/oauth2/authorize?client_id=973905118556729374&permissions=8&scope=bot">пригласите его</a></p>}
+                type="warning"
+                showIcon
+                closable
+              />
+              <CommandsGrid>
+                {commands
+                  .filter(command => command.category === "music")
+                  .map(command => <Command on={command.on}
+                                           name={command.name}
+                                           description={command.description}
+                                           example={command.example}
+                                           isSlash={command?.isSlash}
+                                           options={{rolesWhiteList: command.rolesWhiteList,
+                                             channelWhiteList: command.channelWhiteList}}
+                    />
+                  )
+                }
 
-            </CommandsGrid> : ""
+              </CommandsGrid>
+            </> : ""
           }
 
 
