@@ -124,6 +124,12 @@ export const BotControlPage: FC = () => {
                               canCheck={false}
                               link="cc"
                 />
+                <ModuleButton title="Web Sender"
+                              value="webSender"
+                              checked={false}
+                              canCheck={false}
+                              link="webSender"
+                />
             </Buttons>
         </motion.div>
     )

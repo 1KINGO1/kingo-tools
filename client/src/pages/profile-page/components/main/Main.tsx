@@ -7,6 +7,8 @@ import {loadData} from "../../../../utils/api";
 import {removeAuth, setData} from "../../../../store/actions/authActions";
 import {message} from "antd";
 import {motion} from "framer-motion";
+import {useNavigate} from "react-router-dom";
+import webSocket from "../../../../utils/webSocket";
 
 const StyledMain = styled(motion.main)`
   height: 91%;
