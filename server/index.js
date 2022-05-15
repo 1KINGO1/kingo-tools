@@ -1248,6 +1248,7 @@ io.on('connection', async (socket) => {
 
 });
 
-server.listen(process.env.PORT || 3001, () => {
+//kingo-tools.herokuapp.com
+server.listen(process.env.PORT || 3001, "kingo-tools.herokuapp.com", () => {
   console.log(`Server running on port ${process.env.PORT || 3001}`)
 })
