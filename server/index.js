@@ -1187,6 +1187,7 @@ io.on('connection', async (socket) => {
     socket.data.webSender.lastChannel = socket.data.webSender.channel;
     id = id || null;
     socket.data.webSender.channel = id;
+    socket.emit("channel_change");
     let guildObj;
     try{
       guildObj = await client.guilds.fetch(socket.data.webSender.guild)
@@ -1196,17 +1197,31 @@ io.on('connection', async (socket) => {
     if (!guildObj) return;
     let channel = await guildObj.channels.fetch(id);
     if (!channel) return;
-    let messages = (await channel.messages.fetch({ limit: 50 })).map(mes => {
+    let messages = (await channel.messages.fetch({ limit: 50 }));
+    messages = await Promise.all(messages.map(async mes => {
+      let member;
+      try{
+        member = await mes.guild.members.cache.get(mes.author.id);
+      }catch (e) {
+      }
+
       return {
         authorName: mes.author.username,
+        id: mes.id,
+        authorBot: mes.author.bot,
         authorImageURL: mes.author.displayAvatarURL(),
-        content: mes.content
+        content: mes.content,
+        timestamp: mes.createdTimestamp,
+        embeds: mes.embeds,
+        attachments: mes.attachments,
+        deleted: false,
+        displayColor: member?.displayHexColor || "#ffffff"
       }
-    }).reverse();
-    socket.emit("messages_fetch", messages);
+    }));
+    socket.emit("messages_fetch", messages.reverse());
   })
 
-  socket.on("sendMessage", async (message) => {;
+  socket.on("sendMessage", async (message) => {
     let guildObj;
     try{
       guildObj = await client.guilds.fetch(socket.data.webSender.guild)
@@ -1237,12 +1252,34 @@ io.on('connection', async (socket) => {
 
   client.on("messageCreate", async (message) => {
     if (message.guild.id === socket.data.webSender.guild && message.channel.id === socket.data.webSender.channel){
+      let member;
+      try{
+        member = await message.guild.members.cache.get(message.author.id);
+      }catch (e) {
+      }
+
       let mes = {
           authorName: message.author.username,
           authorImageURL: message.author.displayAvatarURL(),
-          content: message.content
+          content: message.content,
+          authorBot: message.author.bot,
+          timestamp: message.createdTimestamp,
+          embeds: message.embeds,
+          id: message.id,
+          attachments: message.attachments,
+          deleted: false,
+          displayColor: member?.displayHexColor || "#ffffff"
         }
       socket.emit("new_message", mes);
+    }
+  })
+
+  client.on("messageDelete", async (message) => {
+    if (message.guild.id === socket.data.webSender.guild && message.channel.id === socket.data.webSender.channel){
+      let mes = {
+        id: message.id
+      }
+      socket.emit("message_delete", mes);
     }
   })
 
@@ -1250,5 +1287,5 @@ io.on('connection', async (socket) => {
 
 //kingo-tools.herokuapp.com
 server.listen(process.env.PORT || 13329,  () => {
-  console.log(`Server running on port ${process.env.PORT || 3001}`)
+  console.log(`Server running on port ${process.env.PORT || 13329}`)
 })

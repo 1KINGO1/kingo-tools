@@ -2,6 +2,7 @@ import {FC, useState} from "react";
 import styled from "styled-components";
 import {socket} from "../../../../../../../App";
 import {ControlOutlined, SendOutlined} from "@ant-design/icons";
+import {EmbedBuilder} from "./EmbedBuilder";
 
 const Flex = styled.div`
   height: 5%;
@@ -31,30 +32,39 @@ const ToolsBar = styled.div`
   justify-content: center;
 
   * {
-    margin: 0 0 0 6px;
+    margin: 0 0 0 7px;
+    cursor: pointer;
   }
 
   *:hover {
-    transform: scale(1.01);
+    transform: scale(1.03);
   }
 `;
 
 export const SendPanel: FC = () => {
 
   let [message, setMessage] = useState("");
+  let [isEBVisible, setEBVisible]  = useState(false);
+
 
   return(
-    <Flex>
-      <SendPanelWrapper placeholder="Введите сообщение" value={message} onChange={(e) => setMessage(e.target.value)} onKeyUp={(e) => {
-        if (e.key === "Enter"){
-          socket.emit("sendMessage", {content: message});
-          setMessage("")
-        }
-      }}/>
-      <ToolsBar>
-        <ControlOutlined size={20}/>
-        <SendOutlined size={20} />
-      </ToolsBar>
-    </Flex>
+    <>
+      <EmbedBuilder isVisible={isEBVisible} />
+      <Flex>
+        <SendPanelWrapper placeholder="Введите сообщение" value={message} onChange={(e) => setMessage(e.target.value)} onKeyUp={(e) => {
+          if (e.key === "Enter"){
+            socket.emit("sendMessage", {content: message});
+            setMessage("")
+          }
+        }}/>
+        <ToolsBar>
+          <ControlOutlined size={24} onClick={() => setEBVisible(true)}/>
+          <SendOutlined size={24} onClick={() => {
+            socket.emit("sendMessage", {content: message});
+            setMessage("")
+          }}/>
+        </ToolsBar>
+      </Flex>
+    </>
   )
 }
