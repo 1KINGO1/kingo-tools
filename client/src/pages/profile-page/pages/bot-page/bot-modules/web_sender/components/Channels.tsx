@@ -56,6 +56,8 @@ export const Channels: FC<{selectedChannel: string, setSelectedChannel: Function
     })
   }, [])
 
+  //.sort((ch1, ch2) => +ch2.position - +ch1.position)
+
   return(
     <Wrapper>
       {channels.map(channel => (<Channel {...channel} key={channel.id} isSelected={selectedChannel === channel.id} setSelectedChannel={setSelectedChannel}/>))}

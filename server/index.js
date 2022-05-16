@@ -1177,7 +1177,7 @@ io.on('connection', async (socket) => {
         name: channel[1].name,
         id: channel[1].id,
         parentId: channel[1].parentId,
-        position: channel[1].position,
+        position: channel[1].rawPosition,
         type: channel[1].type
       }
     });
