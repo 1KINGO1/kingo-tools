@@ -31,7 +31,6 @@ export const App: FC = () => {
 
         });
         socket.on("disconnect", () => {
-
             navigator("/socket-error");
         });
 

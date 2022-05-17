@@ -4,6 +4,8 @@ import {socket} from "../../../../../../../App";
 import {ControlOutlined, SendOutlined} from "@ant-design/icons";
 import {EmbedBuilder} from "./EmbedBuilder";
 
+import {APIEmbed} from "discord-api-types/v10";
+
 const Flex = styled.div`
   height: 5%;
   width: 97%;
@@ -41,26 +43,56 @@ const ToolsBar = styled.div`
   }
 `;
 
-export const SendPanel: FC = () => {
+export const SendPanel: FC<{ name: string, avatar: string }> = ({name, avatar}) => {
 
   let [message, setMessage] = useState("");
-  let [isEBVisible, setEBVisible]  = useState(false);
+  let [isEBVisible, setEBVisible] = useState(false);
 
+  let [embed, setEmbed] = useState<APIEmbed>({
+    title: "",
+    color: 0,
+    description: "",
+    url: "",
+    fields: [],
+    image: {
+      url: ""
+    },
+    thumbnail: {
+      url: ""
+    },
+    author: {
+      name: "",
+      icon_url: "",
+      url: ""
+    },
+    footer: {
+      icon_url: "",
+      text: ""
+    }
+  })
 
-  return(
+  return (
     <>
-      <EmbedBuilder isVisible={isEBVisible} />
+      <EmbedBuilder isVisible={isEBVisible} embed={embed} setEmbed={setEmbed} name={name} avatar={avatar}
+                    setVisible={setEBVisible}/>
       <Flex>
-        <SendPanelWrapper placeholder="Введите сообщение" value={message} onChange={(e) => setMessage(e.target.value)} onKeyUp={(e) => {
-          if (e.key === "Enter"){
-            socket.emit("sendMessage", {content: message});
-            setMessage("")
-          }
-        }}/>
+        <SendPanelWrapper placeholder="Введите сообщение" value={message} onChange={(e) => setMessage(e.target.value)}
+                          onKeyUp={(e) => {
+                            if (e.key === "Enter") {
+                              socket.emit("sendMessage", {
+                                content: message,
+                                embeds: [embed]
+                              });
+                              setMessage("")
+                            }
+                          }}/>
         <ToolsBar>
           <ControlOutlined size={24} onClick={() => setEBVisible(true)}/>
           <SendOutlined size={24} onClick={() => {
-            socket.emit("sendMessage", {content: message});
+            socket.emit("sendMessage", {
+              content: message,
+              embeds: [embed]
+            });
             setMessage("")
           }}/>
         </ToolsBar>

@@ -15,12 +15,12 @@ interface EmbedProps {
   image?: string,
   thumbnail?: string,
   url?: string,
-  description?: string,
+  description: string,
   footer?: {
     icon_url?: string,
     text?: string
   },
-  fields?: {name: string, value: string, inline: boolean}[]
+  fields?: { name: string, value: string, inline?: boolean }[]
 }
 
 export const Embed: FC<EmbedProps> = ({
@@ -50,11 +50,9 @@ export const Embed: FC<EmbedProps> = ({
         url={url || ""}
       >
 
-        {description ?
-          <DiscordEmbedDescription slot="description">
-            {description || ""}
-          </DiscordEmbedDescription> : ""
-        }
+        <DiscordEmbedDescription slot="description">
+          {description}
+        </DiscordEmbedDescription>
 
         {fields?.length !== 0 ?
           <DiscordEmbedFields slot="fields">

@@ -43,6 +43,8 @@ export const BotPage: FC = () => {
         window.location.href = config.DISCORD_LOGIN_PAGE;
     }
 
+
+
     return (
         Object.keys(discord || {}).length === 0 ? <Result
             status="warning"

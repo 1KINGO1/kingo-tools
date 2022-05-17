@@ -54,7 +54,7 @@ export const Channels: FC<{selectedChannel: string, setSelectedChannel: Function
     socket.on("channels_data", (data) => {
       setChannels(data);
     })
-  }, [])
+  }, []);
 
   //.sort((ch1, ch2) => +ch2.position - +ch1.position)
 

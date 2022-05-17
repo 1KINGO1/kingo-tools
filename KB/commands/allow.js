@@ -6,7 +6,7 @@ module.exports = {
   description: "Разрешает использовать бота на сервере.",
   example: `${prefix}allow`,
   category: "admin",
-  execute: async function (message, command, guild) {
+  execute: async function (message, command, guild, client, io) {
     if(message.author.id !== "633580579035676673") return;
     try{
       if (guild.options.allowed){
@@ -19,6 +19,7 @@ module.exports = {
       guild.options.allowed = true;
       guild.markModified("options");
       await guild.save();
+      io.emit("guild_allow", guild.id);
       let embed = new MessageEmbed()
         .setTitle("Доступ надан!")
         .setAuthor(guild.data.name, guild.data.avatar)

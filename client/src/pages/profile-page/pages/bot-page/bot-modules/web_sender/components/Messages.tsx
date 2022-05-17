@@ -128,7 +128,7 @@ export const Messages: FC<{ selectedChannel: string }> = ({selectedChannel}) => 
           <div id="message-trigger" style={{height: "10px"}}> </div>
         </DiscordMessages>
       </MessagesWrapper>
-      <SendPanel/>
+      <SendPanel name="Hook" avatar="https://play-lh.googleusercontent.com/0oO5sAneb9lJP6l8c6DH4aj6f85qNpplQVHmPmbbBxAukDnlO7DarDW0b-kEIHa8SQ"/>
     </Flex>
   )
 };

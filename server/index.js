@@ -9,7 +9,6 @@ const {CLIENT_URL, REDIRECT_URL} = require("./config");
 const axios = require("axios");
 const path = require("path");
 const fs = require("fs");
-const {client} = require("../KB/main");
 const {m_client} = require("../KMB/main");
 
 //Websocket
@@ -17,6 +16,11 @@ const http = require('http');
 const server = http.createServer(app);
 const {Server} = require("socket.io");
 const io = new Server(server);
+module.exports = {
+  io
+};
+
+const {client} = require("../KB/main");
 
 mongoose.connect('mongodb+srv://fsdfsdfsdf:aYZdwxlnetcEVTzr@cluster0.epd8a.mongodb.net/kingo-tools?retryWrites=true&w=majority').then(() => {
   console.log("Database connected")
@@ -1197,7 +1201,8 @@ io.on('connection', async (socket) => {
     if (!guildObj) return;
     let channel = await guildObj.channels.fetch(id);
     if (!channel) return;
-    let messages = (await channel.messages.fetch({ limit: 50 }));
+    let messages = (await channel?.messages?.fetch({ limit: 50 }).catch(e => e));
+    if (!messages) return;
     messages = await Promise.all(messages.map(async mes => {
       let member;
       try{
@@ -1239,13 +1244,22 @@ io.on('connection', async (socket) => {
           avatar: "",
         });
       }
-      if (!message?.content) return;
+
       await webhook.send({
-        content: message.content,
+        content: !!message?.content ? message?.content : undefined,
         username: socket.data.webSender.webHook.name,
         avatarURL: socket.data.webSender.webHook.image,
-        embeds: message?.embeds || []})
+        embeds: message.embeds || []
+      }).catch(async e => {
+        await webhook.send({
+          content: !!message?.content ? message?.content : undefined,
+          username: socket.data.webSender.webHook.name,
+          avatarURL: socket.data.webSender.webHook.image,
+          embeds: []
+        })
+      })
     }catch (e) {
+      console.log(e);
       return;
     }
   })

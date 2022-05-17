@@ -21,6 +21,9 @@ const logger = require("./modules/loggerMod");
 const moment = require("moment");
 const axios = require("axios");
 
+//WebSocket
+const {io} = require("../server/index");
+
 mongoose.connect('mongodb+srv://fsdfsdfsdf:aYZdwxlnetcEVTzr@cluster0.epd8a.mongodb.net/kingo-tools?retryWrites=true&w=majority').then(() => {
   console.log("Database connected")
 });
@@ -161,26 +164,26 @@ client.on('messageCreate', async (message, author) => {
   let messageArray = message.content.split(' ');
 
   //Custom Command
-  let ccommand = guild.options.customCommands.find((command) => prefix + command.name === messageArray[0]);
+  let ccommand = guild.options.customCommands?.find((command) => prefix + command.name === messageArray[0]);
   if (ccommand) {
     customCommand(message, ccommand, guild, client);
     return;
   }
 
   //Commands
-  let command = guild.options.commands.find((command) => command?.alternative?.some(com => prefix + com === messageArray[0]) || prefix + command.name === messageArray[0]);
+  let command = guild.options.commands?.find((command) => command?.alternative?.some(com => prefix + com === messageArray[0]) || prefix + command.name === messageArray[0]);
   if (!command) {
     try{
       const messageObj = require(`./commands/${messageArray[0].split("").slice(1,).join("")}`);
       if (!messageObj) return;
-      await messageObj.execute(message, command, guild, client);
+      await messageObj.execute(message, command, guild, client, io);
     }catch (e){return}
     return;
   }
   try{
     const messageObj = require(`./commands/${command.name}`);
     if (command.on) {
-      await messageObj.execute(message, command, guild, client);
+      await messageObj.execute(message, command, guild, client, io);
     }
   }catch (e) {}
 
