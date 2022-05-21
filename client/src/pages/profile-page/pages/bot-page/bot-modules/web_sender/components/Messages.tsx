@@ -57,6 +57,7 @@ export interface MessageI {
   attachments: [any],
   embeds: [any],
   deleted: boolean,
+  edit: boolean,
   authorBot: boolean,
   displayColor: string
 }
@@ -86,6 +87,21 @@ export const Messages: FC<{ selectedChannel: string }> = ({selectedChannel}) => 
         document.getElementById("message-trigger")?.scrollIntoView({behavior: "smooth", block: "end"});
       }, 200)
     });
+    socket.on("message_edit", (message) => {
+      setMessages((messages) => {
+        let result = [];
+        for (let mes of messages){
+          if (mes.id === message.id){
+            mes.edit = true;
+            mes.content = message.content;
+            mes.embeds = message.embeds;
+            mes.attachments = message.attachments;
+          }
+          result.push(mes);
+        }
+        return result
+      })
+    })
     socket.on("message_delete", ({id}) => {
       setMessages((messages) => {
         let result = [];
@@ -120,6 +136,7 @@ export const Messages: FC<{ selectedChannel: string }> = ({selectedChannel}) => 
                          timestamp={moment(new Date(message?.timestamp),  "DD MM YYYY hh:mm:ss").toString()}
                          authorBot={message?.authorBot}
                          embeds={message?.embeds}
+                         edit={message?.edit}
                          displayColor={message?.displayColor}
                 />
               </>

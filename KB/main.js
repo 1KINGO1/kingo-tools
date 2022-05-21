@@ -293,6 +293,12 @@ client.on("guildCreate", async guild => {
         role: 0,
         users: []
       },
+      stats: {
+        members: [{
+          value: guild.memberCount,
+          date: new Date().getTime()
+        }]
+      },
       timeRoles: []
     },
     data: {
@@ -668,44 +674,53 @@ client.login(token).then(() => {
     let guilds = await Guild.find({});
     guilds.forEach(g => {
       const CLIENT_ID = client.user.id;
-      const GUILD_ID = g.id
-      const rest = new REST({
-        version: '9'
-      }).setToken(token);
+      const GUILD_ID = g.id;
+      client.guilds.fetch(GUILD_ID).then((async guild => {
 
-      let commands = [];
-      const pathArray = fs.readdirSync(path.join(__dirname, "commands"), {withFileTypes: true});
-      for (const p of pathArray) {
-        const command = require("./commands/" + p.name);
-        if (command.useSlash && g.options.commands.find(com => com.name === command.name).on) {
-          if (!g.options.levelSystem.on && command.category === "levels") continue;
-          if (!g.options.economy.on && command.category === "economy") continue;
-          commands.push(command.data.toJSON());
-        }
-      }
-      (async () => {
-        try {
-          if (!GUILD_ID) {
-            await rest.put(
-              Routes.applicationCommands(CLIENT_ID), {
-                body: commands
-              },
-            );
-            console.log('Successfully registered application commands globally');
-          } else {
-            await rest.put(
-              Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), {
-                body: commands
-              },
-            );
-            console.log('Successfully registered application commands for development guild');
+        g.options.stats.members = [...g.options.stats.members, {value: guild.memberCount, date: new Date().getTime()}]
+
+        g.markModified("options");
+
+        await g.save();
+
+        const rest = new REST({
+          version: '9'
+        }).setToken(token);
+
+        let commands = [];
+        const pathArray = fs.readdirSync(path.join(__dirname, "commands"), {withFileTypes: true});
+        for (const p of pathArray) {
+          const command = require("./commands/" + p.name);
+          if (command.useSlash && g.options.commands.find(com => com.name === command.name).on) {
+            if (!g.options.levelSystem.on && command.category === "levels") continue;
+            if (!g.options.economy.on && command.category === "economy") continue;
+            commands.push(command.data.toJSON());
           }
-        } catch (error) {
-          if (error) console.error(error);
         }
-      })();
+        (async () => {
+          try {
+            if (!GUILD_ID) {
+              await rest.put(
+                Routes.applicationCommands(CLIENT_ID), {
+                  body: commands
+                },
+              );
+              console.log('Successfully registered application commands globally');
+            } else {
+              await rest.put(
+                Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), {
+                  body: commands
+                },
+              );
+              console.log('Successfully registered application commands for development guild');
+            }
+          } catch (error) {
+            if (error) console.error(error);
+          }
+        })();
+      }));
     });
-  }, 1000 * 60 * 5)
+  }, 1000 * 60 * 60 * 24)
 });
 
 module.exports = {

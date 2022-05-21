@@ -13,8 +13,7 @@ module.exports = {
         .setTitle("Подключённые сокеты")
         .setColor(colors.gray);
       io.sockets.sockets.forEach(socket => {
-        console.log(socket)
-        embed.addField(socket?.client?.conn?.id, `Login: ${socket?.data?.user?.login}\nDiscord: <@${socket?.data?.user?.discord?.id}>`, true)
+        embed.addField(socket?.id, `Login: ${socket?.data?.user?.login}\nDiscord: <@${socket?.data?.user?.discord?.id}>`, true)
       });
       message.reply({embeds: [embed]}).catch(e => e);
     }catch (e) {console.log(e)}

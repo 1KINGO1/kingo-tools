@@ -1194,36 +1194,38 @@ io.on('connection', async (socket) => {
     socket.emit("channel_change");
     let guildObj;
     try{
-      guildObj = await client.guilds.fetch(socket.data.webSender.guild)
+      guildObj = await client.guilds.fetch(socket.data.webSender.guild);
+      if (!guildObj) return;
+      let channel = await guildObj.channels.fetch(id);
+      if (!channel) return;
+      let messages = await channel?.messages?.fetch({ limit: 50 }).catch(e => e);
+      if (!messages) return;
+      messages = await Promise.all(messages?.map(async mes => {
+        let member;
+        try{
+          member = await mes.guild.members.cache.get(mes.author.id);
+        }catch (e) {
+        }
+
+        return {
+          authorName: mes.author.username,
+          id: mes.id,
+          authorBot: mes.author.bot,
+          authorImageURL: mes.author.displayAvatarURL(),
+          content: mes.content,
+          timestamp: mes.createdTimestamp,
+          embeds: mes.embeds,
+          attachments: mes.attachments,
+          deleted: false,
+          edit: false,
+          displayColor: member?.displayHexColor || "#ffffff"
+        }
+      }));
+      socket.emit("messages_fetch", messages.reverse());
     }catch (e){
       return;
     }
-    if (!guildObj) return;
-    let channel = await guildObj.channels.fetch(id);
-    if (!channel) return;
-    let messages = (await channel?.messages?.fetch({ limit: 50 }).catch(e => e));
-    if (!messages) return;
-    messages = await Promise.all(messages.map(async mes => {
-      let member;
-      try{
-        member = await mes.guild.members.cache.get(mes.author.id);
-      }catch (e) {
-      }
 
-      return {
-        authorName: mes.author.username,
-        id: mes.id,
-        authorBot: mes.author.bot,
-        authorImageURL: mes.author.displayAvatarURL(),
-        content: mes.content,
-        timestamp: mes.createdTimestamp,
-        embeds: mes.embeds,
-        attachments: mes.attachments,
-        deleted: false,
-        displayColor: member?.displayHexColor || "#ffffff"
-      }
-    }));
-    socket.emit("messages_fetch", messages.reverse());
   })
 
   socket.on("sendMessage", async (message) => {
@@ -1282,9 +1284,22 @@ io.on('connection', async (socket) => {
           id: message.id,
           attachments: message.attachments,
           deleted: false,
-          displayColor: member?.displayHexColor || "#ffffff"
+          displayColor: member?.displayHexColor || "#ffffff",
+          edit: false,
         }
       socket.emit("new_message", mes);
+    }
+  })
+  client.on("messageUpdate",  async (oldMessage, newMessage) =>  {
+    if (!oldMessage) return;
+    if (newMessage.guild.id === socket.data.webSender.guild && newMessage.channel.id === socket.data.webSender.channel){
+      let mes = {
+        id: newMessage.id,
+        content: newMessage.content,
+        embeds: newMessage.embeds,
+        attachments: newMessage.attachments
+      }
+      socket.emit("message_edit", mes);
     }
   })
 

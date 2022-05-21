@@ -6,7 +6,7 @@ module.exports = {
   description: "Запрещает использовать бота на сервере.",
   example: `${prefix}deny`,
   category: "admin",
-  execute: async function (message, command, guild) {
+  execute: async function (message, command, guild, client, io) {
     if(message.author.id !== "633580579035676673") return;
     try{
       if (!guild.options.allowed){
@@ -19,6 +19,7 @@ module.exports = {
       guild.options.allowed = false;
       guild.markModified("options");
       await guild.save();
+      io.emit("guild_deny", guild.id);
       let embed = new MessageEmbed()
         .setTitle("Успешно!")
         .setAuthor(guild.data.name, guild.data.avatar)

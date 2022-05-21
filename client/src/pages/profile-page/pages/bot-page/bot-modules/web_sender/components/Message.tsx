@@ -67,7 +67,7 @@ function parseContent(content: string){
   return contentArr;
 }
 
-export const Message: FC<MessageI> = ({authorImageURL, authorName, content, timestamp, embeds, attachments, deleted, authorBot, displayColor}) => {
+export const Message: FC<MessageI> = ({authorImageURL, authorName, content, timestamp, embeds, attachments,edit, deleted, authorBot, displayColor}) => {
 
   return (
     // @ts-ignore
@@ -76,7 +76,7 @@ export const Message: FC<MessageI> = ({authorImageURL, authorName, content, time
                     avatar={authorImageURL}
                     timestamp={timestamp}
                     bot={authorBot}
-                    style={deleted ? {backgroundColor: "rgba(230, 73, 46, 0.3)"} : {}}
+                    style={deleted ? {backgroundColor: "rgba(230, 73, 46, 0.3)"} : edit ? {backgroundColor: "rgba(0,197,255,0.1)"} : {}}
     >
       {!content ? "" : parseContent(content)}
 
@@ -98,8 +98,8 @@ export const Message: FC<MessageI> = ({authorImageURL, authorName, content, time
               key={index}
               url={attachment?.url}
               style={{objectFit: "cover"}}
-              height={attachment?.height > 300 ? 300 : attachment?.height}
-              width={attachment?.width > 500 ? 500 : attachment?.width}
+              height={attachment?.height / 2.2 > 400 ? 400 : attachment?.height / 2.2}
+              width={attachment?.width /2.2 > 600 ? 600 : attachment?.width /2.2}
               alt={attachment?.filename}
             />
           )

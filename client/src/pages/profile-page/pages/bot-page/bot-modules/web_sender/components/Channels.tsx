@@ -52,6 +52,11 @@ export const Channels: FC<{selectedChannel: string, setSelectedChannel: Function
 
   useEffect(() => {
     socket.on("channels_data", (data) => {
+      setSelectedChannel(() => {
+        let chId = data.find((c: ChannelI) => c.type !== "GUILD_CATEGORY")?.id
+        socket.emit("set_current_channel", chId);
+        return chId || ""
+      })
       setChannels(data);
     })
   }, []);

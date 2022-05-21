@@ -1,4 +1,4 @@
-import {FC, useEffect} from "react";
+import {FC, useEffect, useState} from "react";
 import {Routes, Route, Navigate, useNavigate} from "react-router-dom";
 import {LoginPage, Profile, Introduction, RegistrationPage, Bio} from "./pages";
 import {useSelector} from "react-redux";
@@ -13,6 +13,10 @@ import webSocket from "./utils/webSocket";
 import {message} from "antd";
 import {Socket} from "socket.io-client";
 
+import newMessageSound from "./assets/new-message.mp3";
+
+import useSound from "use-sound";
+
 export let socket: Socket;
 
 export const App: FC = () => {
@@ -22,17 +26,24 @@ export const App: FC = () => {
     const user = useSelector<RootState>(state => state.auth.user) as User;
     const guildId = useSelector<RootState>(state => state.bot.currentGuild);
 
+    const [connected, setConnect] = useState(false);
+
     let navigator = useNavigate();
 
     useEffect(() => {
         socket = webSocket();
 
         socket.on("connect", () => {
-
+            setConnect(true);
         });
         socket.on("disconnect", () => {
+            setConnect(false);
             navigator("/socket-error");
         });
+
+        socket.on("modal_create", ({text}) => {
+            message.info(text);
+        })
 
         return () => {
             socket.disconnect();
@@ -70,7 +81,7 @@ export const App: FC = () => {
                         </>
                     )}
                     <Route path="*" element={<Navigate to={isAuth ? "/profile/intro" : "/login"}/>}/>
-                    <Route path="/socket-error" element={<SocketError/>} />
+                    {connected ? "" : <Route path="/socket-error" element={<SocketError/>} />}
                 </Routes>
             </AnimatePresence>
             {

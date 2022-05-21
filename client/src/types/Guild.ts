@@ -55,7 +55,10 @@ export interface Guild{
             role: string,
             users: {id: string, to: number}[]
         },
-        timeRoles: {roleId: string, id: string, to: string}[]
+        timeRoles: {roleId: string, id: string, to: string}[],
+        stats: {
+            members: {value: string, date: string}[]
+        }
     },
     data: {
         name: string,

@@ -65,6 +65,11 @@ export const BotControlPage: FC = () => {
         setAllowed(true);
       }
     })
+    socket.on("guild_deny", (data) => {
+      if (guild_id === data){
+        setAllowed(false);
+      }
+    })
   }, [])
 
   useEffect(() => {
@@ -156,6 +161,12 @@ export const BotControlPage: FC = () => {
                           checked={false}
                           canCheck={false}
                           link="webSender"
+            />
+            <ModuleButton title="Analytics"
+                          value="analytics"
+                          checked={false}
+                          canCheck={false}
+                          link="analytics"
             />
           </>
 

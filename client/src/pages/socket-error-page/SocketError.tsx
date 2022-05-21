@@ -8,6 +8,7 @@ const Wrapper = styled.div`
 `;
 
 export const SocketError: FC = () => {
+
   return (
     <Wrapper>
       <Result
@@ -17,4 +18,4 @@ export const SocketError: FC = () => {
       />
     </Wrapper>
   )
-}
+} 
