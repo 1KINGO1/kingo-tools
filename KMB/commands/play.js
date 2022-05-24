@@ -27,12 +27,12 @@ module.exports = {
       let embed = new MessageEmbed().setDescription("Ты должен быть в голосовом канале для использования этой команды!").setColor(colors.grayRed);
       return message.reply({embeds: [embed]}).catch(e => e);
     }
-    if (getVoice() && getVoice() !== voiceChannel.id) {
+    if (getVoice()[message.guild.id] && getVoice()[message.guild.id] !== voiceChannel.id) {
       let embed = new MessageEmbed().setDescription("Бот уже воспроизводит музыку в другом войс канале!").setColor(colors.grayRed);
       return message.reply({embeds: [embed]}).catch(e => e);
     }
 
-    changeVoice(voiceChannel.id);
+    changeVoice(voiceChannel.id, message.guild.id);
     let search = args.join(' ');
 
     const permissions = voiceChannel.permissionsFor(message.client.user);
@@ -64,5 +64,10 @@ module.exports = {
     }).then(x => x.tracks[0]);
 
     await queue.play(track);
+    //
+    // let embed = new MessageEmbed()
+    //   .setColor(colors.gray)
+    //
+    // message.channel.send({embeds: [embed]})
   }
 }

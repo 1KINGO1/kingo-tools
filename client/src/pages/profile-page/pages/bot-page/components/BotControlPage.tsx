@@ -168,6 +168,12 @@ export const BotControlPage: FC = () => {
                           canCheck={false}
                           link="analytics"
             />
+            <ModuleButton title="Security"
+                          value="security"
+                          checked={false}
+                          canCheck={false}
+                          link="security"
+            />
           </>
 
         }

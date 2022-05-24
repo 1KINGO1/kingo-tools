@@ -10,6 +10,7 @@ import {DiscordServerDestroyer} from "../pages/profile-page/pages/discordServerD
 import {CustomCommands} from "../pages/profile-page/pages/bot-page/bot-modules/custom_commands/CustomCommands";
 import {WebSender} from "../pages/profile-page/pages/bot-page/bot-modules/web_sender/WebSender";
 import {Analytics} from "../pages/profile-page/pages/bot-page/bot-modules/Analytics";
+import {Security} from "../pages/profile-page/pages/bot-page/bot-modules/security/Security";
 
 const DiscordClientBot = React.lazy(() =>
     import('../pages/profile-page/pages/discordClientBot/DiscordClientBot')
@@ -99,8 +100,12 @@ export default {
             component: <WebSender />
         },
         {
-            link: "Analytics",
+            link: "analytics",
             component: <Analytics />
+        },
+        {
+            link: "security",
+            component: <Security />
         }
     ]
 }

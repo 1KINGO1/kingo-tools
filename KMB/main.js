@@ -21,10 +21,13 @@ const Guild = mongoose.model("Server", {
     data: Object
 });
 
-let voice = null;
+// key: guildId
+// value: voice Id
 
-function changeVoice(id){
-    voice = id;
+let voice = {};
+
+function changeVoice(id, guildId){
+    voice[guildId] = id;
 }
 function getVoice(){
     return voice;
@@ -36,7 +39,8 @@ player.on("trackStart", (queue, track) => {
 })
 player.on('botDisconnect', async (queue) => {
     let embed = new MessageEmbed().setDescription("🎶 | Бот покинул войс-канал").setColor(colors.grayRed);
-    queue.metadata.channel.send({embeds: [embed]})
+    queue.metadata.channel.send({embeds: [embed]});
+    changeVoice(undefined,  queue.metadata.channel.guild.id);
 });
 player.on('queueEnd', async (queue) => {
     let embed = new MessageEmbed().setDescription("🎶 | Бот отключился").setColor(colors.grayRed);
@@ -82,16 +86,22 @@ client.on('messageCreate', async (message) => {
 });
 
 client.on('voiceStateUpdate', async (oldVoice, newVoice) => {
-    if (!voice) return;
-    let currentVoice = await client.channels.fetch(voice);
-    if (currentVoice.members.size === 1){
-        try{
-            let queue = player.getQueue(oldVoice?.guild.id || newVoice?.guild.id);
-            queue.destroy()
-            voice = null;
-        } catch (e) {}
-    }
-})
+    try{
+        if (!voice[newVoice?.guild.id]) return;
+        let currentVoice = await client.channels.fetch(voice[newVoice?.guild.id]);
+        if (currentVoice.members.size === 1){
+            try{
+                let queue = player.getQueue(oldVoice?.guild.id || newVoice?.guild.id);
+                queue.destroy()
+                changeVoice(undefined, newVoice.guild.id)
+            } catch (e) {}
+        }
+    }catch(e){}
+});
+
+client.on("error", () => {});
+
+player.on("error", () => {});
 
 client.login(token);
 module.exports = {

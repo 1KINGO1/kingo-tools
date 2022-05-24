@@ -27,7 +27,7 @@ module.exports = {
       let embed = new MessageEmbed().setDescription("Ты должен быть в голосовом канале для использования этой команды!").setColor(colors.grayRed);
       return message.reply({embeds: [embed]}).catch(e => e);
     }
-    if (getVoice() && getVoice() !== voiceChannel.id) {
+    if (getVoice()[message.guild.id] && getVoice()[message.guild.id] !== voiceChannel.id) {
       let embed = new MessageEmbed().setDescription("Бот уже воспроизводит музыку в другом войс канале!").setColor(colors.grayRed);
       return message.reply({embeds: [embed]}).catch(e => e);
     }

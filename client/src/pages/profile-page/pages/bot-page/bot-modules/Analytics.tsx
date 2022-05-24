@@ -28,7 +28,7 @@ export const Analytics: FC = () => {
         onBack={() => window.history.back()}
         title={<>
           Аналитика
-        </>}
+        </>} 
         subTitle="Просмотр"
       />
 
