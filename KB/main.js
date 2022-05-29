@@ -208,7 +208,7 @@ client.on('interactionCreate', async (interaction) => {
   if (command.on) {
     await messageObj.executeLikeSlash(interaction, command, guild, client);
   }
-})
+});
 
 client.on("guildCreate", async guild => {
 
@@ -299,7 +299,12 @@ client.on("guildCreate", async guild => {
           date: new Date().getTime()
         }]
       },
-      timeRoles: []
+      timeRoles: [],
+      secure: {
+        userControl: {
+
+        }
+      }
     },
     data: {
       name: guild.name,
@@ -309,13 +314,13 @@ client.on("guildCreate", async guild => {
   });
   await server.save();
   log(`**Новый сервер** - \`${guild.name}\` \`${guild.id}\``)
-})
+});
 client.on("guildDelete", async guild => {
 
   let server = Guild.findOne({id: guild.id});
   await server.remove();
   log(`**Сервер удалён** - \`${guild.name}\` \`${guild.id}\``)
-})
+});
 
 //LOGGER MESSAGES
 client.on("messageDelete", async message => {
@@ -351,7 +356,7 @@ client.on("messageDelete", async message => {
     await channel.send({embeds: [embed]})
   } catch (e) {
   }
-})
+});
 client.on("messageUpdate", async (oldMessage, newMessage) => {
   let guild = await Guild.findOne({id: newMessage.guild.id});
   if (!guild.options.logger.on) return;
@@ -380,7 +385,7 @@ client.on("messageUpdate", async (oldMessage, newMessage) => {
     await channel.send({embeds: [embed]})
   } catch (e) {
   }
-})
+});
 client.on("messageDeleteBulk", async (messages) => {
   messages = messages.reverse();
   let guild = await Guild.findOne({id: messages.first().guildId});
@@ -409,7 +414,7 @@ client.on("messageDeleteBulk", async (messages) => {
     await channel.send({embeds: [embed]})
   } catch (e) {
   }
-})
+});
 
 //Mute
 client.on("guildMemberAdd", async member => {
@@ -447,7 +452,7 @@ client.on("guildMemberAdd", async member => {
       }
     }, +mute.to - new Date().getTime() < 0 ? 0 : +mute.to - new Date().getTime());
   }
-})
+});
 
 //LOGGER MEMBERS
 client.on("guildMemberAdd", async member => {
@@ -467,7 +472,7 @@ client.on("guildMemberAdd", async member => {
     let channel = await client.channels.fetch(guild.options.logger.membersChannel);
     await channel.send({embeds: [embed]})
   } catch (e) {}
-})
+});
 client.on("guildMemberRemove", async member => {
   let guild = await Guild.findOne({id: member.guild.id});
   if (!guild.options.logger.on) return;
@@ -488,7 +493,7 @@ client.on("guildMemberRemove", async member => {
     await channel.send({embeds: [embed]})
   } catch (e) {
   }
-})
+});
 client.on("guildMemberUpdate", async (oldMember, newMember) => {
   await newMember.guild.members.fetch();
   let guild = await Guild.findOne({id: newMember.guild.id});
@@ -540,7 +545,7 @@ client.on("guildMemberUpdate", async (oldMember, newMember) => {
     }
     return
   }
-})
+});
 
 //LOGGER VOICE
 client.on("voiceStateUpdate", async (oldState, newState) => {
@@ -598,7 +603,7 @@ client.on("voiceStateUpdate", async (oldState, newState) => {
       console.log(e)
     }
   }
-})
+});
 
 //LOGGER MOD
 client.on("guildBanRemove", async (ban) => {
@@ -625,7 +630,7 @@ client.on("guildBanRemove", async (ban) => {
       mod: executor
     }, client);
   }
-})
+});
 client.on("guildBanAdd", async (ban) => {
   let guild = await Guild.findOne({id: ban.guild.id});
   if (!guild.options.logger.on) return;
@@ -650,7 +655,7 @@ client.on("guildBanAdd", async (ban) => {
       mod: executor
     }, client);
   }
-})
+});
 client.on("messageReactionAdd", async (reaction, user) => {
   let guild = await Guild.findOne({id: reaction.message.guild.id});
   if (!guild.options.logger.on) return;
@@ -668,7 +673,53 @@ client.on("messageReactionRemove", async (reaction, user) => {
   }
   ;
   reactionRoles(guild, reaction, user, client, "remove")
+});
+
+//SECURE
+//User Control
+client.on("guildMemberAdd", async member => {
+  let guild = await Guild.findOne({id: member.guild.id});
+  if (!guild) return;
+
+  try{
+    if (guild.options.secure.userControl?.kickNewAccount){
+      let userCreate = member.user.createdTimestamp;
+      if (userCreate + 1000 * 60 * 60 * 24 * 7 >= new Date().getTime()){
+        let dm = await member?.createDM().catch(e => e);
+        if (dm?.id){
+          await dm.send({content: `Вы были кикнуты с сервера ${member.guild.name}. Причина: \`Новый аккаунт\``}).catch(e => e)
+        }
+        await member.kick("Новый аккаунт").catch(e => e);
+        return await logger(guild, {
+          type: "KICK",
+          category: "mod",
+          offender: {id: member.user.id},
+          name: "kick",
+          reason: "Новый аккаунт",
+          mod: client.user.id
+        }, client);
+      }
+    }
+    if (guild.options.secure.userControl?.kickPinglessNicks){
+      if (!/^[0-9A-Za-zа-яА-Я!@#$%^&*()\\/"'`}{\+-\?><,.:~|]+/.test(member.user.username)){
+        let dm = await member?.createDM().catch(e => e);
+        if (dm?.id){
+          await dm.send({content: `Вы были кикнуты с сервера ${member.guild.name}. Причина: \`Непингабельный ник\``}).catch(e => e)
+        }
+        await member.kick("Новый аккаунт").catch(e => e);
+        return await logger(guild, {
+          type: "KICK",
+          category: "mod",
+          offender: {id: member.user.id},
+          name: "kick",
+          reason: "Непингабельный ник",
+          mod: client.user.id
+        }, client);
+      }
+    }
+  }catch (e) {console.log(e)}
 })
+
 client.login(token).then(() => {
   setInterval(async () => {
     let guilds = await Guild.find({});
@@ -722,7 +773,6 @@ client.login(token).then(() => {
     });
   }, 1000 * 60 * 60 * 24)
 });
-
 module.exports = {
   client,
   User,

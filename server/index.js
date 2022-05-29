@@ -696,12 +696,12 @@ app.post("/api/config", async (req, res) => {
   switch (type) {
     case "change_field":
 
-      if (!guild.options[module].hasOwnProperty(property)) {
+      if (!guild.options[module].hasOwnProperty(property) && !["userControl"].includes(property)) {
         res.send({err: true, message: "Свойство не найдено!"});
         return;
       }
 
-      if (typeof guild.options[module][property] !== typeof payload) {
+      if (!commandName && guild.options[module][property] && typeof guild.options[module][property] !== typeof payload) {
         res.send({err: true, message: "Неверные данные для изменения!"});
         return;
       }
@@ -736,8 +736,18 @@ app.post("/api/config", async (req, res) => {
         await guild.save();
         res.send({err: false})
       } else {
-        guild.options = {...guild.options, [module]: {...guild.options[module], [property]: payload}}
+        if (commandName && guild.options[module][property][commandName] && typeof guild.options[module][property][commandName] !== typeof payload){
+            res.send({err: true, message: "Неверные данные для изменения!"});
+            return;
+        }
+        if (commandName){
+          guild.options = {...guild.options, [module]: {...guild.options[module], [property]: {...guild.options[module][property], [commandName]: payload}}}
+          await guild.save();
+          res.send({err: false})
+          return;
+        }
 
+        guild.options = {...guild.options, [module]: {...guild.options[module], [property]: payload}}
         await guild.save();
         res.send({err: false})
       }
@@ -1267,6 +1277,8 @@ io.on('connection', async (socket) => {
   })
 
   client.on("messageCreate", async (message) => {
+    if (message.author.bot) return;
+    if (!socket?.data?.webSender?.guild) return;
     if (message.guild.id === socket.data.webSender.guild && message.channel.id === socket.data.webSender.channel){
       let member;
       try{

@@ -58,6 +58,12 @@ export interface Guild{
         timeRoles: {roleId: string, id: string, to: string}[],
         stats: {
             members: {value: string, date: string}[]
+        },
+        secure: {
+            userControl?: {
+                kickNewAccount?: boolean,
+                kickPinglessNicks?: boolean
+            }
         }
     },
     data: {

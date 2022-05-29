@@ -95,10 +95,11 @@ export const toggleModule = async (moduleName: string, guildId: string, action: 
   return data;
 };
 
-export const defineProperty = async (payload: any, guildId: string, moduleName: string, property:string) => {
+export const defineProperty = async (payload: any, guildId: string, moduleName: string, property:string, commandName?: string) => {
   const {data} = await axios.post(config.API_URL + "/config",{
     type: "change_field",
     payload,
+    commandName,
     guild_id: guildId || "none",
     module: moduleName || "none",
     property: property || "none"
