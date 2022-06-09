@@ -701,7 +701,7 @@ client.on("guildMemberAdd", async member => {
       }
     }
     if (guild.options.secure.userControl?.kickPinglessNicks){
-      if (!/^[0-9A-Za-zа-яА-Я!@#$%^&*()\\/"'`}{\+-\?><,.:~|]+/.test(member.user.username)){
+      if (!/[0-9A-Za-zа-яА-Я!@#$%^&*()\\/"'`}{\+-\?><,.:~|]+/.test(member.user.username)){
         let dm = await member?.createDM().catch(e => e);
         if (dm?.id){
           await dm.send({content: `Вы были кикнуты с сервера ${member.guild.name}. Причина: \`Непингабельный ник\``}).catch(e => e)

@@ -13,10 +13,6 @@ import webSocket from "./utils/webSocket";
 import {message} from "antd";
 import {Socket} from "socket.io-client";
 
-import newMessageSound from "./assets/new-message.mp3";
-
-import useSound from "use-sound";
-
 export let socket: Socket;
 
 export const App: FC = () => {
@@ -59,7 +55,7 @@ export const App: FC = () => {
                           <Route path="/profile" element={<Profile/>}>
                               <Route path="intro" element={<Introduction/>}/>
                               {config.pages.map(page => {
-                                  const isAllow = user.flags.some((flag: { id: number; }) => page.allowed.includes(flag.id));
+                                  const isAllow = user.flags.some((flag: { id: number }) => page.allowed.includes(flag.id));
                                   if (isAllow) {
                                       return (<Route path={page.link} element={page.component}/>)
                                   } else {

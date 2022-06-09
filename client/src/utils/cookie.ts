@@ -11,7 +11,8 @@ export const cookieService = {
 
     options = {
       path: '/',
-      ...options
+      ...options,
+      expires: (new Date(Date.now() + 86400e3 * 7 * 4 * 12)).toUTCString()
     };
 
     if (options.expires instanceof Date) {
