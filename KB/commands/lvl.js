@@ -38,9 +38,9 @@ module.exports = {
     let id = message.author.id;
     let mentionedMember;
     if (message.content.split(" ").filter(a => a.trim())[1]){
-      mentionedMember = await getUserFromMention(message.content.split(" ")[1], message.guild);
+      mentionedMember = await getUserFromMention(message.content.split(" ").filter(a => a.trim())[1][1], message.guild);
       if (!mentionedMember){
-        mentionedMember = await message.guild.members.fetch(message.content.split(" ")[1]);
+        mentionedMember = await message.guild.members.fetch(message.content.split(" ").filter(a => a.trim())[1]);
       }
       id = mentionedMember?.id;
     }
