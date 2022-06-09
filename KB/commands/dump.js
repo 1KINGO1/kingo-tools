@@ -11,7 +11,7 @@ module.exports = {
   example: `${prefix}dump [role]`,
   category: "roles",
   execute: async function (message, command, dbGuild, client) {
-    let messageArray = message.content.split(' ');
+    let messageArray = message.content.split(' ').filter(a => a.trim());
     let args = messageArray.slice(1);
     let guild = message.guild;
     let member = await guild.members.fetch(message.author.id);

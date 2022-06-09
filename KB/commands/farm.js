@@ -10,7 +10,7 @@ module.exports = {
   category: "economy",
   execute: async function (message, command, guild) {
     if (!guild.options.economy.on) return;
-    let messageArray = message.content.split(' ');
+    let messageArray = message.content.split(' ').filter(a => a.trim());
     let member = await message.guild.members.fetch(message.author.id);
     if (!await checkRoles(command, member)){
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);

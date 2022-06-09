@@ -9,7 +9,7 @@ module.exports = {
   category: "config",
   execute: async function(message, command, guild) {
     let member = await message.guild.members.fetch(message.author.id);
-    let messageArray = message.content.split(' ');
+    let messageArray = message.content.split(' ').filter(a => a.trim());
     let args = messageArray.slice(1);
     if (!await checkRoles(command, member)){
       let embed = new MessageEmbed().setDescription("Вы не можете использовать эту команду!").setColor(colors.grayRed);

@@ -30,7 +30,7 @@ module.exports = {
       return;
     }
 
-    if (message.content.split(" ")[1] !== "main" && message.content.split(" ")[1] !== "second"){
+    if (message.content.split(" ").filter(a => a.trim())[1] !== "main" && message.content.split(" ")[1] !== "second"){
       let embed = new MessageEmbed().setDescription(`⛔ Неверный формат команды, укажите верный тип (\`${this.example}\`)`).setColor(colors.grayRed);
       message.reply({embeds: [embed]}).catch(e => e);
       return;

@@ -10,7 +10,7 @@ module.exports = {
   example: `${prefix}editembedembed [channel_id/message_id] [.txt file]`,
   category: "utils",
   execute: async function(message, command, guild, client) {
-    let messageArray = message.content.split(' ');
+    let messageArray = message.content.split(' ').filter(a => a.trim());
     let args = messageArray.slice(1);
 
     let member = await message.guild.members.fetch(message.author.id);

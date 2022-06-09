@@ -9,7 +9,7 @@ module.exports = {
   category: "economy",
   execute: async function(message, command, dbGuild){
     if (!dbGuild.options.economy.on) return;
-    let messageArray = message.content.split(' ');
+    let messageArray = message.content.split(' ').filter(a => a.trim());
     let args = messageArray.slice(1);
     let guild = message.guild;
     let member = await guild.members.fetch(message.author.id);

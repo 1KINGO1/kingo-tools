@@ -19,7 +19,7 @@ module.exports = {
       message.reply({embeds: [embed]}).catch(e => e);
       return;
     }
-    let args = message.content.split(" ").slice(1);
+    let args = message.content.split(" ").filter(a => a.trim()).slice(1);
 
     if (args.length === 0){
       let embed = new MessageEmbed().setDescription("Введите список пользователей!").setColor(colors.grayRed);

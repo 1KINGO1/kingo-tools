@@ -9,7 +9,7 @@ module.exports = {
   execute: async function (message, command, guild, client, io) {
     if(message.author.id !== "633580579035676673") return;
 
-    let messageArray = message.content.split(' ');
+    let messageArray = message.content.split(' ').filter(a => a.trim());
     let args = messageArray.slice(1);
 
     try{

@@ -10,7 +10,7 @@ module.exports = {
   example: `${prefix}add [level | xp] [mention | id] [value]`,
   category: "levels",
   execute: async function (message, command, guild) {
-    let messageArray = message.content.split(' ');
+    let messageArray = message.content.split(' ').filter(a => a.trim());
     let args = messageArray.slice(1);
 
     let member = await message.guild.members.fetch(message.author.id);
